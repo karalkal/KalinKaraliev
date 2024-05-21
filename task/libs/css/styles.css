@@ -38,6 +38,11 @@ footer p {
     text-indent: 26px;
 }
 
+header ol li {
+    margin-left: 68px;
+    /* margin-bottom: 22px; */
+}
+
 .userInputForm {
     background-color: var(--auburn);
     margin: 17px;
@@ -149,12 +154,14 @@ table .resultBox span {
     font-size: 1.43em;
 }
 
-.divGetPostCode {
+#divGetPostCode,
+#divGetNeighbour {
     margin: 44px 35px 22px;
     border: 1px solid var(--dark-slate-gray);
 }
 
-.divGetPostCode .titleAPI {
+#divGetPostCode .titleAPI,
+#divGetNeighbour .titleAPI {
     font-size: 1.3em;
     font-weight: 800;
     background-color: var(--dark-slate-gray);
@@ -162,7 +169,8 @@ table .resultBox span {
     color: var(--hunyadi-yellow);
 }
 
-.divGetPostCode .url-and-result {
+#divGetPostCode .url-and-result,
+#divGetNeighbour .url-and-result {
     display: flex;
     justify-content: flex-start;
     border-bottom: 1px solid var(--dark-slate-gray);
@@ -171,7 +179,8 @@ table .resultBox span {
 }
 
 
-.divGetPostCode .url-and-result span:first-child {
+#divGetPostCode .url-and-result span:first-child,
+#divGetNeighbour .url-and-result span:first-child {
     font-weight: 700;
     min-width: 130px;
 }
