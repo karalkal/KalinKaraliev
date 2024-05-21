@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+/* CSS HEX */
+:root {
+    --dark-slate-gray: #335c67ff;
+    --vanilla: #fff3b0ff;
+    --hunyadi-yellow: #e09f3eff;
+    --auburn: #9e2a2bff;
+    --chocolate-cosmos: #540b0eff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font-family: "Nunito Sans", sans-serif;
+    vertical-align: baseline;
+}
+
+html {
+    background-color: var(--vanilla);
+}
+
+header,
+footer {
+    background-color: var(--vanilla);
+    margin: 22px 35px;
+    padding: 22px;
+    border: 4px solid var(--chocolate-cosmos);
+    border-radius: 11px;
+}
+
+header p,
+footer p {
+    font-size: 1.1em;
+    margin: 8px 0 8px 11px;
+    text-indent: 26px;
+}
+
+.userInputForm {
+    background-color: var(--auburn);
+    margin: 17px;
+    padding: 22px;
+    border: 4px solid var(--chocolate-cosmos);
+    border-radius: 11px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.userInputForm input,
+.userInputForm button {
+    padding: 8px;
+    border-radius: 11px;
+    margin: 0 8px;
+    font-weight: 900;
+}
+
+.userInputForm input {
+    color: var(--dark-slate-gray);
+    background-color: var(--vanilla);
+
+}
+
+.userInputForm input:focus {
+    outline: none;
+    background-color: var(--hunyadi-yellow);
+}
+
+.userInputForm button {
+    background-color: var(--hunyadi-yellow);
+    color: var(--chocolate-cosmos);
+}
+
+table,
+table th,
+table td {
+    margin: 22px 35px;
+    border: 1px solid var(--dark-slate-gray);
+    border-collapse: collapse;
+}
+
+
+table thead {
+    background-color: var(--chocolate-cosmos);
+    color: var(--vanilla);
+}
+
+table th {
+    padding: 11px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+table td {
+    padding: 4px 11px;
+}
+
+table th:first-child,
+table td:first-child {
+    width: 26%;
+}
+
+table th:nth-child(2),
+table td:nth-child(2) {
+    width: 48%;
+}
+
+table th:last-child,
+table td:last-child {
+    width: 26%;
+}
+
+table td div {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--dark-slate-gray);
+    margin: 2px 0;
+}
+
+table td div:last-child {
+    border: none;
+}
+
+
+table td div span:first-child {
+    font-weight: 700;
+    min-width: 130px;
+}
+
+table .titleAPI,
+.formContainer {
+    font-size: 1.3em;
+    font-weight: 800;
+    background-color: var(--dark-slate-gray);
+    padding: 2px 31px 2px 31px;
+    color: var(--hunyadi-yellow);
+}
+
+table .resultBox {
+    background-color: var(--hunyadi-yellow);
+    color: var(--chocolate-cosmos);
+    font-size: 1.25em;
+}
+
+table .resultBox span {
+    font-weight: 900;
+    font-size: 1.43em;
+}
+
+.divGetPostCode {
+    margin: 44px 35px 22px;
+    border: 1px solid var(--dark-slate-gray);
+}
+
+.divGetPostCode .titleAPI {
+    font-size: 1.3em;
+    font-weight: 800;
+    background-color: var(--dark-slate-gray);
+    padding: 2px 0 2px 31px;
+    color: var(--hunyadi-yellow);
+}
+
+.divGetPostCode .url-and-result {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--dark-slate-gray);
+    margin: 2px 0;
+    padding: 2px 0 2px 31px;
+}
+
+
+.divGetPostCode .url-and-result span:first-child {
+    font-weight: 700;
+    min-width: 130px;
+}
+
+.paramsHeading {
+    margin: 2px 0;
+    padding: 2px 0 2px 31px;
+}
+
+.paramsGrid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+.paramsGrid div {
+    padding: 4px 0 4px 31px;
+    border-bottom: 1px solid var(--dark-slate-gray);
+    font-size: .88em;
+}
+
+.paramsGrid div:nth-child(3n+1) {
+    padding: 4px 0 4px 44px;
+}
+
+.ulResult {
+    min-height: 130px;
+    background-color: var(--hunyadi-yellow);
+    margin: 17px;
+    padding: 11 px22px;
+    border: 4px solid var(--dark-slate-gray);
+    border-radius: 11px;
+}
+
+.resultHeading {
+    color: var(--dark-slate-gray);
+    text-align: center;
+    font-size: 1.5em;
+    padding: 2px 0 2px 31px;
+}
+
+
+#postcodeResultGrid,
+#neighbourResultGrid {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+#postcodeResultGrid li,
+#neighbourResultGrid li {
+    display: grid;
+    grid-template-columns: 32% 68%;
+    background-color: var(--dark-slate-gray);
+    color: var(--vanilla);
+    list-style: none;
+    margin: 8px;
+    padding: 8px;
+    border-radius: 11px;
+    font-weight: 400;
+    font-size: .8em;
+}
+
+#postcodeResultGrid li p:nth-child(2),
+#postcodeResultGrid li p:nth-child(4),
+#postcodeResultGrid li p:nth-child(6),
+#neighbourResultGrid li p:nth-child(2),
+#neighbourResultGrid li p:nth-child(4),
+#neighbourResultGrid li p:nth-child(6) {
+    font-weight: 600;
+    font-size: 1.1em;
+}

@@ -1,0 +1,304 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Utilizing AJAX-PHP-CURL-JSON</title>
+	<meta name="description" content="Get data from GeoNames API">
+	<meta name="author" content="KK">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="libs/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="libs/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="libs/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<!-- css -->
+	<link rel="stylesheet" href="libs/css/styles.css">
+	<link rel="stylesheet" href="libs/css/preloader.css">
+
+</head>
+
+<body>
+	<header>
+		<p> This little application will display information derived from <a href="http://www.geonames.org/about.html"
+				target="_blank">GeoNames geographical database.</a> and its main purpose is to illustrate the
+			interaction between our front-end app and the API using PHP/Ajax/jQuery and other related technologies. </p>
+		<p>It has 3 functionalities:<br>
+			1. This section will send GET requests to 3 different endpoints with user-provided coordinates (Latitude and
+			Longitude). (Latitude/longitude values for virtually any location can be obtained from <a
+				href="https://www.gps-coordinates.net/" target="_blank">this website</a>. If you (like me) need a
+			refresher of how these work, info could be found in <a href="#footer">the footer of this page.)</a><br>
+			1.1 The endpoint returns the elevation in meters of the selected location using one of the most
+			popular freely available methodologies.<br>
+			1.2. The endpoint returns json containing data about the populated place nearest to the location (max 300km
+			distance) if one is found. The app will render some basic information about it.<br>
+			1.3. The endpoint returns weather data from weather station nearby, selected properties will be rendered.
+		</p>
+		<p>2. <a href="#divGetPostCode">This section</a> will search for postcodes for a place in a specific country.
+			The country input myst be in 'ISO 3166-1 alpha-2' format, e.g. JP (Japan), NL (Netherlands), UY (Uruguay),
+			PH (Philippines), FR (France), EE (Estonia) etc. The app has a limit of 8 entries.</p>
+		<p>3. <a href="#divGetNeighbour">This section</a> will find a country's neighbours if any. It uses the same
+			format for user input.</p>
+	</header>
+
+	<main>
+		<!-- LATITUDE AND LONGITUDE DATA -->
+		<table>
+			<thead>
+				<th>API description</th>
+				<th>API specs</th>
+				<th>Result</th>
+			</thead>
+			<tbody>
+
+				<!-- Elevation -->
+				<tr>
+					<td class="titleAPI" colspan="3">Elevation - SRTM1</td>
+				</tr>
+				<tr>
+					<td>
+						<p>The Shuttle Radar Topography Mission (SRTM) is a NASA mission conducted in 2000 to obtain
+							elevation data for most of the world. It is the current dataset of choice for digital
+							elevation model (DEM) data since it has a fairly high resolution (1 arc-second, or around 25
+							meters), has near-global coverage (from 56°S to 60°N), and is in
+							the public domain. Version 1.0 is the (almost) raw data obtained during the mission and its
+							quality is considered research-grade. </p>
+					</td>
+					<td>
+						<div><span>Webservice:&nbsp;</span><span>REST </span></div>
+						<div><span>Url:&nbsp;</span><span>api.geonames.org/srtm1?</span></div>
+						<div><span>Parameters:&nbsp;</span><span>&#8226;&nbsp;lat<br>&#8226;&nbsp;lng;</span></div>
+						<div><span>Req method:&nbsp;</span><span>GET or POST</span></div>
+						<div><span>Sample area:&nbsp;</span><span>ca 30m x 30m </span></div>
+						<div><span>Result:&nbsp;</span><span>a single number giving the elevation in meters according to
+								srtm1, ocean areas have
+								been masked as "no data" and have been assigned a value of -32768</span>
+						</div>
+						<div><span>Example:&nbsp;</span><span>
+								http://api.geonames.org/srtm1?lat=50.01&lng=10.2&username=demo</span></div>
+					</td>
+					<td class="resultBox" id="srtm1Result">
+					</td>
+				</tr>
+
+				<!-- City -->
+				<tr>
+					<td class="titleAPI" colspan="3">Nearest settlement with over 1000 population</td>
+				</tr>
+				<tr>
+					<td>
+						<p>Find nearby populated place / reverse geocoding. The query parameter
+							'lang' is set to 'local', hence the nearest settlement's name will be displayed in the
+							respective local language. The 'city' parameter is set to obtain only value for settlements
+							with a population of over 1000. <br>If no 'radius' parameter is provided the returned array
+							will contain only the name of the nearest toponym. If it is, i.e. radius=300, (I believe)
+							the results will be sorted by proximity to the searched location. In this app the latter
+							approach has been used.</p>
+					</td>
+					<td>
+						<div><span>Webservice:&nbsp;</span><span>REST </span></div>
+						<div><span>Url:&nbsp;</span><span>api.geonames.org/findNearbyPlaceName?</span></div>
+						<div><span>Parameters:&nbsp;</span><span>&#8226;&nbsp;lat<br>
+								&#8226;&nbsp;lng<br>
+								&#8226;&nbsp;lang: language of returned 'name' element (the pseudo language code 'local'
+								will return
+								it in local language)<br>
+								&#8226;&nbsp;radius: radius in km (optional)<br>
+								&#8226;&nbsp;maxRows: max number of rows (default 10)<br>
+								&#8226;&nbsp;style: SHORT,MEDIUM,LONG,FULL (default = MEDIUM), verbosity of returned xml
+								document<br>
+								&#8226;&nbsp;localCountry: in border areas this parameter will restrict the search on
+								the local
+								country, value=true<br>
+								&#8226;&nbsp;cities: optional filter parameter with three possible values 'cities1000',
+								'cities5000','cities15000'</span></div>
+						<div><span>Result:&nbsp;</span><span> returns the closest populated place (feature class=P) for
+								the lat/lng query as xml document. The unit of the distance element is 'km'.</span>
+						</div>
+						<div><span>Example:&nbsp;</span><span>
+								http://api.geonames.org/findNearbyPlaceNameJSON?lat=47.3&lng=9&username=demo</span>
+						</div>
+					</td>
+					<td class="resultBox" id="cityResult">
+					</td>
+				</tr>
+
+				<!-- Weather -->
+				<tr>
+					<td class="titleAPI" colspan="3">Most recent readings from weather station nearby</td>
+				</tr>
+				<tr>
+					<td>
+						<p>Weather Station with most recent weather observation / reverse geocoding</p>
+					</td>
+					<td>
+						<div><span>Webservice:&nbsp;</span><span>REST </span></div>
+						<div><span>Url:&nbsp;</span><span>api.geonames.org/findNearByWeatherJSON?</span></div>
+						<div><span>Parameters:&nbsp;</span><span>&#8226;&nbsp;lat, lng: the service will return the
+								station closest to this given point (reverse geocoding)<br>
+								&#8226;&nbsp;callback : name of javascript function (optional parameter)<br>
+								&#8226;&nbsp;radius: search radius, only weather stations within this radius are
+								considered. Default is about 100km.</span></div>
+						<div><span>Result:&nbsp;</span><span> returns a weather station with the most recent weather
+								observation.</span>
+						</div>
+						<div><span>Example:&nbsp;</span><span>
+								http://api.geonames.org/findNearByWeatherJSON?lat=43&lng=-2&username=demo</span>
+						</div>
+					</td>
+					<td class="resultBox" id="weatherResult">
+					</td>
+				</tr>
+				<tr>
+					<td class="formContainer" colspan="3">
+						<form id="getDataFromLatAndLng" class="userInputForm">
+							<label for="lat">latitude: <input id="lat"></label>
+							<label for="lng">longitude: <input id="lng"></label>
+							<button id="getBtn">GO!</button>
+						</form>
+					</td>
+
+				</tr>
+
+			</tbody>
+
+		</table>
+
+		<!-- POSTCODE DATA-->
+		<div id="divGetPostCode">
+			<h3 class="titleAPI">Post Code Search (limited to max. 8 results)</h3>
+			<div class="url-and-result"><span>Url:&nbsp;</span><span>api.geonames.org/postalCodeSearchJSON?</span>
+			</div>
+			<div class="url-and-result"><span>Result:&nbsp;</span><span> returns a list of postal codes and places for
+					the
+					placename/postalcode
+					query as json document. For the US the first returned zip code is determined using zip code area
+					shapes,
+					the following zip codes are based on the centroid. For all other supported countries all returned
+					postal
+					codes are based on
+					centroids.</span>
+			</div>
+			<h4 class="paramsHeading">Parameters:</h4>
+			<div class="paramsGrid">
+				<div>Parameter</div>
+				<div>Value</div>
+				<div>Description</div>
+				<div>postalcode</div>
+				<div>string (postalcode or placename required)</div>
+				<div>postal code</div>
+				<div>postalcode_startsWith</div>
+				<div>string</div>
+				<div>the first characters or letters of a postal code</div>
+				<div>placename</div>
+				<div>string (postalcode or placename required)</div>
+				<div> all fields : placename,postal code, country, admin name (Important:urlencoded utf8)</div>
+				<div>placename_startsWith</div>
+				<div> string</div>
+				<div>the first characters of a place name</div>
+				<div>country</div>
+				<div>string : country code, ISO-3166 (optional)</div>
+				<div>Default is all countries. The country parameter may occur more than once, example:
+					country=FR&country=GP</div>
+				<div>countryBias</div>
+				<div> string</div>
+				<div>records from the countryBias are listed first</div>
+				<div>maxRows</div>
+				<div> integer (optional)</div>
+				<div>the maximal number of rows in the document returned by the service. Default is 10</div>
+				<div>style</div>
+				<div>string SHORT,MEDIUM,LONG,FULL (optional)</div>
+				<div>verbosity of returned xml document, default = MEDIUM</div>
+				<div>operator</div>
+				<div>string AND,OR (optional)</div>
+				<div>the operator 'AND' searches for all terms in the placename parameter, the operator 'OR' searches
+					for any term, default = AND</div>
+				<div>charset</div>
+				<div> string (optional)</div>
+				<div>default is 'UTF8', defines the encoding used for the document returned by the web service.</div>
+				<div>isReduced</div>
+				<div> true or false (optional)</div>
+				<div>default is 'false', when set to 'true' only the UK outer codes respectivel the NL 4-digits are
+					returned. Attention: the default value on the commercial servers is currently set to 'true'. It will
+					be
+					changed later to 'false'.</div>
+				<div>east,west,north,south</div>
+				<div> float (optional)</div>
+				<div>bounding box, only features within the box are returned</div>
+			</div>
+
+			<div class="formContainer">
+				<form id="getPostCodeForm" class="userInputForm ">
+					<label for="settlement">settlement: <input id="settlement"></label>
+					<label for="country">country (by <a
+							href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+							target="_blank">ISO-3166 alpha2</a> code): <input id="country"></label>
+					<button id="getBtn">GO!</button>
+				</form>
+
+				<ul class="ulResult">
+					<h4 class="resultHeading">Results appear here:</h4>
+					<div id="postcodeResultGrid"></div>
+				</ul>
+			</div>
+		</div>
+
+
+		<!-- NEIGHBOURS DATA-->
+		<div id="divGetNeighbour">
+			<h3 class="titleAPI">County's Neighbours Search</h3>
+			<div class="url-and-result"><span>Url:&nbsp;</span><span> api.geonames.org/neighboursJSON?</span>
+			</div>
+			<div class="url-and-result"><span>Result:&nbsp;</span><span> returns the neighbours of a toponym, currently
+					only
+					implemented for countries.</span>
+			</div>
+			<h4 class="paramsHeading">Parameters:</h4>
+			<div class="paramsGrid">
+				<div>geonameId</div>
+				<div>the geonameId for the neighbours (country or ADM)</div>
+				<div></div>
+				<div>country</div>
+				<div>the country code (alternative parameter instead of the geonameId)</div>
+				<div></div>
+			</div>
+
+			<div class="formContainer">
+				<form id="getNeighboursForm" class="userInputForm">
+					<label for="country">country (by <a
+							href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+							target="_blank">ISO-3166 alpha2</a> code): <input id="state"></label>
+					<button id="getBtn">GO!</button>
+				</form>
+
+				<ul class="ulResult">
+					<h4 class="resultHeading">Results appear here:</h4>
+					<div id="neighbourResultGrid"></div>
+				</ul>
+
+			</div>
+		</div>
+	</main>
+
+
+	<footer id="footer">
+		<p>The valid range of latitude in degrees is -90 and +90 for the
+			southern and northern hemisphere, respectively. Longitude is in the range -180 and +180 specifying
+			coordinates west and east of the Prime Meridian, respectively. </p>
+		<p>For reference, the Equator has a latitude of 0°, the North pole has a latitude of 90° and the South pole
+			has a latitude of -90°. </p>
+		<p>The Prime Meridian has a longitude of 0° that goes through Greenwich, England. The International Date
+			Line (IDL) roughly follows the 180° longitude. A longitude with a positive value falls in the eastern
+			hemisphere and the negative value falls in the western hemisphere.</p>
+	</footer>
+
+	<div id=”preloader”></div>
+
+	<script type="application/javascript" src="libs/js/jquery-2.2.3.min.js"></script>
+	<script type="application/javascript" src="libs/js/script.js"></script>
+
+</body>
+
+</html>
