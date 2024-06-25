@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Gazetteer-KK</title>
+	<meta name="description" content="All countries' maps and essential info">
+	<meta name="author" content="KK">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="libs/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="libs/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="libs/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<!-- Font-awesome -->
+	<link rel="stylesheet" href="libs/fontawesome/css/fontawesome.css" />
+	<link rel="stylesheet" href="libs/fontawesome/css/solid.css" />
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="libs/css/bootstrap.min.css">
+	<!--LEAFLET css + script-->
+	<!--		Main -->
+	<link rel="stylesheet" href="libs/leaflet/main/leaflet.css" />
+	<script src="libs/leaflet/main/leaflet.js"></script>
+	<!-- 		Button -->
+	<link rel="stylesheet" href="libs/leaflet/easy-button/easy-button.css">
+	<script src="libs/leaflet/easy-button/easy-button.js"></script>
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="libs/css/main.css">
+	<link rel="stylesheet" href="libs/css/modal.css">
+	<link rel="stylesheet" href="libs/css/preloader.css">
+</head>
+
+<body>
+	<span id="selectContainer">
+		<select id="countrySelect" class="form-select shadow-sm">
+			<option selected disabled hidden>Countries List:</option>
+			<!-- populate from an AJAX CALL to a PHP routine that returns a JSON object 
+				that is an array of just ISO codes and names from countryBorders.geo.json 
+				e.g.	<option value="AF">Afghanistan</option> -->
+		</select>
+	</span>
+
+	<div id="map"></div>
+
+	<div id="genericModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					<!-- render modal content here -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btnClose">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id=”preloader”></div>
+
+	<!-- SCRIPTS -->
+	<!-- JQUERY  --  $(document).ready(function() ensures no issues with load at end of doc-->
+	<script src="libs/js/jquery-3.7.1.min.js"></script>
+	<!-- Bootstrap --  suggested location by BS-->
+	<script src="libs//js/bootstrap.bundle.min.js"></script>
+	<!-- My script -->
+	<script src="libs/js/script.js"></script>
+
+</body>
+
+</html>

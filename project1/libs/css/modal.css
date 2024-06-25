@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap');
+
+
+/* CSS HEX */
+:root {
+    --font-main: "Open Sans", sans-serif;
+    --font-condensed: : "Oswald", sans-serif;
+
+    --prussian-blue: hsla(201, 100%, 14%, 1);
+    --fire-engine-red: hsla(0, 69%, 50%, 1);
+    --orange-wheel: hsla(31, 100%, 48%, 1);
+    --xanthous: hsla(40, 97%, 64%, 1);
+    --vanilla: hsla(51, 55%, 82%, 1);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+.modal-content {
+    background-color: var(--xanthous);
+}
+
+.divNames {
+    background-color: var(--vanilla);
+    padding: .4em;
+    margin-bottom: .2em;
+}
+
+h3,
+h4,
+h5 {
+    text-align: center;
+    margin-bottom: .1em;
+}
+
+h4,
+h6 {
+    font-family: "Oswald", sans-serif;
+    margin-bottom: .1em;
+}
+
+h4 {
+    font-weight: 400 !important;
+}
+
+h6 {
+    font-weight: 300 !important;
+}
+
+.divOneCol {
+    display: block;
+    background-color: var(--vanilla);
+    margin-bottom: .2em;
+    padding: .2em .4em;
+}
+
+.divOneCol>p {
+    margin-bottom: 0;
+}
+
+.divOneCol>p:last-child {
+    text-align: right;
+}
+
+.divTwoCols {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    background-color: var(--vanilla);
+    margin-bottom: .2em;
+}
+
+.divTwoCols>div {
+    display: flex;
+    flex-direction: column;
+    padding: .2em .4em;
+}
+
+.divTwoCols>.divFlagAndCoA {
+    justify-content: flex-start;
+}
+
+.divTwoCols>.divWeather {
+    justify-content: center;
+}
+
+.divTwoCols>div>p {
+    margin-bottom: .2em;
+}
+
+.divTwoCols>.divFlagAndCoA>p {
+    margin-bottom: .4em;
+}
+
+#countryFlag img {
+    width: 52%;
+    margin-top: .2em;
+}
+
+#countryCoatOfArms {
+    aspect-ratio: 1 / 1;
+    width: 46%;
+    padding: 4px
+}
+
+#countryCoatOfArms img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: 1px solid var(--prussian-blue);
+    padding: .3em;
+}
+
+.countryData {
+    font-size: 1.16em;
+    font-weight: 600;
+}
+
+
+.countryData .dataYear {
+    font-size: .8em;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.divTwoColsSplit {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    margin-bottom: .2em;
+    /* background-color: var(--vanilla); */
+    /* color will come from child element */
+}
+
+
+.divTwoColsSplit>.divSplitColumnsLeft,
+.divTwoColsSplit>.divSplitColumnsRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: .2em .4em;
+}
+
+.divTwoColsSplit>.divSplitColumnsLeft p,
+.divTwoColsSplit>.divSplitColumnsRight p {
+    margin: 0;
+}
+
+.divTwoColsSplit>.divSplitColumnsLeft p:first-child,
+.divTwoColsSplit>.divSplitColumnsRight p:first-child {
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    /* font-style: oblique; */
+}
+
+.divTwoColsSplit>.divSplitColumnsLeft {
+    background-color: var(--vanilla);
+    margin-right: .1em;
+}
+
+.divTwoColsSplit>.divSplitColumnsRight {
+    background-color: var(--vanilla);
+    margin-left: .1em;
+}
+
+.modal-footer {
+    border-top: 2px solid var(--fire-engine-red);
+}
+
+.btnClose {
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+    border: 2px solid var(--orange-wheel);
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.btnClose:hover {
+    background-color: var(--orange-wheel);
+    border: 2px solid var(--fire-engine-red);
+}
+
+.weatherSubHeading1 {
+    font-size: 1em;
+}
+
+.weatherSubHeading2 {
+    font-family: "Oswald", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    text-align: left;
+}
+
+.weatherIcon img {
+    width: 44%;
+    background-color: var(--xanthous);
+}
+
+.weatherDescription1 {
+    font-size: 1.25em;
+    font-weight: 600;
+}
+
+.weatherDescription2 {
+    font-size: 1.16em;
+    font-weight: 500;
+    font-style: oblique;
+}
+
+.weatherMeasurement {
+    font-weight: 400;
+    font-style: italic;
+    padding-left: .25em;
+}
+
+#exchangeForm1,
+#exchangeForm2 {
+    background-color: var(--orange-wheel);
+    border: 1px solid var(--fire-engine-red);
+    padding: 1%;
+}
+
+#originalAmount1,
+#originalCurrency1[readonly],
+#resultAmount1,
+#currencySelect1,
+#originalAmount2,
+#originalCurrency2[readonly],
+#resultAmount2,
+#currencySelect2 {
+    background-color: var(--vanilla);
+    border: none;
+}
+
+#originalAmount1:focus,
+#resultAmount1:focus,
+#currencySelect1:focus,
+#originalAmount2:focus,
+#resultAmount2:focus,
+#currencySelect2:focus {
+    background-color: var(--xanthous);
+    border: none;
+    box-shadow: none;
+}
+
+#originalCurrency1[readonly]:focus,
+#originalCurrency2[readonly]:focus {
+    background-color: var(--vanilla);
+    border: none;
+    box-shadow: none;
+}
+
+.btnSubmit {
+    background-color: var(--prussian-blue);
+    color: var(--vanilla);
+    border: 1px solid var(--vanilla);
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1em;
+    -webkit-transition-duration: .4s;
+    /* Safari */
+    transition-duration: .4s;
+}
+
+.btnSubmit:hover {
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+    border-color: var(--prussian-blue);
+}
+
+.btnSubmit:focus,
+.btnSubmit:active {
+    outline: none !important;
+    box-shadow: none;
+}
+
+.convertedAmount{
+    background-color: var(--xanthous) !important;
+    font-weight: 700;
+    border: none;
+    box-shadow: none;
+}

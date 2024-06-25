@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap');
+
+/* CSS HEX */
+:root {
+    --font-main: "Open Sans", sans-serif;
+    --font-condensed: : "Oswald", sans-serif;
+
+    --prussian-blue: hsla(201, 100%, 14%, 1);
+    --fire-engine-red: hsla(0, 69%, 50%, 1);
+    --orange-wheel: hsla(31, 100%, 48%, 1);
+    --xanthous: hsla(40, 97%, 64%, 1);
+    --vanilla: hsla(51, 55%, 82%, 1);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+body {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+}
+
+#map {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+#selectContainer {
+    position: fixed;
+    top: 0;
+    left: 28%;
+    z-index: 1000;
+    width: 44%;
+    padding: 11px 0;
+    text-align: center;
+}
+
+#countrySelect {
+    height: 2em;
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+    width: 98%;
+    padding-left: 1em;
+    border: 2px solid var(--orange-wheel);
+    font-weight: 700;
+}
+
+.leaflet-touch .leaflet-bar {
+    border: 1px solid var(--orange-wheel);
+    margin-top: 6em;
+}
+
+.leaflet-left {
+    /* center zoom and button bars */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1%;
+}
+
+.leaflet-right.leaflet-top {
+    margin-top: 6em;
+    margin-right: 1%;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle {
+    background-color: var(--xanthous);
+    width: 5.3em;
+    height: 5.3em;
+}
+
+.leaflet-touch .leaflet-bar a {
+    /* center icons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2em;
+    height: 2.2em;
+    border: 2px solid var(--orange-wheel);
+    background-color: var(--xanthous);
+    opacity: .8;
+    color: var(--prussian-blue);
+}
+
+.leaflet-bar a:hover {
+    opacity: 1;
+    border: 2px solid var(--fire-engine-red);
+    background-color: var(--orange-wheel);
+}
+
+.leaflet-control-zoom-in {
+    margin: .4em .4em 1.1em .4em;
+}
+
+.leaflet-control-zoom-out {
+    margin: .4em .4em 1.1em .4em;
+}
+
+.leaflet-touch .easy-button-container {
+    width: 4em;
+    height: 4em;
+    margin-top: 1.7em;
+}
+
+.leaflet-touch .leaflet-bar button {
+    border-radius: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--prussian-blue);
+    color: var(--vanilla);
+}
+
+.leaflet-touch .leaflet-bar button:hover {
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+}
+
+.easy-button-button .fa {
+    padding: .2em 0;
+    font-size: 2.6em;
+}
+
+
+
+
+/* Tablet Landscape and smaller*/
+@media only screen and (max-width: 992px) {
+    .leaflet-touch .leaflet-control-layers-toggle {
+        width: 4.4em;
+        height: 4.4em;
+    }
+}
