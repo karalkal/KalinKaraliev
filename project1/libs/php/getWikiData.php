@@ -13,7 +13,7 @@ $north = $_GET['north'];
 $south = $_GET['south'];
 $maxRows = $_GET['maxRows'];
 
-$url = 'http://api.geonames.org/earthquakesJSON?'
+$url = 'http://api.geonames.org/wikipediaBoundingBoxJSON?'
     . 'north=' . $north
     . '&south=' . $south
     . '&east=' . $east

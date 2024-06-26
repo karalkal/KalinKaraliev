@@ -23,7 +23,7 @@ $decodedCountryData = json_decode($resultJson, true);
 $output['data']['capitalName'] = $decodedCountryData[0]['capital'];
 $output['data']['countryName'] = $decodedCountryData[0]['name']['common'];
 
-// NOTE: longitude param is called lon in thi API
+// NOTE: longitude param is called lon in this API
 // example URL: https://api.openweathermap.org/data/2.5/weather?appid=cabebd5bf39ecdc54982ba9d45841f89&units=metric&lat=37.98381&lon=23.727539
 $weatherUrl = 'https://api.openweathermap.org/data/2.5/weather?appid=cabebd5bf39ecdc54982ba9d45841f89&units=metric&lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'];
 
