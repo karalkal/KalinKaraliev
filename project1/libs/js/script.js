@@ -69,10 +69,10 @@ function createCityMarker(city) {
 
 	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
 		.bindPopup(`
-		${toponymName}<br>
-		population: ${population}<br>
-		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
-		wiki: ${wikipedia || 'N.A.'}
+		<p class="popupTitle">${toponymName}</p>
+		<p><span>population:</span>&nbsp;&nbsp;${population}</p>
+		<p><span>latitude/longitude:</span>&nbsp;&nbsp;${lat.toFixed(2)}/${lng.toFixed(2)}</p>
+		<p><span>wiki:</span><a class="popup-link" href="https://${wikipedia}" target="_blank">${wikipedia || 'N.A.'}</a></p>
 		`);
 
 	cityMarker.addTo(citiesLayer);
@@ -90,17 +90,20 @@ function createEarthquakeMarker(earthquake) {
 
 	let eqMarker = L.marker([lat, lng], { icon: eqMarkerIcon })
 		.bindPopup(`
-		date/time: ${datetime || 'N.A.'}<br>
-		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
-		magnitude: ${magnitude || 'N.A.'}<br>
-		depth: ${depth || 'N.A.'}
+		<p class="popupTitle">magnitude:&nbsp;&nbsp;${magnitude}</p>
+		<p><span>date/time:</span>&nbsp;&nbsp;${datetime || 'N.A.'}</p>
+		<p><span>latitude/longitude:</span>&nbsp;&nbsp;${lat.toFixed(2)}/${lng.toFixed(2)}</p>
+		<p><span>depth:</span>&nbsp;&nbsp;${depth}</p>
 		`);
 
 	eqMarker.addTo(earthQuakeLayer);
 }
 
 function createWikiMarker(article) {
-	const { lat, lng, title, feature, summary, thumbnailImg, wikipediaUrl } = article
+	const { lat, lng, title, feature, summary, thumbnailImg, wikipediaUrl } = article;
+	const imgParagraphElement = thumbnailImg
+		? `<p><span>image:</span>&nbsp;&nbsp;<img src="${thumbnailImg}"</p>`
+		: ""
 
 	let wikiIcon = L.icon({
 		iconUrl: "libs/fontawesome/svgs/brands/wikipedia-w(orange).svg",
@@ -111,11 +114,10 @@ function createWikiMarker(article) {
 
 	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
 		.bindPopup(`
-		${title} <br>
-		feature: ${feature}<br>
-		summary: ${summary}<br>
-		image: ${thumbnailImg}<br>
-		url: ${wikipediaUrl}
+		<p class="popupTitle">${title} <p>
+		<p><span>summary:</span>&nbsp;&nbsp;${summary.substr(0, 150) + '...'}</p>
+		${imgParagraphElement}
+		<p><span>url:</span><a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
 		`);
 
 	wikiMarkersClusters.addLayer(wikiMarker);
@@ -165,9 +167,7 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEssentials();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -178,9 +178,7 @@ $(document).ready(function () {
 			title: 'Economy',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEconomy();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -191,9 +189,7 @@ $(document).ready(function () {
 			title: 'Population',
 			icon: 'fa-solid fa-people-group',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getPopulation();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -204,9 +200,7 @@ $(document).ready(function () {
 			title: 'Education',
 			icon: 'fa-solid fa-person-chalkboard',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEducation();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -217,9 +211,7 @@ $(document).ready(function () {
 			title: 'Currency',
 			icon: 'fa-solid fa-money-bill-transfer',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getExchangeRates();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -230,9 +222,7 @@ $(document).ready(function () {
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-cloud-sun',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getWeather({ latlng: capitalLatLng });
-				$("#genericModal").modal("show");
 			}
 		}]
 	});
@@ -1263,6 +1253,8 @@ $(document).ready(function () {
 			`)
 		}
 
+		// ... AND FINALLY, make the modal visible
+		$("#genericModal").modal("show");
 	}
 
 	// end of $(document).ready(function {
