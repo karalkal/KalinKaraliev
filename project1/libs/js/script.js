@@ -118,17 +118,20 @@ function createWikiMarker(article) {
 		popupAnchor: [11, -17],
 	});
 
+	// undefined summary sometimes, e.g. Dom. Rep.
+	let truncatedSummary = summary !== undefined
+		? summary.substr(0, 150) + '...'
+		: "N.A.";
+
 	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
 		.bindPopup(`
 		<p class="popupTitle">${title} <p>
-		<p><span>summary:</span>&nbsp;&nbsp;${summary.substr(0, 150) + '...'}</p>
+		<p><span>summary:</span>&nbsp;&nbsp;${truncatedSummary}</p>
 		${imgParagraphElement}
 		<p><span>url:</span><a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
 		`);
 
 	wikiMarkersClusters.addLayer(wikiMarker);
-
-	// wikiMarker.addTo(wikiLayer);
 }
 
 
@@ -145,7 +148,7 @@ $(document).ready(function () {
 		if user refuses, display default country map
 	*/
 	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', getCountryOfUserLocation); // gets code AND sets location and gets cities
+	map.once('locationfound', setCountryOfUserLocation); // gets code AND sets location and gets cities
 	map.on('locationerror', (e) => {
 		alert(`${e.message}\nBy default map will be set to Greece`);
 		centerMapOnSelectedCountry(countryCodeIso2);
@@ -296,7 +299,12 @@ $(document).ready(function () {
 		}(jQuery));
 
 		$(".modal-body").append(`
-			<form class="mb-2" id="exchangeForm1">
+			<form class="mt-2 mb-2" id="exchangeForm1">
+				<div class="row mb-1">
+					<div class="col-12">
+						<h6>convert local to foreign:</h6>
+					</div>
+				</div>
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
 						<input type="text" class="form-control" 
@@ -316,32 +324,40 @@ $(document).ready(function () {
 					<div class="col-5 pl-1">
 						<p class="form-control" id="resultAmount1">[result]</p>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-12">
-						<button type="submit" class="btn float-right btnSubmit">Convert</button>
-					</div>
-				</div>
+				</div>				
 			</form>`);
 
 		// Numeric input only: can use dot or comma
-		$("#originalAmount1").inputFilter(function (value) {
-			// return /^-?\d*[.,]?\d*$/.test(value);
-			return /^[+]?\d*([.,]\d+)?$/.test(value);
+		$("#originalAmount1").on("keyup").inputFilter(function (value) {
+			return /^-?\d*[.,]?\d*$/.test(value);
 		}, "Must be a positive real number");
 
-		$("#exchangeForm1").on("submit", function (event) {
+		$("#exchangeForm1 #currencySelect1").
+			on("change", calculateFromNativeToForeign);
+		$("#exchangeForm1 #originalAmount1").
+			on("keyup", calculateFromNativeToForeign);
+
+
+		function calculateFromNativeToForeign(event) {
 			event.preventDefault();
-			// confirm numeric and !NaN, confirm selected currency is not null
-			let originalAmount1 = Number($('#originalAmount1').val())
-			let selectedCurrency = $("#currencySelect1").val();
-			// Number converts null to 0, still invalid
-			if (originalAmount1 && selectedCurrency) {
-				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = targetCurrencyExchangeRate * originalAmount1;
-				$('#resultAmount1').html(result).addClass('convertedAmount');;
+			// Number converts null, empty string to 0, i.e. still should not trigger currency conversion, 
+			// BUT make user input of '0' valid
+			let originalAmount1 = undefined;
+			if ($('#originalAmount1').val() || $('#originalAmount1').val() === "0") {
+				originalAmount1 = Number($('#originalAmount1').val())
 			}
-		});
+			let selectedCurrency = $("#currencySelect1").val();
+
+			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
+			if (originalAmount1 !== undefined && selectedCurrency) {
+				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
+				let result = (targetCurrencyExchangeRate * originalAmount1).toFixed(6);
+				$('#resultAmount1').html(result).addClass('convertedAmount');
+			}
+			else {		// reinstate original state
+				$('#resultAmount1').html('[result]').removeClass('convertedAmount');
+			}
+		}
 	}
 
 	function renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData) {
@@ -374,7 +390,12 @@ $(document).ready(function () {
 		}(jQuery));
 
 		$(".modal-body").append(`
-			<form class="mb-2" id="exchangeForm2">
+			<form class="mt-2 mb-2" id="exchangeForm2">
+				<div class="row mb-1">
+					<div class="col-12">
+						<h6>convert foreign to local:</h6>
+					</div>
+				</div>
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
 						<input type="text" class="form-control" 
@@ -394,31 +415,40 @@ $(document).ready(function () {
 					<div class="col-5 pl-1">
 						<p class="form-control" id="resultAmount2">[result]</p>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-12">
-						<button type="submit" class="btn float-right btnSubmit">Convert</button>
-					</div>
-				</div>
+				</div>				
 			</form>`);
 
 		// Numeric input only: can use dot or comma
-		$("#originalAmount2").inputFilter(function (value) {
-			return /^[+]?\d*([.,]\d+)?$/.test(value);
+		$("#originalAmount2").on("keyup").inputFilter(function (value) {
+			return /^-?\d*[.,]?\d*$/.test(value);
 		}, "Must be a positive real number");
 
-		$("#exchangeForm2").on("submit", function (event) {
+		$("#exchangeForm2 #currencySelect2").
+			on("change", calculateFromForeignToLocal);
+		$("#exchangeForm2 #originalAmount2").
+			on("keyup", calculateFromForeignToLocal);
+
+
+		function calculateFromForeignToLocal(event) {
 			event.preventDefault();
-			// confirm numeric and !NaN, confirm selected currency is not null
-			let originalAmount2 = Number($('#originalAmount2').val())
+			// Number converts null, empty string to 0, i.e. still should not trigger currency conversion, 
+			// BUT make user input of '0' valid
+			let originalAmount2 = undefined;
+			if ($('#originalAmount2').val() || $('#originalAmount2').val() === "0") {
+				originalAmount2 = Number($('#originalAmount2').val())
+			}
 			let selectedCurrency = $("#currencySelect2").val();
-			// Number converts null to 0, still invalid
-			if (originalAmount2 && selectedCurrency) {
+
+			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
+			if (originalAmount2 !== undefined && selectedCurrency) {
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = originalAmount2 / targetCurrencyExchangeRate;
+				let result = (originalAmount2 / targetCurrencyExchangeRate).toFixed(6);
 				$('#resultAmount2').html(result).addClass('convertedAmount');
 			}
-		});
+			else {		// reinstate original state
+				$('#resultAmount2').html('[result]').removeClass('convertedAmount');
+			}
+		}
 	}
 
 	function populateCurrencySelectContainer(allCurrenciesArr, optionsMenuTitle) {
@@ -430,6 +460,9 @@ $(document).ready(function () {
 	}
 
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
+		// select from options too
+		$(`#countrySelect option[value='${countryCodeIso2}|${countryCodeIso3}']`).prop("selected", true);
+
 		$.ajax({
 			url: "libs/php/loadCountryBoundaries.php",
 			type: 'GET',
@@ -438,7 +471,7 @@ $(document).ready(function () {
 
 			success: function (result) {
 				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
-				let latlngs = []
+				let latlngs = [];
 				if (result.data.geometryType === "Polygon") {
 					for (let tuple of result.data.coordinatesArray[0]) {
 						latlngs.push([tuple[1], tuple[0]])
@@ -470,7 +503,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function getCountryOfUserLocation(e) {
+	function setCountryOfUserLocation(e) {
 		const { lat, lng } = e.latlng;
 		$.ajax({
 			url: "libs/php/getCountryIso2CodeByLatLng.php",
@@ -602,7 +635,7 @@ $(document).ready(function () {
 	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
 		wikiMarkersClusters.clearLayers();
-		const maxRows = 260;
+		const maxRows = 170;
 
 		$.ajax({
 			url: "libs/php/getWikiData.php",
