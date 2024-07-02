@@ -231,7 +231,7 @@ $(document).ready(function () {
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-cloud-sun',
 			onClick: async function (btn, map) {
-				getWeather({ latlng: capitalLatLng });
+				getWeather(capitalLatLng);
 			}
 		}]
 	});
@@ -777,8 +777,9 @@ $(document).ready(function () {
 		});
 	}
 
-	function getWeather(e) {
-		const { lat, lng } = e.latlng;
+	function getWeather(capitalLatLng) {
+		const { lat, lng } = capitalLatLng;
+		console.log(lat, lng)
 		$.ajax({
 			url: "libs/php/getWeatherData.php",
 			type: 'GET',
