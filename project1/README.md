@@ -8,7 +8,7 @@
   - The file countryBorders.geo.json contains *all** (see remark below) countries ISO2 and ISO3 codes, their coordinates in shapes of polygons or multi-poligons.  
   *The data contained in this json in my humble opinion is neither correct (because it does not include territories like Canary Islands (Spain) or Reunion (France) for the relevant countries) nor simplified enough to make these omissions worthwhile (it includes others like French Guyana which distorts the bounding box and general appearance of a country map - a map of France should be the hexagon only, really). It also includes "countries" like North Cyprus (hm, hm, hm...) and some other which are not recognized. However this is the dataset I was supposed to work with and this is the one I had used.
 
-  - The other json file countryCodesWithBoundingBox.json contains plenty of useful data but here we are loading the requested country's Bounding Box only.
+  - The file countryCodesWithBoundingBox.json contains other useful data too but for this app we are interested in loading the requested country's Bounding Box only.
 
 - Gets data from the following APIs:
   - [REST Countries](https://restcountries.com/)
