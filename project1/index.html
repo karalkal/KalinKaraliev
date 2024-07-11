@@ -21,17 +21,14 @@
 	<link rel="stylesheet" href="libs/fontawesome/css/brands.min.css" />
 	<!--Bootstrap-->
 	<link rel="stylesheet" href="libs/css/bootstrap.min.css">
-	<!--LEAFLET css + script-->
+	<!--LEAFLET css-->
 	<!--		Main -->
 	<link rel="stylesheet" href="libs/leaflet/main/leaflet.css" />
-	<script src="libs/leaflet/main/leaflet.js"></script>
 	<!-- 		Button -->
 	<link rel="stylesheet" href="libs/leaflet/easy-button/easy-button.css">
-	<script src="libs/leaflet/easy-button/easy-button.js"></script>
 	<!-- 		MarkerCluster -->
 	<link rel="stylesheet" type="text/css" href="libs/leaflet/markercluster/MarkerCluster.css" />
 	<link rel="stylesheet" type="text/css" href="libs/leaflet/markercluster/MarkerCluster.Default.css" />
-	<script src="libs/leaflet/markercluster/leaflet.markercluster.js"></script>
 	<!-- Custom CSS -->
 	<link rel="stylesheet" href="libs/css/main.css">
 	<link rel="stylesheet" href="libs/css/modal.css">
@@ -49,9 +46,11 @@
 		</select>
 	</span>
 
-	<div id="map"></div>
+	<div id="map">
+		<!-- render map here -->
+	</div>
 
-	<div id="genericModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+	<div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 			<div class="modal-content">
 				<div class="modal-body">
@@ -71,6 +70,13 @@
 	<script src="libs/js/jquery-3.7.1.min.js"></script>
 	<!-- Bootstrap --  suggested location by BS-->
 	<script src="libs//js/bootstrap.bundle.min.js"></script>
+	<!--LEAFLET -->
+	<!--		Main -->
+	<script src="libs/leaflet/main/leaflet.js"></script>
+	<!-- 		Button -->
+	<script src="libs/leaflet/easy-button/easy-button.js"></script>
+	<!-- 		MarkerCluster -->
+	<script src="libs/leaflet/markercluster/leaflet.markercluster.js"></script>
 	<!-- My script -->
 	<script src="libs/js/script.js"></script>
 

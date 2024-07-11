@@ -7,8 +7,8 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-// $url = 'https://restcountries.com/v3.1/alpha/' . $_REQUEST['countryCodeIso3'];
-$url = 'https://countryinfoapi.com/api/countries/' . $_REQUEST['countryCodeIso3'];
+$url = 'https://restcountries.com/v3.1/alpha/' . $_REQUEST['countryCodeIso2'];
+// $url = 'https://countryinfoapi.com/api/countries/' . $_REQUEST['countryCodeIso3'];
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

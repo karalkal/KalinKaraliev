@@ -19,12 +19,7 @@ const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
 });
 
-const OpenRailwayMap = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
-	maxZoom: 22,
-	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-});
 
-// let map = L.map("map");
 let map = L.map("map", { layers: [OpenStreetMap_HOT] });
 
 const baseMaps = { 		// last one in list will be displayed by default on initial render
@@ -41,17 +36,19 @@ const wikiLayer = L.layerGroup([]);
 
 // define and add marker clusters
 const wikiMarkersClusters = L.markerClusterGroup();
-// map.addLayer(wikiMarkersClusters);
 wikiMarkersClusters.addTo(wikiLayer);
 
 const overlayMaps = {
-	"Rail (OpenRailwayMap)": OpenRailwayMap,
 	"Cities": citiesLayer,
 	"Earthquakes": earthQuakeLayer,
 	"Wiki Articles": wikiLayer,
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+// define polygon with zero values, in dedicated function remove prev. polygon, create new with actual values, add it map and center map
+// i.e. when new country is selected polygon of previously selected country disappears
+let polygon = L.polygon([[0, 0]]);
 
 
 function createCityMarker(city) {
@@ -244,7 +241,7 @@ $(document).ready(function () {
 	infoBtn6.addTo(map);
 
 	$(".btnClose").on('click', function () {
-		$("#genericModal").modal("hide")
+		$("#genericModal").modal("hide");
 	});
 
 
@@ -459,7 +456,7 @@ $(document).ready(function () {
 		return options;
 	}
 
-	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
+	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon, create new and center map
 		// select from options too
 		$(`#countrySelect option[value='${countryCodeIso2}|${countryCodeIso3}']`).prop("selected", true);
 
@@ -491,10 +488,12 @@ $(document).ready(function () {
 				}
 
 				// polygon is used to determine borders of selected country and then "fill" screen 
-				let polygon = L.polygon(latlngs, { color: 'orange' }).addTo(map);
-				// zoom the map to the polygon, leave it on for some time
+				polygon.removeFrom(map);		// remove polygon from previous selected/set country
+
+				polygon = L.polygon(latlngs, { color: 'orange' }).addTo(map);
+
+				// zoom the map to the polygon, leave it on
 				map.fitBounds(polygon.getBounds());
-				setTimeout(() => polygon.removeFrom(map), 17000) //keep on for 17 secs
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown);
@@ -672,10 +671,10 @@ $(document).ready(function () {
 			url: "libs/php/getEssentialCountryData.php",
 			type: 'GET',
 			dataType: 'json',
-			data: ({ countryCodeIso3: countryCodeIso3 }),
+			data: ({ countryCodeIso2: countryCodeIso2 }),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "essential");
+				renderCountryDataInModal(result.data[0], "essential");	// this API returns array with 1 element
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -806,29 +805,28 @@ $(document).ready(function () {
 		if (dataType === "essential") {
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h3>${data.name}</h3>
-					<h4>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+					<h3>${data.name.common}</h3>
 				</div>
 
 				<div class="divTwoCols">
 					<div class="divFlagAndCoA">
 						<p>Flag:</p>
-						<div id="countryFlag"><img src="${data.flag}"></div>
+						<div id="countryFlag"><img src="${data.flags.png}"></div>
 					</div>
 					<div class="divFlagAndCoA">
 						<p>Coat of Arms:</p>
-						<div id="countryCoatOfArms"><img src="${data.coatOfArms}"></div>
+						<div id="countryCoatOfArms"><img src="${data.coatOfArms.png}"></div>
 					</div>
 				</div>
 
 				<div class="divTwoCols">
 					<div>
 						<p>Area:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
+						<p class="countryData"><span>${Intl.NumberFormat('en-GB').format(data.area)} km&#178;</span></p>
 					</div>
 					<div>
 						<p>Population:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
+						<p class="countryData"><span>${Intl.NumberFormat('en-GB').format(data.population)}</span></p>
 					</div>
 				</div>
 
@@ -882,7 +880,7 @@ $(document).ready(function () {
 				<div class="divOneCol">
 					<p>GDP (current US$):</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
 					</p>
 				</div>
@@ -903,21 +901,21 @@ $(document).ready(function () {
 				<div class="divOneCol">
 					<p>Imports of goods and services (BoP, current US$):</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Exports of goods and services (BoP, current US$):</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Current account balance (BoP, current US$):</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</p>
 				</div>
@@ -973,14 +971,14 @@ $(document).ready(function () {
 				<div class="divOneCol">
 					<p>Population, total:</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["SP.POP.TOTL"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["SP.POP.TOTL"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Land area (sq. km):</p>
 					<p class="countryData">
-					${Intl.NumberFormat('de-DE').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
+					${Intl.NumberFormat('en-GB').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
 					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
 					</p>
 				</div>
@@ -1223,12 +1221,9 @@ $(document).ready(function () {
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
 			// console.log(data);
-			const { capitalName, countryName, main, sunrise, sunset,
-				weatherArr, clouds, wind, epochDateTime, timezone } = data;
+			const { capitalName, countryName, main, weatherArr, clouds, wind, epochDateTime } = data;
 			// weather is array
 			const weather = weatherArr[0];
-			// const sunriseTime = new Date(sunrise * 1e3).toISOString().slice(-13, -5);
-			// const sunsetTime = new Date(sunset * 1e3).toISOString().slice(-13, -5);
 
 			$(".modal-body").html(`
 				<div class="divNames">
@@ -1277,17 +1272,6 @@ $(document).ready(function () {
 					<div class="divSplitColumnsRight">
 						<p>Clouds</p>
 						<p class="countryData">${clouds}<span class="weatherMeasurement">%</span></p>
-					</div>
-				</div>
-
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Sunrise (Unix time):</p>
-						<p class="countryData">${sunrise}</p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>Sunset (Unix time):</p>
-						<p class="countryData">${sunset}</p>
 					</div>
 				</div>
 			`)
