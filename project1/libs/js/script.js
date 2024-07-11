@@ -66,17 +66,25 @@ function createCityMarker(city) {
 	let cityIcon = L.icon({
 		iconUrl: cityIconUrl,
 		iconSize: cityIconSize,
-		iconAnchor: [22, 26],
-		popupAnchor: [11, -17],
+		// iconAnchor: [22, 26],		// was asked to place marker right on top
+		// popupAnchor: [11, -17],
 	});
 
 	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
 		.bindPopup(`
-		<p class="popupTitle">${toponymName}</p>
-		<p><span>population:</span>&nbsp;&nbsp;${population}</p>
-		<p><span>latitude/longitude:</span>&nbsp;&nbsp;${lat.toFixed(2)}/${lng.toFixed(2)}</p>
-		<p><span>wiki:</span><a class="popup-link" href="https://${wikipedia}" target="_blank">${wikipedia || 'N.A.'}</a></p>
+		<div class="modal-header">
+        	<h5 class="modal-title">${toponymName}</h5>
+		</div>
+		<p>population:</span>&nbsp;&nbsp;${Intl.NumberFormat('en-GB').format(population)}</p>
+		<p><a href="https://${wikipedia}" target="_blank">Wikipedia article</a></p>
 		`);
+
+	cityMarker.on('mouseover', function (e) {
+		this.openPopup();
+	});
+	cityMarker.on('mouseout', function (e) {
+		this.closePopup();
+	});
 
 	cityMarker.addTo(citiesLayer);
 }
@@ -87,32 +95,36 @@ function createEarthquakeMarker(earthquake) {
 	let eqMarkerIcon = L.icon({
 		iconUrl: "libs/fontawesome/svgs/solid/circle-dot(red).svg",
 		iconSize: [22, 22],
-		iconAnchor: [0, 22],
-		popupAnchor: [11, -17],
 	});
 
 	let eqMarker = L.marker([lat, lng], { icon: eqMarkerIcon })
 		.bindPopup(`
-		<p class="popupTitle">magnitude:&nbsp;&nbsp;${magnitude}</p>
-		<p><span>date/time:</span>&nbsp;&nbsp;${datetime || 'N.A.'}</p>
-		<p><span>latitude/longitude:</span>&nbsp;&nbsp;${lat.toFixed(2)}/${lng.toFixed(2)}</p>
-		<p><span>depth:</span>&nbsp;&nbsp;${depth}</p>
+		<div class="modal-header">
+        	<h5 class="modal-title">Magnitude: ${magnitude}</h5>
+		</div>
+		<p>date/time:&nbsp;&nbsp;${datetime || 'N.A.'}</p>
+		<p>depth:&nbsp;&nbsp;${depth}</p>
 		`);
+
+	eqMarker.on('mouseover', function (e) {
+		this.openPopup();
+	});
+	eqMarker.on('mouseout', function (e) {
+		this.closePopup();
+	});
 
 	eqMarker.addTo(earthQuakeLayer);
 }
 
 function createWikiMarker(article) {
-	const { lat, lng, title, feature, summary, thumbnailImg, wikipediaUrl } = article;
+	const { lat, lng, title, summary, thumbnailImg, wikipediaUrl } = article;
 	const imgParagraphElement = thumbnailImg
-		? `<p><span>image:</span>&nbsp;&nbsp;<img src="${thumbnailImg}"</p>`
+		? `<p><img src="${thumbnailImg}"</p>`
 		: ""
 
 	let wikiIcon = L.icon({
 		iconUrl: "libs/fontawesome/svgs/brands/wikipedia-w(orange).svg",
 		iconSize: [22, 22],
-		iconAnchor: [0, 22],
-		popupAnchor: [11, -17],
 	});
 
 	// undefined summary sometimes, e.g. Dom. Rep.
@@ -122,10 +134,12 @@ function createWikiMarker(article) {
 
 	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
 		.bindPopup(`
-		<p class="popupTitle">${title} <p>
-		<p><span>summary:</span>&nbsp;&nbsp;${truncatedSummary}</p>
+		<div class="modal-header">
+        	<h5 class="modal-title">${title}</h5>
+		</div>
+		<p>${truncatedSummary}</p>
 		${imgParagraphElement}
-		<p><span>url:</span><a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
+		<p>url:<a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
 		`);
 
 	wikiMarkersClusters.addLayer(wikiMarker);
@@ -134,7 +148,7 @@ function createWikiMarker(article) {
 
 $(document).ready(function () {
 	// default country set to Greece, these values are changed as required
-	let [countryCodeIso2, countryCodeIso3] = ["GR", "GRC"];
+	let countryCodeIso2 = "GR";
 	let [easternMost, westernMost, northersMost, southernMost] = [41.7488862, 34.7006096, 29.7296986, 19.2477876];
 	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }
 
@@ -157,7 +171,8 @@ $(document).ready(function () {
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
-		[countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
+		countryCodeIso2 = $("#countrySelect").val();
+
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
 		updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
@@ -255,7 +270,7 @@ $(document).ready(function () {
 				$.each(result.data.allCountriesArr, function (index, value) {
 					$('#countrySelect')
 						.append($("<option></option>")
-							.attr("value", `${value.iso_a2}|${value.iso_a3}`)
+							.attr("value", `${value.iso_a2}`)
 							.text(value.name));
 				});
 			},
@@ -458,7 +473,7 @@ $(document).ready(function () {
 
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon, create new and center map
 		// select from options too
-		$(`#countrySelect option[value='${countryCodeIso2}|${countryCodeIso3}']`).prop("selected", true);
+		$(`#countrySelect option[value='${countryCodeIso2}]`).prop("selected", true);
 
 		$.ajax({
 			url: "libs/php/loadCountryBoundaries.php",
@@ -516,12 +531,7 @@ $(document).ready(function () {
 
 			success: function (result) {
 				countryCodeIso2 = result.data.countryCode;
-				// need to get iso3 code too to get country info from 'https://countryinfoapi.com/api/countries/{cca3}
-				$("option").each(function () {
-					if (($(this).val().split("|")[0]) === countryCodeIso2) {
-						countryCodeIso3 = $(this).val().split("|")[1];
-					}
-				});
+
 				centerMapOnSelectedCountry(countryCodeIso2);
 				loadCountryBoundaries(countryCodeIso2);
 				updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
@@ -688,7 +698,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryCodeIso3,
+				countryCodeIso2: countryCodeIso2,
 				timeFrame: "2006:2024"
 			}),
 
@@ -707,7 +717,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryCodeIso3,
+				countryCodeIso2: countryCodeIso2,
 				timeFrame: "2006:2024"
 			}),
 
@@ -726,7 +736,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryCodeIso3,
+				countryCodeIso2: countryCodeIso2,
 				timeFrame: "1991:2024"			// get education since 1991, as less data is available
 			}),
 

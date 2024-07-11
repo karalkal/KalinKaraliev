@@ -12,7 +12,7 @@ $executionStartTime = microtime(true);
 // Unemployment, female (% of female labor force) (modeled ILO estimate), Unemployment, male (% of male labor force) (modeled ILO estimate), 
 // Children in employment, total (% of children ages 7-14), Population living in slums (% of urban population)
 
-$url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
+$url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso2'] .
     '/indicator/SE.XPD.TOTL.GD.ZS;SE.PRM.ENRL.TC.ZS;SE.PRM.NENR;SE.SEC.NENR;SL.UEM.TOTL.FE.ZS;SL.UEM.TOTL.MA.ZS;SL.TLF.0714.ZS;EN.POP.SLUM.UR.ZS' .
     '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=400';        // request up to 200 results in one page just in case
 

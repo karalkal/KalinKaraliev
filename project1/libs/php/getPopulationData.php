@@ -12,7 +12,7 @@ $executionStartTime = microtime(true);
 // "Urban population (% of total population)", "Rural population (% of total population)", 
 // "Population, total", "Land area (sq. km)"
 
-$url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
+$url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso2'] .
     '/indicator/SP.DYN.LE00.MA.IN;SP.DYN.LE00.FE.IN;EN.POP.DNST;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS;SP.POP.TOTL;AG.LND.TOTL.K2' .
     '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=200';        // request up to 200 results in one page just in case
 
