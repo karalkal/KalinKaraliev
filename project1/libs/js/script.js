@@ -13,20 +13,21 @@ const Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{
 	attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	accessToken: 'mJZnCYHFpNftBsC6PF64A1V0f7vwRW5xneYEg4rRfMoZimE53hjq2wJUuG1btLQ4'
 });
-
+/*
 const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 	maxZoom: 22,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
 });
+*/
 
 
-let map = L.map("map", { layers: [OpenStreetMap_HOT] });
+let map = L.map("map", { layers: [Jawg_Terrain] });
 
 const baseMaps = { 		// last one in list will be displayed by default on initial render
-	"Satellite": Esri_WorldImagery,
+	"Satellite (Esri_WorldImagery)": Esri_WorldImagery,
 	"Topographical (OpenTopoMap)": OpenTopoMap,
 	"Terrain (Jawg Lab)": Jawg_Terrain,
-	"General (OpenStreetMap)": OpenStreetMap_HOT
+	// "General (OpenStreetMap)": OpenStreetMap_HOT,
 };
 
 // define extra layers
@@ -72,25 +73,23 @@ function createCityMarker(city) {
 
 	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
 		.bindPopup(`
-		<div class="modal-header">
-        	<h5 class="modal-title">${toponymName}</h5>
-		</div>
-		<p>population:</span>&nbsp;&nbsp;${Intl.NumberFormat('en-GB').format(population)}</p>
+        <h5>${toponymName}</h5>
+		<p>population:</span>&nbsp;&nbsp;<span class="popup-data">${Intl.NumberFormat('en-GB').format(population)}</span></p>
 		<p><a href="https://${wikipedia}" target="_blank">Wikipedia article</a></p>
 		`);
 
-	cityMarker.on('mouseover', function (e) {
-		this.openPopup();
-	});
-	cityMarker.on('mouseout', function (e) {
-		this.closePopup();
-	});
-
+	// mouseover and mouseout not ok here because popups will not be clickable, i.e. cannot click wiki link
 	cityMarker.addTo(citiesLayer);
 }
 
 function createEarthquakeMarker(earthquake) {
-	const { lat, lng, datetime, depth, magnitude, src, eqid } = earthquake
+	const { lat, lng, datetime, magnitude } = earthquake;
+	const date = new Date(datetime)
+		.toLocaleString("en-GB", {
+			year: 'numeric',
+			month: 'numeric',
+			day: 'numeric',
+		});
 
 	let eqMarkerIcon = L.icon({
 		iconUrl: "libs/fontawesome/svgs/solid/circle-dot(red).svg",
@@ -99,27 +98,32 @@ function createEarthquakeMarker(earthquake) {
 
 	let eqMarker = L.marker([lat, lng], { icon: eqMarkerIcon })
 		.bindPopup(`
-		<div class="modal-header">
-        	<h5 class="modal-title">Magnitude: ${magnitude}</h5>
-		</div>
-		<p>date/time:&nbsp;&nbsp;${datetime || 'N.A.'}</p>
-		<p>depth:&nbsp;&nbsp;${depth}</p>
+    		<p>Magnitude:&nbsp;&nbsp;<span class="popup-data">${magnitude}</span>
+    		<p>
+			<i class="fa-regular fa-calendar popup-icon"></i>		
+			&nbsp;&nbsp;${date || 'N.A.'}
+			</p>
 		`);
 
-	eqMarker.on('mouseover', function (e) {
-		this.openPopup();
-	});
-	eqMarker.on('mouseout', function (e) {
-		this.closePopup();
-	});
+	eqMarker.on('mouseover', function (e) { this.openPopup(); });
+	eqMarker.on('click', function (e) { this.openPopup(); });
+	eqMarker.on('mouseout', function (e) { this.closePopup(); });
 
 	eqMarker.addTo(earthQuakeLayer);
 }
 
 function createWikiMarker(article) {
 	const { lat, lng, title, summary, thumbnailImg, wikipediaUrl } = article;
-	const imgParagraphElement = thumbnailImg
-		? `<p><img src="${thumbnailImg}"</p>`
+	const imageRow = thumbnailImg
+		? `
+		<div class="container mt-1">
+  			<div class="row vh-50">
+    			<div class="col d-flex justify-content-center">
+					<img src="${thumbnailImg}" class="img-fluid">  
+				</div>
+			</div>
+		</div>		
+		`
 		: ""
 
 	let wikiIcon = L.icon({
@@ -129,17 +133,15 @@ function createWikiMarker(article) {
 
 	// undefined summary sometimes, e.g. Dom. Rep.
 	let truncatedSummary = summary !== undefined
-		? summary.substr(0, 150) + '...'
+		? summary.substr(0, 190) + '...'
 		: "N.A.";
 
 	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
 		.bindPopup(`
-		<div class="modal-header">
-        	<h5 class="modal-title">${title}</h5>
-		</div>
+        <h5>${title}</h5>
 		<p>${truncatedSummary}</p>
-		${imgParagraphElement}
-		<p>url:<a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
+		${imageRow}
+		<p class="text-center"><a href="https://${wikipediaUrl}" target="_blank">Wikipedia article</a></p>
 		`);
 
 	wikiMarkersClusters.addLayer(wikiMarker);
@@ -654,7 +656,6 @@ $(document).ready(function () {
 				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
 			}),
 			success: function (wikiRes) {
-				console.log("returnedIn:", wikiRes.status.returnedIn, "ms");
 				// if requesting too much data returns timeout error
 				if (wikiRes.data.status) {
 					alert(`Error ${wikiRes.data.status.value}:\nLoading Wikipedia data timed out.\nIf it is required, please try again later.`)
@@ -663,7 +664,6 @@ $(document).ready(function () {
 					// filter for country only
 					const articlesForCountry = (wikiRes.data.geonames)
 						.filter(article => article.countryCode === countryCodeIso2);
-					console.log(articlesForCountry)
 
 					for (let article of articlesForCountry) {
 						createWikiMarker(article);

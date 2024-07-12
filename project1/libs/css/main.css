@@ -43,3 +43,11 @@ body {
     text-align: center;
 }
 
+.popup-icon {
+    font-size: 120%;
+}
+
+.popup-data {
+    font-size: 125%;
+    font-weight: 600;
+}

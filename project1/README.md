@@ -84,7 +84,9 @@ In getExchangeRates() the sequence is as follow:
 - when new country is selected polygon of previously selected country disappears
 - removed custom styling of all leaflet buttons (zoom in/ot, buttons, map selector) and `<select>`
 - removed all references to country ISO3 codes, refactored APIs to work with ISO2
-- cities - removed lat, lng data, reverted to Bootstrap styling
+- marker popups - removed unnecessary labels and data, reverted to Bootstrap styling
+- earthquakes marker popups - opening popup on `mouseover` or `click` event
+
 
 
 
