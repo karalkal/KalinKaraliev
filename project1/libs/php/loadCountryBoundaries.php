@@ -3,11 +3,11 @@
 $executionStartTime = microtime(true);
 
 $resultJson = file_get_contents('../../countryBorders.geo.json');
-$countryCode = $_GET['countryCode'];
+$countryCode = $_GET['countryCodeIso2'];
 
 // develop two PHP routines that return subsets of the file contents; 
 // one to return a JSON object that contains just the codes and names to populate the select and 
-// the other to return just the feature for the selected country so that it can be plotted on the map with L.geoJSON()
+// THIS -> the other to return just the feature for the selected country so that it can be plotted on the map with L.geoJSON()
 
 $decodedDataArray = json_decode($resultJson, true);
 

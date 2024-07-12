@@ -22,7 +22,7 @@
 }
 
 body {
-    font-family: var(--font-main) !important;
+    font-family: "Open Sans", sans-serif;
     font-weight: 400 !important;
 }
 
@@ -60,6 +60,11 @@ body {
     font-size: 1.3em;
     font-weight: 600;
 }
+.modal-data-label {
+    font-size: 1em;
+    font-weight: 300;
+    font-family: "Oswald", sans-serif;
+}
 
 .modal-data-med {
     font-size: 1.16em;
@@ -67,7 +72,7 @@ body {
 }
 
 .modal-data-med .dataYear {
-    font-size: .8em;
+    font-size: .9em;
     font-weight: 400;
     font-style: italic;
 }

@@ -506,7 +506,7 @@ $(document).ready(function () {
 			url: "libs/php/loadCountryBoundaries.php",
 			type: 'GET',
 			dataType: 'json',
-			data: ({ countryCode: countryCodeIso2 }),
+			data: ({ countryCodeIso2: countryCodeIso2 }),
 
 			success: function (result) {
 				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
@@ -582,11 +582,11 @@ $(document).ready(function () {
 
 			success: function (result) {
 				// some "countries", e.g. N. Cyprus won't contain city data
-				if (result.data.localcountryData) {
-					easternMost = result.data.localcountryData.boundingBox.ne.lon;
-					westernMost = result.data.localcountryData.boundingBox.sw.lon;
-					northersMost = result.data.localcountryData.boundingBox.ne.lat;
-					southernMost = result.data.localcountryData.boundingBox.sw.lat;
+				if (result.data.localCountryData) {
+					easternMost = result.data.localCountryData.boundingBox.ne.lon;
+					westernMost = result.data.localCountryData.boundingBox.sw.lon;
+					northersMost = result.data.localCountryData.boundingBox.ne.lat;
+					southernMost = result.data.localCountryData.boundingBox.sw.lat;
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -709,7 +709,7 @@ $(document).ready(function () {
 			data: ({ countryCodeIso2: countryCodeIso2 }),
 
 			success: function (result) {
-				rendercountryDataInModal(result.data[0], "essential");	// this API returns array with 1 element
+				renderCountryDataInModal(result.data[0], "essential");	// this API returns array with 1 element
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -728,7 +728,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				rendercountryDataInModal(result.data, "economy");
+				renderCountryDataInModal(result.data, "economy");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -747,7 +747,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				rendercountryDataInModal(result.data, "population");
+				renderCountryDataInModal(result.data, "population");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -766,7 +766,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				rendercountryDataInModal(result.data, "education");
+				renderCountryDataInModal(result.data, "education");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -796,7 +796,7 @@ $(document).ready(function () {
 							allCurrenciesData: allCurrenciesResult.data,
 							exchangeRatesData: ratesResult.data
 						}
-						rendercountryDataInModal(combinedData, "money");
+						renderCountryDataInModal(combinedData, "money");
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
 						console.log(jqXHR, textStatus, errorThrown)
@@ -826,7 +826,7 @@ $(document).ready(function () {
 			},
 
 			success: function (result) {
-				rendercountryDataInModal(result.data, "weather");
+				renderCountryDataInModal(result.data, "weather");
 
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -835,18 +835,18 @@ $(document).ready(function () {
 		});
 	}
 
-	function rendercountryDataInModal(data, dataType) {
+	function renderCountryDataInModal(data, dataType) {
 		//    ****    GOVERNMENT    ****    //
 		if (dataType === "essential") {
 			$(".modal-title").text(`${data.name.common}`);
 			$(".modal-body").html(`
 				<div class="row mb-2">
 					<div class="col">
-						<p mb-1>Flag:</p>
+						<p class="mb-1">Flag:</p>
 						<img src="${data.flags.png}" alt="flag of ${data.name.common}">
 					</div>
 					<div class="col">
-						<p mb-1>Coat of Arms:</p>
+						<p class="mb-1">Coat of Arms:</p>
 						<img src="${data.coatOfArms.png}" alt="coat of arms of ${data.name.common}">
 					</div>
 				</div>
@@ -905,57 +905,57 @@ $(document).ready(function () {
 			// console.log("mostRecentData:\n", mostRecentData);
 			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Economy`);
 			$(".modal-body").html(`
-				<div class="divOneCol">
-					<p>GDP (current US$):</p>
+				<div>
+					<p class="modal-data-label mb-0">GDP (current US$):</p>
 					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>GDP growth (annual %):</p>
+				<div>
+					<p class="modal-data-label mb-0">GDP growth (annual %):</p>
 					<p class="modal-data-med">
 					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>GDP per capita growth (annual %):</p>
+				<div>
+					<p class="modal-data-label mb-0">GDP per capita growth (annual %):</p>
 					<p class="modal-data-med">
 					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Imports of goods and services (BoP, current US$):</p>
+				<div>
+					<p class="modal-data-label mb-0">Imports of goods and services (BoP, current US$):</p>
 					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Exports of goods and services (BoP, current US$):</p>
+				<div>
+					<p class="modal-data-label mb-0">Exports of goods and services (BoP, current US$):</p>
 					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Current account balance (BoP, current US$):</p>
+				<div>
+					<p class="modal-data-label mb-0">Current account balance (BoP, current US$):</p>
 					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Population below national poverty line (%):</p>
+				<div>
+					<p class="modal-data-label mb-0">Population below national poverty line (%):</p>
 					<p class="modal-data-med">
 					${Number(mostRecentData["SI.POV.NAHC"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Gini index:</p>
+				<div>
+					<p class="modal-data-label mb-0">Gini index:</p>
 					<p class="modal-data-med">
 					${Number(mostRecentData["SI.POV.GINI"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
@@ -991,63 +991,61 @@ $(document).ready(function () {
 					};
 				};
 			}
-			$(".modal-body").html(`
-				< div class="divNames" >
-					<h5>${mostRecentData.countryName || "Country not in DB"} - Demographics</h5>
-				</div >
 
-				<div class="divOneCol">
-					<p>Population, total:</p>
-					<p class="countryData">
+			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Demographics`);
+			$(".modal-body").html(`
+				<div>
+					<p class="modal-data-label mb-0">Population, total:</p>
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["SP.POP.TOTL"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Land area (sq. km):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Land area (sq. km):</p>
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
 					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
 					</p>
-				</div>
-				<div class="divOneCol">
-					<p>Population density (people/sq.km):</p>
-					<p class="countryData">
+				</div>			
+				<div>
+					<p class="modal-data-label mb-0">Population density (people/sq.km):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["EN.POP.DNST"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Population growth (annual %):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Population growth (annual %):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SP.POP.GROW"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.GROW"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Urban population (%):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Urban population (%):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Rural population (%):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Rural population (%):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Life expectancy, male (years):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Life expectancy, male (years):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
 					</p>
 				</div>	
-				<div class="divOneCol">
-					<p>Life expectancy, female (years):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Life expectancy, female (years):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
 					</p>
@@ -1082,63 +1080,61 @@ $(document).ready(function () {
 					};
 				};
 			}
-			$(".modal-body").html(`
-				< div class="divNames" >
-					<h5>${mostRecentData.countryName || "Country not in DB"} - Education</h5>
-				</div >
 
-				<div class="divOneCol">
-					<p>Government expenditure on education, total (% of GDP):</p>
-					<p class="countryData">
+			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Education`);
+			$(".modal-body").html(`
+				<div>
+					<p class="modal-data-label mb-0">Government expenditure on education, total (% of GDP):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SE.XPD.TOTL.GD.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.XPD.TOTL.GD.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Pupil-teacher ratio, primary:</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Pupil-teacher ratio, primary:</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SE.PRM.ENRL.TC.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.ENRL.TC.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>School enrollment, primary (% net):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">School enrollment, primary (% net):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SE.PRM.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.NENR"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>School enrollment, secondary (% net):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">School enrollment, secondary (% net):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SE.SEC.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.SEC.NENR"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Unemployment, female (%):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Unemployment, female (%):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SL.UEM.TOTL.FE.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.FE.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Unemployment, male (%):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Unemployment, male (%):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SL.UEM.TOTL.MA.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.MA.ZS"].year})</span>
 					</p>
 				</div>
-				<div class="divOneCol">
-					<p>Children in employment, (% of age 7-14):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Children in employment, (% of age 7-14):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["SL.TLF.0714.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.TLF.0714.ZS"].year})</span>
 					</p>
 				</div>	
-				<div class="divOneCol">
-					<p>Population in slums (%):</p>
-					<p class="countryData">
+				<div>
+					<p class="modal-data-label mb-0">Population in slums (%):</p>
+					<p class="modal-data-med">
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</p>
@@ -1167,81 +1163,81 @@ $(document).ready(function () {
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Euro (€):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.EUR}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.EUR}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>US Dollar (US$): </p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.USD}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.USD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Japanese yen (¥ / 円):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.JPY}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.JPY}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>British pound (£):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.GBP}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.GBP}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Swiss franc (CHF):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CHF}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CHF}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">					
 						<p>Renminbi (¥ / 元):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CNY}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CNY}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Australian dollar (A$):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.AUD}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.AUD}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Canadian dollar (C$):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CAD}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CAD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Swedish krona (kr):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.SEK}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.SEK}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Norwegian krona (kr):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.NOK}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.NOK}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Danish krona (kr):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.DKK}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.DKK}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Polish złoty (zł):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.PLN}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.PLN}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Czech koruna (Kč):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CZK}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CZK}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Romanian leu (L):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.RON}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.RON}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Hungarian forint (Ft):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.HUF}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.HUF}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Bulgarian lev (лв):</p>
-						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.BGN}</span></p>
+						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.BGN}</span></p>
 					</div>
 				</div>
 			`)
@@ -1273,33 +1269,33 @@ $(document).ready(function () {
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Temperature:</p>
-						<p class="countryData">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
+						<p class="modal-data-med">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Feels Like:</p>
-						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
+						<p class="modal-data-med">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 				</div>
 
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Humidity:</p>
-						<p class="countryData">${main.humidity}<span class="weatherMeasurement">%</span></p>
+						<p class="modal-data-med">${main.humidity}<span class="weatherMeasurement">%</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Pressure:</p>
-						<p class="countryData">${main.pressure}<span class="weatherMeasurement">hPa</p>
+						<p class="modal-data-med">${main.pressure}<span class="weatherMeasurement">hPa</p>
 					</div>
 				</div>
 
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Wind:</p>
-						<p class="countryData">${wind}<span class="weatherMeasurement">m/s</span></p>
+						<p class="modal-data-med">${wind}<span class="weatherMeasurement">m/s</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Clouds</p>
-						<p class="countryData">${clouds}<span class="weatherMeasurement">%</span></p>
+						<p class="modal-data-med">${clouds}<span class="weatherMeasurement">%</span></p>
 					</div>
 				</div>
 			`)
