@@ -147,8 +147,33 @@ function createWikiMarker(article) {
 	wikiMarkersClusters.addLayer(wikiMarker);
 }
 
+document.onreadystatechange = function (e) {
+	if (document.readyState !== 'complete') {
+		$('#preloader').show();
+	}
+};
+/*
+$(window).on("load", function () {
+	console.log("preloading...")
+	$('#preloader').show();
+});
+*/
+
+$(document).on({
+	ajaxStart: function () {
+		console.log("waiting for ajax response...")
+		$('#preloader').show();
+	},
+	ajaxStop: function () {
+		console.log("got ajax response!")
+		$('#preloader').hide();
+	}
+});
 
 $(document).ready(function () {
+	//hide preloader
+	$("#preloader").hide();
+
 	// default country set to Greece, these values are changed as required
 	let countryCodeIso2 = "GR";
 	let [easternMost, westernMost, northersMost, southernMost] = [41.7488862, 34.7006096, 29.7296986, 19.2477876];

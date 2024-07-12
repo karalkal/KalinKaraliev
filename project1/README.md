@@ -86,6 +86,7 @@ In getExchangeRates() the sequence is as follow:
 - removed all references to country ISO3 codes, refactored APIs to work with ISO2
 - marker popups - removed unnecessary labels and data, reverted to Bootstrap styling
 - earthquakes marker popups - opening popup on `mouseover` or `click` event
+- added spinner/preloader
 
 
 
