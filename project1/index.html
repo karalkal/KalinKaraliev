@@ -31,7 +31,6 @@
 	<link rel="stylesheet" type="text/css" href="libs/leaflet/markercluster/MarkerCluster.Default.css" />
 	<!-- Custom CSS -->
 	<link rel="stylesheet" href="libs/css/main.css">
-	<link rel="stylesheet" href="libs/css/modal.css">
 	<link rel="stylesheet" href="libs/css/preloader.css">
 </head>
 
@@ -49,21 +48,40 @@
 		<!-- render map here -->
 	</div>
 
-	<div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+	<!-- Modal -->
+	<div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
-				<div class="modal-body">
-					<!-- render modal content here -->
+				<div class="modal-header bg-info">
+					<h5 class="modal-title text-center"></h5>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btnClose">Close</button>
+				<div class="modal-body bg-info-subtle">
+					<!-- render modal body here -->
+				</div>
+				<div class="modal-footer bg-info">
+					<button type="button" class="btn bg-info-subtle btnClose" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
+	<!-- <div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body"> -->
+	<!-- render modal content here -->
+	<!-- </div>
+				<div class="modal-footer">
+					<button type="button" class="btn btnClose">Close</button>
+				</div>
+			</div>
+		</div>
+	</div> -->
+
 	<div id="preloader">
-		
+
 	</div>
 
 	<!-- SCRIPTS -->

@@ -161,17 +161,17 @@ $(window).on("load", function () {
 
 $(document).on({
 	ajaxStart: function () {
-		console.log("waiting for ajax response...")
+		// console.log("waiting for ajax response...")
 		$('#preloader').show();
 	},
 	ajaxStop: function () {
-		console.log("got ajax response!")
+		// console.log("got ajax response!")
 		$('#preloader').hide();
 	}
 });
 
 $(document).ready(function () {
-	//hide preloader
+	//hide preloader appearing before document.ready
 	$("#preloader").hide();
 
 	// default country set to Greece, these values are changed as required
@@ -582,11 +582,11 @@ $(document).ready(function () {
 
 			success: function (result) {
 				// some "countries", e.g. N. Cyprus won't contain city data
-				if (result.data.localCountryData) {
-					easternMost = result.data.localCountryData.boundingBox.ne.lon;
-					westernMost = result.data.localCountryData.boundingBox.sw.lon;
-					northersMost = result.data.localCountryData.boundingBox.ne.lat;
-					southernMost = result.data.localCountryData.boundingBox.sw.lat;
+				if (result.data.localcountryData) {
+					easternMost = result.data.localcountryData.boundingBox.ne.lon;
+					westernMost = result.data.localcountryData.boundingBox.sw.lon;
+					northersMost = result.data.localcountryData.boundingBox.ne.lat;
+					southernMost = result.data.localcountryData.boundingBox.sw.lat;
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -709,7 +709,7 @@ $(document).ready(function () {
 			data: ({ countryCodeIso2: countryCodeIso2 }),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data[0], "essential");	// this API returns array with 1 element
+				rendercountryDataInModal(result.data[0], "essential");	// this API returns array with 1 element
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -728,7 +728,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "economy");
+				rendercountryDataInModal(result.data, "economy");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -747,7 +747,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "population");
+				rendercountryDataInModal(result.data, "population");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -766,7 +766,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "education");
+				rendercountryDataInModal(result.data, "education");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -796,7 +796,7 @@ $(document).ready(function () {
 							allCurrenciesData: allCurrenciesResult.data,
 							exchangeRatesData: ratesResult.data
 						}
-						renderCountryDataInModal(combinedData, "money");
+						rendercountryDataInModal(combinedData, "money");
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
 						console.log(jqXHR, textStatus, errorThrown)
@@ -826,7 +826,7 @@ $(document).ready(function () {
 			},
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "weather");
+				rendercountryDataInModal(result.data, "weather");
 
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -835,47 +835,44 @@ $(document).ready(function () {
 		});
 	}
 
-	function renderCountryDataInModal(data, dataType) {
+	function rendercountryDataInModal(data, dataType) {
 		//    ****    GOVERNMENT    ****    //
 		if (dataType === "essential") {
+			$(".modal-title").text(`${data.name.common}`);
 			$(".modal-body").html(`
-				<div class="divNames">
-					<h3>${data.name.common}</h3>
-				</div>
-
-				<div class="divTwoCols">
-					<div class="divFlagAndCoA">
-						<p>Flag:</p>
-						<div id="countryFlag"><img src="${data.flags.png}"></div>
+				<div class="row mb-2">
+					<div class="col">
+						<p mb-1>Flag:</p>
+						<img src="${data.flags.png}" alt="flag of ${data.name.common}">
 					</div>
-					<div class="divFlagAndCoA">
-						<p>Coat of Arms:</p>
-						<div id="countryCoatOfArms"><img src="${data.coatOfArms.png}"></div>
+					<div class="col">
+						<p mb-1>Coat of Arms:</p>
+						<img src="${data.coatOfArms.png}" alt="coat of arms of ${data.name.common}">
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
-						<p>Area:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('en-GB').format(data.area)} km&#178;</span></p>
+				<div class="row">
+					<div class="col">
+						Area:
+						<p class="modal-data-lrg">${Intl.NumberFormat('en-GB').format(data.area)} km&#178;</p>
 					</div>
-					<div>
-						<p>Population:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('en-GB').format(data.population)}</span></p>
+					<div class="col">
+						Population:
+						<p class="modal-data-lrg">${Intl.NumberFormat('en-GB').format(data.population)}</p>
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
-						<p>Capital:</p>
-						<p class="countryData"><span>${data.capital}</span></p>
+				<div class="row">
+					<div class="col">
+						Capital:
+						<p class="modal-data-lrg">${data.capital}</p>
 					</div>
-					<div>
-						<p>TLD:</p>
-						<p class="countryData"><span>${data.tld}</p>
+					<div class="col">
+						TLD:
+						<p class="modal-data-lrg">${data.tld}</p>
 					</div>
 				</div>
-			`)
+				`)
 		}
 		//    ****    ECONOMY    ****    //
 		else if (dataType === "economy") {
@@ -906,69 +903,65 @@ $(document).ready(function () {
 				};
 			}
 			// console.log("mostRecentData:\n", mostRecentData);
-
+			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Economy`);
 			$(".modal-body").html(`
-				<div class="divNames">
-					<h5>${mostRecentData.countryName || "Country not in DB"} - Economy</h5>
-				</div>
-
 				<div class="divOneCol">
 					<p>GDP (current US$):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>GDP growth (annual %):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>GDP per capita growth (annual %):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Imports of goods and services (BoP, current US$):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Exports of goods and services (BoP, current US$):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Current account balance (BoP, current US$):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Population below national poverty line (%):</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Number(mostRecentData["SI.POV.NAHC"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>Gini index:</p>
-					<p class="countryData">
+					<p class="modal-data-med">
 					${Number(mostRecentData["SI.POV.GINI"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
 					</p>
-				</div>				
-				`)
+				</div>
+			`)
 		}
 		//    ****    DEMOGRAPHICS    ****    //
 		else if (dataType === "population") {
@@ -999,9 +992,9 @@ $(document).ready(function () {
 				};
 			}
 			$(".modal-body").html(`
-				<div class="divNames">
+				< div class="divNames" >
 					<h5>${mostRecentData.countryName || "Country not in DB"} - Demographics</h5>
-				</div>
+				</div >
 
 				<div class="divOneCol">
 					<p>Population, total:</p>
@@ -1058,8 +1051,8 @@ $(document).ready(function () {
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
 					</p>
-				</div>				
-				`)
+				</div>
+			`)
 		}
 		//    ****    EDUCATION    ****    //
 		else if (dataType === "education") {
@@ -1090,9 +1083,9 @@ $(document).ready(function () {
 				};
 			}
 			$(".modal-body").html(`
-				<div class="divNames">
+				< div class="divNames" >
 					<h5>${mostRecentData.countryName || "Country not in DB"} - Education</h5>
-				</div>
+				</div >
 
 				<div class="divOneCol">
 					<p>Government expenditure on education, total (% of GDP):</p>
@@ -1149,8 +1142,8 @@ $(document).ready(function () {
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</p>
-				</div>				
-				`)
+				</div>
+			`)
 		}
 		//    ****    MONEY EXCHANGE    ****    //
 		else if (dataType === "money") {
@@ -1158,19 +1151,19 @@ $(document).ready(function () {
 			const currencyArr = Object.values(exchangeRatesData.primaryCurrency);
 
 			$(".modal-body").html(`
-				<div class="divNames">
+				< div class="divNames" >
 					<h5>${exchangeRatesData.countryName || "Country not in DB"} - Money</h5>
 					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
-				</div>`);
+				</div > `);
 
 			renderCurrencyConversionForm1(currencyArr, allCurrenciesData, exchangeRatesData);
 			renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData);
 
 			$(".modal-body").append(`
-				<div class="divOneCol">
+				< div class="divOneCol" >
 					<h6>exchange rates as of UTC time</h6>
 					<h6>${exchangeRatesData.exchangeRates.time_last_update_utc}</h6>
-				</div>
+				</div >
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Euro (€):</p>
@@ -1250,8 +1243,8 @@ $(document).ready(function () {
 						<p>Bulgarian lev (лв):</p>
 						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.BGN}</span></p>
 					</div>
-				</div>				
-				`)
+				</div>
+			`)
 		}
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
@@ -1261,11 +1254,11 @@ $(document).ready(function () {
 			const weather = weatherArr[0];
 
 			$(".modal-body").html(`
-				<div class="divNames">
+				< div class="divNames" >
 					<h5>Current weather in ${capitalName}</h5>
 					<h5 class="weatherSubHeading1">(capital of ${countryName || "Country not in DB"})</h5>
 					<h5 class="weatherSubHeading1">at ${epochDateTime} (Unix time)</h5>
-				</div>
+				</div >
 				<div class="divTwoCols">
 					<div class="divWeather">
 						<div class="weatherIcon"><img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png"></div>

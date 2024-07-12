@@ -18,10 +18,10 @@ $resultJson = curl_exec($ch);
 
 curl_close($ch);
 
-$decodedCountryData = json_decode($resultJson, true);
+$decodedcountryData = json_decode($resultJson, true);
 
-$output['data']['capitalName'] = $decodedCountryData[0]['capital'];
-$output['data']['countryName'] = $decodedCountryData[0]['name']['common'];
+$output['data']['capitalName'] = $decodedcountryData[0]['capital'];
+$output['data']['countryName'] = $decodedcountryData[0]['name']['common'];
 
 // NOTE: longitude param is called lon in this API
 // example URL: https://api.openweathermap.org/data/2.5/weather?appid=cabebd5bf39ecdc54982ba9d45841f89&units=metric&lat=37.98381&lon=23.727539

@@ -63,7 +63,7 @@ As of 1 July 2024 app is deployed at:
 
 - **lines 635-668** - getEarthquakesAndSetMarkers, as above **with filtering** by country. In order to make the marker clustering meaningful we have high value for maxRows. Often the API will return a timeout error if no value is returned from its DB (I guess) within 14-15 seconds. So this "error" is more or less intended - if we have little wikipedia articles for a particular country, clustering becomes totally unnecessary.
 
-- **lines 670-802** - The different GET functions will send AJAX request to our backend (written in basic PHP). On success it will trigger our modal rendering function with the data returned and additional parameter identifying what data the modal would actually be displaying, e.g. `renderCountryDataInModal(result.data, "essential")`. Most of these are self-explanatory, including the php scripts.
+- **lines 670-802** - The different GET functions will send AJAX request to our backend (written in basic PHP). On success it will trigger our modal rendering function with the data returned and additional parameter identifying what data the modal would actually be displaying, e.g. `rendercountryDataInModal(result.data, "essential")`. Most of these are self-explanatory, including the php scripts.
 In getExchangeRates() the sequence is as follow:
   - Get the codes, names, symbols of all supported currencies (AJAX request to `getAllCurrencies.php`).  
   - If this request is successful send next one to `getExchangeRatesData.php`. It will 1. get essential country data from `https://restcountries.com/v3.1/alpha/`. From there we get the searched country's primary currency (`$decodedData[0]['currencies'];`). 2. Having identified the country's currency we send another request to get exchange rates to all other currencies
@@ -87,6 +87,7 @@ In getExchangeRates() the sequence is as follow:
 - marker popups - removed unnecessary labels and data, reverted to Bootstrap styling
 - earthquakes marker popups - opening popup on `mouseover` or `click` event
 - added spinner/preloader
+- restyled modals with Bootstrap
 
 
 

@@ -44,10 +44,30 @@ body {
 }
 
 .popup-icon {
-    font-size: 120%;
+    font-size: 1.2em;
 }
 
 .popup-data {
-    font-size: 125%;
+    font-size: 1.25em;
     font-weight: 600;
+}
+
+.modal-body img {
+    max-width: 100%;
+}
+
+.modal-data-lrg {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.modal-data-med {
+    font-size: 1.16em;
+    font-weight: 600;
+}
+
+.modal-data-med .dataYear {
+    font-size: .8em;
+    font-weight: 400;
+    font-style: italic;
 }
