@@ -152,13 +152,8 @@ document.onreadystatechange = function (e) {
 		$('#preloader').show();
 	}
 };
-/*
-$(window).on("load", function () {
-	console.log("preloading...")
-	$('#preloader').show();
-});
-*/
 
+// trigger preloader while ajax request is pending
 $(document).on({
 	ajaxStart: function () {
 		// console.log("waiting for ajax response...")
@@ -813,7 +808,6 @@ $(document).ready(function () {
 
 	function getWeather(capitalLatLng) {
 		const { lat, lng } = capitalLatLng;
-		console.log(lat, lng)
 		$.ajax({
 			url: "libs/php/getWeatherData.php",
 			type: 'GET',
@@ -1054,7 +1048,6 @@ $(document).ready(function () {
 		}
 		//    ****    EDUCATION    ****    //
 		else if (dataType === "education") {
-			console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
 				"SE.XPD.TOTL.GD.ZS": { value: "N.A.", year: "no recent data is available" },	// "Government expenditure on education, total (% of GDP)"
