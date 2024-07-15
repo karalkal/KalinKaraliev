@@ -905,56 +905,56 @@ $(document).ready(function () {
 			$(".modal-body").html(`
 				<div>
 					<p class="modal-data-label mb-0">GDP (current US$):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">GDP growth (annual %):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">GDP per capita growth (annual %):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Imports of goods and services (BoP, current US$):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Exports of goods and services (BoP, current US$):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Current account balance (BoP, current US$):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Population below national poverty line (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SI.POV.NAHC"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Gini index:</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SI.POV.GINI"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
 					</p>
@@ -994,56 +994,56 @@ $(document).ready(function () {
 			$(".modal-body").html(`
 				<div>
 					<p class="modal-data-label mb-0">Population, total:</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["SP.POP.TOTL"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Land area (sq. km):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
 					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
 					</p>
 				</div>			
 				<div>
 					<p class="modal-data-label mb-0">Population density (people/sq.km):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["EN.POP.DNST"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Population growth (annual %):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SP.POP.GROW"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.GROW"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Urban population (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Rural population (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Life expectancy, male (years):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
 					</p>
 				</div>	
 				<div>
 					<p class="modal-data-label mb-0">Life expectancy, female (years):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
 					</p>
@@ -1082,56 +1082,56 @@ $(document).ready(function () {
 			$(".modal-body").html(`
 				<div>
 					<p class="modal-data-label mb-0">Government expenditure on education, total (% of GDP):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SE.XPD.TOTL.GD.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.XPD.TOTL.GD.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Pupil-teacher ratio, primary:</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SE.PRM.ENRL.TC.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.ENRL.TC.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">School enrollment, primary (% net):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SE.PRM.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.NENR"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">School enrollment, secondary (% net):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SE.SEC.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.SEC.NENR"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Unemployment, female (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SL.UEM.TOTL.FE.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.FE.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Unemployment, male (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SL.UEM.TOTL.MA.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.MA.ZS"].year})</span>
 					</p>
 				</div>
 				<div>
 					<p class="modal-data-label mb-0">Children in employment, (% of age 7-14):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["SL.TLF.0714.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.TLF.0714.ZS"].year})</span>
 					</p>
 				</div>	
 				<div>
 					<p class="modal-data-label mb-0">Population in slums (%):</p>
-					<p class="modal-data-med">
+					<p class="modal-data-right">
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</p>
@@ -1168,56 +1168,52 @@ $(document).ready(function () {
 			// weather is array
 			const weather = weatherArr[0];
 
+			$(".modal-title").text(`Current weather in capital ${capitalName}`);
 			$(".modal-body").html(`
-				< div class="divNames" >
-					<h5>Current weather in ${capitalName}</h5>
-					<h5 class="weatherSubHeading1">(capital of ${countryName || "Country not in DB"})</h5>
-					<h5 class="weatherSubHeading1">at ${epochDateTime} (Unix time)</h5>
-				</div >
-				<div class="divTwoCols">
-					<div class="divWeather">
-						<div class="weatherIcon"><img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png"></div>
+				<div class="row mb-2">
+					<div class="col">
+						<div class="weatherIcon">
+							<img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png">
+						</div>
 					</div>
-					<div>
+					<div class="col">
 						<p class="weatherDescription1">${weather.main}</p>
 						<p class="weatherDescription2">${weather.description}</p>
 					</div>
 				</div>
 
-
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Temperature:</p>
-						<p class="modal-data-med">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
+				<div class="row">
+					<div class="col">
+						Temperature:
+						<p class="modal-data-left">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
-					<div class="divSplitColumnsRight">
-						<p>Feels Like:</p>
-						<p class="modal-data-med">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
-					</div>
-				</div>
-
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Humidity:</p>
-						<p class="modal-data-med">${main.humidity}<span class="weatherMeasurement">%</span></p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>Pressure:</p>
-						<p class="modal-data-med">${main.pressure}<span class="weatherMeasurement">hPa</p>
+					<div class="col">
+						Feels Like:
+						<p class="modal-data-left">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 				</div>
 
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Wind:</p>
-						<p class="modal-data-med">${wind}<span class="weatherMeasurement">m/s</span></p>
+				<div class="row">
+					<div class="col">
+						Humidity:
+						<p class="modal-data-left">${main.humidity}<span class="weatherMeasurement">%</span></p>
 					</div>
-					<div class="divSplitColumnsRight">
-						<p>Clouds</p>
-						<p class="modal-data-med">${clouds}<span class="weatherMeasurement">%</span></p>
+					<div class="col">
+						Pressure:
+						<p class="modal-data-left">${main.pressure}<span class="weatherMeasurement">hPa</p>
 					</div>
 				</div>
-			`)
+
+				<div class="row">
+					<div class="col">
+						Wind:
+						<p class="modal-data-left">${wind}<span class="weatherMeasurement">m/s</span></p>
+					</div>
+					<div class="col">
+						Clouds
+						<p class="modal-data-left">${clouds}<span class="weatherMeasurement">%</span></p>
+					</div>
+				</div>`)
 		}
 
 		// ... AND FINALLY, make the modal visible
