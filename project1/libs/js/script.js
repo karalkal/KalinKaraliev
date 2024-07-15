@@ -336,13 +336,13 @@ $(document).ready(function () {
 			<form class="mt-2 mb-2" id="exchangeForm1">
 				<div class="row mb-1">
 					<div class="col-12">
-						<h6>convert local to foreign:</h6>
+						<h6 class="convertor-form-type">convert local to foreign:</h6>
 					</div>
 				</div>
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
-						<input type="text" class="form-control" 
-						id="originalAmount1" placeholder="convert [amount]">
+						<input type="number" class="form-control" 
+						id="originalAmount1" value="100">
 					</div>
 					<div class="col-7 pl-1 align-self-end">
 						<input readonly class="form-control text-truncate" id="originalCurrency1"
@@ -352,11 +352,11 @@ $(document).ready(function () {
 				<div class="row">
 					<div class="col-7 pr-1">
 						<select class="form-control" id="currencySelect1">	
-						${populateCurrencySelectContainer(allCurrenciesData.supported_codes, "to: &darr; [select currency] &darr;")}
+						${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
 						</select>
 					</div>
 					<div class="col-5 pl-1">
-						<p class="form-control" id="resultAmount1">[result]</p>
+						<p class="form-control" id="resultAmount1">${(100 * exchangeRatesData.exchangeRates.conversion_rates["USD"]).toFixed(2)}</p>
 					</div>
 				</div>				
 			</form>`);
@@ -367,6 +367,8 @@ $(document).ready(function () {
 		}, "Must be a positive real number");
 
 		$("#exchangeForm1 #currencySelect1").
+			on("change", calculateFromNativeToForeign);
+		$("#exchangeForm1 #originalAmount1").
 			on("change", calculateFromNativeToForeign);
 		$("#exchangeForm1 #originalAmount1").
 			on("keyup", calculateFromNativeToForeign);
@@ -385,7 +387,7 @@ $(document).ready(function () {
 			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
 			if (originalAmount1 !== undefined && selectedCurrency) {
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = (targetCurrencyExchangeRate * originalAmount1).toFixed(6);
+				let result = (targetCurrencyExchangeRate * originalAmount1).toFixed(2);
 				$('#resultAmount1').html(result).addClass('convertedAmount');
 			}
 			else {		// reinstate original state
@@ -427,17 +429,17 @@ $(document).ready(function () {
 			<form class="mt-2 mb-2" id="exchangeForm2">
 				<div class="row mb-1">
 					<div class="col-12">
-						<h6>convert foreign to local:</h6>
+						<h6 class="convertor-form-type">convert foreign to local:</h6>
 					</div>
 				</div>
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
-						<input type="text" class="form-control" 
-						id="originalAmount2" placeholder="convert [amount]">
+						<input type="number" class="form-control" 
+						id="originalAmount2" value="100">
 					</div>
 					<div class="col-7 pl-1 align-self-end">
 						<select class="form-control" id="currencySelect2">	
-						${populateCurrencySelectContainer(allCurrenciesData.supported_codes, "&darr; [select currency] &darr;")}
+						${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
 						</select>						
 					</div>
 				</div>
@@ -447,7 +449,7 @@ $(document).ready(function () {
 							value="to: ${currencyArr[0].name} (${currencyArr[0].symbol})"></input>						
 					</div>
 					<div class="col-5 pl-1">
-						<p class="form-control" id="resultAmount2">[result]</p>
+						<p class="form-control" id="resultAmount2">${(100 / exchangeRatesData.exchangeRates.conversion_rates["USD"]).toFixed(2)}</p>
 					</div>
 				</div>				
 			</form>`);
@@ -458,6 +460,8 @@ $(document).ready(function () {
 		}, "Must be a positive real number");
 
 		$("#exchangeForm2 #currencySelect2").
+			on("change", calculateFromForeignToLocal);
+		$("#exchangeForm2 #originalAmount2").
 			on("change", calculateFromForeignToLocal);
 		$("#exchangeForm2 #originalAmount2").
 			on("keyup", calculateFromForeignToLocal);
@@ -476,7 +480,7 @@ $(document).ready(function () {
 			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
 			if (originalAmount2 !== undefined && selectedCurrency) {
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = (originalAmount2 / targetCurrencyExchangeRate).toFixed(6);
+				let result = (originalAmount2 / targetCurrencyExchangeRate).toFixed(2);
 				$('#resultAmount2').html(result).addClass('convertedAmount');
 			}
 			else {		// reinstate original state
@@ -485,8 +489,8 @@ $(document).ready(function () {
 		}
 	}
 
-	function populateCurrencySelectContainer(allCurrenciesArr, optionsMenuTitle) {
-		let options = `<option selected disabled hidden>${optionsMenuTitle}</option>`;
+	function populateCurrencySelectContainer(allCurrenciesArr) {
+		let options = `<option selected value="USD">United States Dollar</option>`;
 		allCurrenciesArr.forEach(curr => {
 			options += `<option value="${curr[0]}">${curr[1]}</option>\n`
 		});
@@ -1139,100 +1143,22 @@ $(document).ready(function () {
 			const { allCurrenciesData, exchangeRatesData } = data
 			const currencyArr = Object.values(exchangeRatesData.primaryCurrency);
 
-			$(".modal-body").html(`
-				< div class="divNames" >
-					<h5>${exchangeRatesData.countryName || "Country not in DB"} - Money</h5>
-					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
-				</div > `);
+			$(".modal-title").text(`${exchangeRatesData.countryName || "Country not in DB"} - Exchange Rates`);
 
+			$(".modal-body").html(``);	// just delete everything and render forms anew
 			renderCurrencyConversionForm1(currencyArr, allCurrenciesData, exchangeRatesData);
 			renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData);
 
 			$(".modal-body").append(`
-				< div class="divOneCol" >
-					<h6>exchange rates as of UTC time</h6>
-					<h6>${exchangeRatesData.exchangeRates.time_last_update_utc}</h6>
-				</div >
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Euro (€):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.EUR}</span></p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>US Dollar (US$): </p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.USD}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Japanese yen (¥ / 円):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.JPY}</span></p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>British pound (£):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.GBP}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Swiss franc (CHF):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CHF}</span></p>
-					</div>
-					<div class="divSplitColumnsRight">					
-						<p>Renminbi (¥ / 元):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CNY}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Australian dollar (A$):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.AUD}</span></p>
-					</div>					
-					<div class="divSplitColumnsRight">
-						<p>Canadian dollar (C$):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CAD}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Swedish krona (kr):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.SEK}</span></p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>Norwegian krona (kr):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.NOK}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Danish krona (kr):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.DKK}</span></p>
-					</div>
-					<div class="divSplitColumnsRight">
-						<p>Polish złoty (zł):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.PLN}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Czech koruna (Kč):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.CZK}</span></p>
-					</div>					
-					<div class="divSplitColumnsRight">
-						<p>Romanian leu (L):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.RON}</span></p>
-					</div>
-				</div>
-				<div class="divTwoColsSplit">
-					<div class="divSplitColumnsLeft">
-						<p>Hungarian forint (Ft):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.HUF}</span></p>
-					</div>					
-					<div class="divSplitColumnsRight">
-						<p>Bulgarian lev (лв):</p>
-						<p class="modal-data-med"><span>${exchangeRatesData.exchangeRates.conversion_rates.BGN}</span></p>
-					</div>
-				</div>
+				<div>
+					<h6 class="dataDateTitle">exchange rates last updated:</h6>
+					<p class="dataDate">${new Date(exchangeRatesData.exchangeRates.time_last_update_utc)
+					.toLocaleString("en-GB", {
+						year: 'numeric', month: 'numeric', day: 'numeric',
+						hour: 'numeric', minute: 'numeric', second: 'numeric',
+					})
+				}</p>
+				</div >				
 			`)
 		}
 		//    ****    WEATHER    ****    //

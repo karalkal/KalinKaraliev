@@ -80,7 +80,6 @@ In getExchangeRates() the sequence is as follow:
 - removed country name alternative spelling from government modal
 - removed sunset and sunrise from modal
 - switched from Intl.NumberFormat("de-DE") to Intl.NumberFormat("en-GB") for large numbers formatting, use "," instead of"."
-- applied correct bootstrap class to modal
 - when new country is selected polygon of previously selected country disappears
 - removed custom styling of all leaflet buttons (zoom in/ot, buttons, map selector) and `<select>`
 - removed all references to country ISO3 codes, refactored APIs to work with ISO2
@@ -88,6 +87,7 @@ In getExchangeRates() the sequence is as follow:
 - earthquakes marker popups - opening popup on `mouseover` or `click` event
 - added spinner/preloader
 - restyled modals with Bootstrap
+- money exchange forms render with default value, currency and calculation
 
 
 
