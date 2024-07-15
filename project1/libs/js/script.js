@@ -876,14 +876,14 @@ $(document).ready(function () {
 			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
-				"BN.CAB.XOKA.CD": { value: "N.A.", year: "no recent data is available" },
-				"BM.GSR.GNFS.CD": { value: "N.A.", year: "no recent data is available" },
-				"BX.GSR.GNFS.CD": { value: "N.A.", year: "no recent data is available" },
-				"NY.GDP.MKTP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
-				"NY.GDP.MKTP.CD": { value: "N.A.", year: "no recent data is available" },
-				"NY.GDP.PCAP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
-				"SI.POV.NAHC": { value: "N.A.", year: "no recent data is available" },			//Population below national poverty line (%)
-				"SI.POV.GINI": { value: "N.A.", year: "no recent data is available" },			//Gini
+				"BN.CAB.XOKA.CD": { value: "N.A.", year: "N.A." },
+				"BM.GSR.GNFS.CD": { value: "N.A.", year: "N.A." },
+				"BX.GSR.GNFS.CD": { value: "N.A.", year: "N.A." },
+				"NY.GDP.MKTP.KD.ZG": { value: "N.A.", year: "N.A." },
+				"NY.GDP.MKTP.CD": { value: "N.A.", year: "N.A." },
+				"NY.GDP.PCAP.KD.ZG": { value: "N.A.", year: "N.A." },
+				"SI.POV.NAHC": { value: "N.A.", year: "N.A." },			//Population below national poverty line (%)
+				"SI.POV.GINI": { value: "N.A.", year: "N.A." },			//Gini
 			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
@@ -902,61 +902,84 @@ $(document).ready(function () {
 			// console.log("mostRecentData:\n", mostRecentData);
 			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Economy`);
 			$(".modal-body").html(`
-				<div>
-					<p class="modal-data-label mb-0">GDP (current US$):</p>
-					<p class="modal-data-right">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					GDP (current US$):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">GDP growth (annual %):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					GDP growth (annual&nbsp;%):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">GDP per capita growth (annual %):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					GDP per capita growth (annual&nbsp;%):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Imports of goods and services (BoP, current US$):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					Imports of goods and services (BoP,&nbsp;current&nbsp;US$):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Exports of goods and services (BoP, current US$):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					Exports of goods and services (BoP,&nbsp;current&nbsp;US$):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Current account balance (BoP, current US$):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					Current account balance (BoP,&nbsp;current&nbsp;US$):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Population below national poverty line (%):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					Population below national poverty line (%):
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Number(mostRecentData["SI.POV.NAHC"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Gini index:</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-5 modal-data-label mb-0">
+					Gini index:
+					</div>
+					<div class="col-7 modal-data-left modal-data">
 					${Number(mostRecentData["SI.POV.GINI"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
-					</p>
+					</div>
 				</div>
 			`)
 		}
@@ -965,14 +988,14 @@ $(document).ready(function () {
 			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
-				"SP.DYN.LE00.MA.IN": { value: "N.A.", year: "no recent data is available" },	// "Life expectancy at birth, male (years)"
-				"SP.DYN.LE00.FE.IN": { value: "N.A.", year: "no recent data is available" },	// "Life expectancy at birth, female (years)"
-				"EN.POP.DNST": { value: "N.A.", year: "no recent data is available" },			// "Population density (people per sq. km of land area)"
-				"SP.POP.GROW": { value: "N.A.", year: "no recent data is available" },			// "Population growth (annual %)"
-				"SP.URB.TOTL.IN.ZS": { value: "N.A.", year: "no recent data is available" },	// "Urban population (% of total population)"
-				"SP.RUR.TOTL.ZS": { value: "N.A.", year: "no recent data is available" },		// "Rural population (% of total population)"
-				"SP.POP.TOTL": { value: "N.A.", year: "no recent data is available" },			// "Population, total"
-				"AG.LND.TOTL.K2": { value: "N.A.", year: "no recent data is available" },		// "Land area (sq. km)"
+				"SP.DYN.LE00.MA.IN": { value: "N.A.", year: "N.A." },	// "Life expectancy at birth, male (years)"
+				"SP.DYN.LE00.FE.IN": { value: "N.A.", year: "N.A." },	// "Life expectancy at birth, female (years)"
+				"EN.POP.DNST": { value: "N.A.", year: "N.A." },			// "Population density (people per sq. km of land area)"
+				"SP.POP.GROW": { value: "N.A.", year: "N.A." },			// "Population growth (annual %)"
+				"SP.URB.TOTL.IN.ZS": { value: "N.A.", year: "N.A." },	// "Urban population (% of total population)"
+				"SP.RUR.TOTL.ZS": { value: "N.A.", year: "N.A." },		// "Rural population (% of total population)"
+				"SP.POP.TOTL": { value: "N.A.", year: "N.A." },			// "Population, total"
+				"AG.LND.TOTL.K2": { value: "N.A.", year: "N.A." },		// "Land area (sq. km)"
 			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
@@ -991,61 +1014,83 @@ $(document).ready(function () {
 
 			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Demographics`);
 			$(".modal-body").html(`
-				<div>
-					<p class="modal-data-label mb-0">Population, total:</p>
-					<p class="modal-data-right">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Population, total:
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["SP.POP.TOTL"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Land area (sq. km):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Land area (sq. km):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
 					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
-					</p>
+					</div>
 				</div>			
-				<div>
-					<p class="modal-data-label mb-0">Population density (people/sq.km):</p>
-					<p class="modal-data-right">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Population density (people/sq.km):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["EN.POP.DNST"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Population growth (annual %):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Population growth (annual&nbsp;%):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["SP.POP.GROW"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.GROW"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Urban population (%):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Urban population (%):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Rural population (%):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Rural population (%):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Life expectancy, male (years):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Life expectancy, male (years):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
-					</p>
-				</div>	
-				<div>
-					<p class="modal-data-label mb-0">Life expectancy, female (years):</p>
-					<p class="modal-data-right">
+					</div>
+				</div>
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-6 modal-data-label mb-0">
+					Life expectancy, female (years):
+					</div>
+					<div class="col-6 modal-data-left modal-data">
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
-					</p>
+					</div>
 				</div>
 			`)
 		}
@@ -1053,14 +1098,14 @@ $(document).ready(function () {
 		else if (dataType === "education") {
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
-				"SE.XPD.TOTL.GD.ZS": { value: "N.A.", year: "no recent data is available" },	// "Government expenditure on education, total (% of GDP)"
-				"SE.PRM.ENRL.TC.ZS": { value: "N.A.", year: "no recent data is available" },	// "Pupil-teacher ratio, primary"
-				"SE.PRM.NENR": { value: "N.A.", year: "no recent data is available" },			// "School enrollment, primary (% net)"
-				"SE.SEC.NENR": { value: "N.A.", year: "no recent data is available" },			// "School enrollment, secondary (% net)"
-				"SL.UEM.TOTL.FE.ZS": { value: "N.A.", year: "no recent data is available" },	// "Unemployment, female (% of female labor force) (modeled ILO estimate)"
-				"SL.UEM.TOTL.MA.ZS": { value: "N.A.", year: "no recent data is available" },	// "Unemployment, male (% of male labor force) (modeled ILO estimate)"
-				"SL.TLF.0714.ZS": { value: "N.A.", year: "no recent data is available" },		// "Children in employment, total (% of children ages 7-14)"
-				"EN.POP.SLUM.UR.ZS": { value: "N.A.", year: "no recent data is available" },	// "Population living in slums (% of urban population)"
+				"SE.XPD.TOTL.GD.ZS": { value: "N.A.", year: "N.A." },	// "Government expenditure on education, total (% of GDP)"
+				"SE.PRM.ENRL.TC.ZS": { value: "N.A.", year: "N.A." },	// "Pupil-teacher ratio, primary"
+				"SE.PRM.NENR": { value: "N.A.", year: "N.A." },			// "School enrollment, primary (% net)"
+				"SE.SEC.NENR": { value: "N.A.", year: "N.A." },			// "School enrollment, secondary (% net)"
+				"SL.UEM.TOTL.FE.ZS": { value: "N.A.", year: "N.A." },	// "Unemployment, female (% of female labor force) (modeled ILO estimate)"
+				"SL.UEM.TOTL.MA.ZS": { value: "N.A.", year: "N.A." },	// "Unemployment, male (% of male labor force) (modeled ILO estimate)"
+				"SL.TLF.0714.ZS": { value: "N.A.", year: "N.A." },		// "Children in employment, total (% of children ages 7-14)"
+				"EN.POP.SLUM.UR.ZS": { value: "N.A.", year: "N.A." },	// "Population living in slums (% of urban population)"
 			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
@@ -1079,61 +1124,84 @@ $(document).ready(function () {
 
 			$(".modal-title").text(`${mostRecentData.countryName || "Country not in DB"} - Education`);
 			$(".modal-body").html(`
-				<div>
-					<p class="modal-data-label mb-0">Government expenditure on education, total (% of GDP):</p>
-					<p class="modal-data-right">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Government expenditure on education, total (% of GDP):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SE.XPD.TOTL.GD.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.XPD.TOTL.GD.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Pupil-teacher ratio, primary:</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Pupil-teacher ratio, primary:
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SE.PRM.ENRL.TC.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.ENRL.TC.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">School enrollment, primary (% net):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					School enrollment,&nbsp;primary&nbsp;(%&nbsp;net):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SE.PRM.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.NENR"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">School enrollment, secondary (% net):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					School enrollment, secondary&nbsp;(%&nbsp;net):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SE.SEC.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.SEC.NENR"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Unemployment, female (%):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Unemployment, female&nbsp;(%):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SL.UEM.TOTL.FE.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.FE.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Unemployment, male (%):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Unemployment, male&nbsp;(%):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SL.UEM.TOTL.MA.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.MA.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
-				<div>
-					<p class="modal-data-label mb-0">Children in employment, (% of age 7-14):</p>
-					<p class="modal-data-right">
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Children in employment, (%&nbsp;of&nbsp;age&nbsp;7-14):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["SL.TLF.0714.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.TLF.0714.ZS"].year})</span>
-					</p>
-				</div>	
-				<div>
-					<p class="modal-data-label mb-0">Population in slums (%):</p>
-					<p class="modal-data-right">
+					</div>
+				</div>
+				<hr class="hr-modal-data">
+				<div class="row mb-1">
+					<div class="col-7 modal-data-label mb-0">
+					Population in slums (%):
+					</div>
+					<div class="col-5 modal-data-left modal-data">
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
-					</p>
+					</div>
 				</div>
 			`)
 		}

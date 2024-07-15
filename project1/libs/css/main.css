@@ -61,6 +61,11 @@ body {
     font-weight: 600;
 }
 
+.hr-modal-data {
+    border: 1px solid #0DCAF0;
+    margin: 0 0 .5rem 0;
+}
+
 .modal-data-label {
     font-size: 1em;
     font-weight: 300;
@@ -73,13 +78,13 @@ body {
     font-weight: 600;
 }
 
-.modal-data-right {
+.modal-data {
     text-align: right;
     font-size: 1.16em;
     font-weight: 600;
 }
 
-.modal-data-right .dataYear {
+.modal-data .dataYear {
     font-size: .9em;
     font-weight: 400;
     font-style: italic;
