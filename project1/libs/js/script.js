@@ -1,4 +1,5 @@
-//   ----    TILE LAYERS and INIT    ----    //
+//   ----   MAP INIT    ----    //
+// define base layers
 const Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
@@ -20,24 +21,17 @@ const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}
 });
 */
 
-
-let map = L.map("map", { layers: [Jawg_Terrain] });
-
-const baseMaps = { 		// last one in list will be displayed by default on initial render
+const baseMaps = {
 	"Satellite (Esri_WorldImagery)": Esri_WorldImagery,
 	"Topographical (OpenTopoMap)": OpenTopoMap,
 	"Terrain (Jawg Lab)": Jawg_Terrain,
 	// "General (OpenStreetMap)": OpenStreetMap_HOT,
 };
 
-// define extra layers
+// define overlays
 const citiesLayer = L.layerGroup([]);
 const earthQuakeLayer = L.layerGroup([]);
 const wikiLayer = L.layerGroup([]);
-
-// define and add marker clusters
-const wikiMarkersClusters = L.markerClusterGroup();
-wikiMarkersClusters.addTo(wikiLayer);
 
 const overlayMaps = {
 	"Cities": citiesLayer,
@@ -45,6 +39,11 @@ const overlayMaps = {
 	"Wiki Articles": wikiLayer,
 };
 
+// define and add marker clusters
+const wikiMarkersClusters = L.markerClusterGroup();
+wikiMarkersClusters.addTo(wikiLayer);
+
+let map = L.map("map", { layers: [Jawg_Terrain, citiesLayer] });
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 // define polygon with zero values, in dedicated function remove prev. polygon, create new with actual values, add it map and center map
