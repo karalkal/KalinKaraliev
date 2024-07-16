@@ -553,6 +553,7 @@ $(document).ready(function () {
 
 			success: function (result) {
 				countryCodeIso2 = result.data.countryCode;
+				$('#countrySelect').val(countryCodeIso2).change();
 
 				centerMapOnSelectedCountry(countryCodeIso2);
 				loadCountryBoundaries(countryCodeIso2);
