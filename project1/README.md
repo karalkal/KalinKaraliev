@@ -89,6 +89,8 @@ In getExchangeRates() the sequence is as follow:
 - restyled modals with Bootstrap
 - money exchange forms render with default value, currency and calculation
 - default overlay (cities) displayed upon initial load
+- restyled modals economy, demographics, education as 2 columns in row
+
 
 
 

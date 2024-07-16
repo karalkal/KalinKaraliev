@@ -17,6 +17,7 @@ foreach ($decodedDataArray['features'] as $countryData) {
         // echo "SUCCESS!\n" . $countryCode . " === " . $countryData['properties']['iso_a2'] . " which is " . $countryData['properties']['name'] . "\n";
         $coordinatesArray = $countryData['geometry']['coordinates'];
         $geometryType = $countryData['geometry']['type'];
+        $countryName = $countryData['properties']['name'];
         break;
     }
 }
@@ -27,6 +28,7 @@ $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 $output['data']['coordinatesArray'] = $coordinatesArray;
 $output['data']['geometryType'] = $geometryType;
+$output['data']['countryName'] = $countryName;
 
 
 header('Content-Type: application/json; charset=UTF-8');

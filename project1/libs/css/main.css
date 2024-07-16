@@ -61,7 +61,7 @@ body {
     font-weight: 600;
 }
 
-.hr-modal-data {
+.hr-modal {
     border: 1px solid #0DCAF0;
     margin: 0 0 .5rem 0;
 }
@@ -72,14 +72,7 @@ body {
     font-family: "Oswald", sans-serif;
 }
 
-.modal-data-left {
-    text-align: left;
-    font-size: 1.16em;
-    font-weight: 600;
-}
-
 .modal-data {
-    text-align: right;
     font-size: 1.16em;
     font-weight: 600;
 }
@@ -100,12 +93,12 @@ body {
 }
 
 .weatherDescription1 {
-    font-size: 1.25em;
+    font-size: 1.2em;
     font-weight: 600;
 }
 
 .weatherDescription2 {
-    font-size: 1.16em;
+    font-size: 1.1em;
     font-weight: 500;
     font-style: oblique;
 }

@@ -14,12 +14,6 @@ const Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{
 	attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	accessToken: 'mJZnCYHFpNftBsC6PF64A1V0f7vwRW5xneYEg4rRfMoZimE53hjq2wJUuG1btLQ4'
 });
-/*
-const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-	maxZoom: 22,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
-});
-*/
 
 const baseMaps = {
 	"Satellite (Esri_WorldImagery)": Esri_WorldImagery,
@@ -170,8 +164,10 @@ $(document).ready(function () {
 
 	// default country set to Greece, these values are changed as required
 	let countryCodeIso2 = "GR";
+	let countryName = "Greece";		// updated from local json (countryBorders.geo.json)
 	let [easternMost, westernMost, northersMost, southernMost] = [41.7488862, 34.7006096, 29.7296986, 19.2477876];
-	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }
+	let capitalName = "Athens";		// updated when getting its coordinates
+	let capitalLatLng = { lat: 37.983810, lng: 23.727539 };
 
 	renderCountriesNamesAndCodes();			// Load Counties as <select> options
 
@@ -196,7 +192,7 @@ $(document).ready(function () {
 
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
-		updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
+		updateCapitalNameAndCoordinates(countryCodeIso2);		// needed for weather modal
 		getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 		getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 		getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
@@ -507,6 +503,7 @@ $(document).ready(function () {
 			data: ({ countryCodeIso2: countryCodeIso2 }),
 
 			success: function (result) {
+				countryName = result.data.countryName;	// update var for current country
 				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
 				let latlngs = [];
 				if (result.data.geometryType === "Polygon") {
@@ -559,7 +556,7 @@ $(document).ready(function () {
 
 				centerMapOnSelectedCountry(countryCodeIso2);
 				loadCountryBoundaries(countryCodeIso2);
-				updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
+				updateCapitalNameAndCoordinates(countryCodeIso2);		// needed for weather modal
 				getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 				getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 				getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
@@ -593,16 +590,17 @@ $(document).ready(function () {
 		})
 	}
 
-	function updateCapitalCoordinates(countryCodeIso2) {
+	function updateCapitalNameAndCoordinates(countryCodeIso2) {
 		$.ajax({
-			url: "libs/php/getCapitalLatLngByCountryIso2Code.php",
+			url: "libs/php/getCapitalNameAndLatLngByCountryIso2Code.php",
 			type: 'GET',
 			async: false,
 			dataType: 'json',
 			data: { countryCodeIso2 },
 			success: function (result) {
-				const capitalCoordinatesArr = result.data.capitalLatLng
-				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
+				const capitalCoordinatesArr = result.data.capitalLatLng;
+				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] };
+				capitalName = result.data.capitalName;
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -824,7 +822,6 @@ $(document).ready(function () {
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "weather");
-
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -906,77 +903,77 @@ $(document).ready(function () {
 					<div class="col-5 modal-data-label mb-0">
 					GDP (current US$):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					GDP growth (annual&nbsp;%):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					GDP per capita growth (annual&nbsp;%):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					Imports of goods and services (BoP,&nbsp;current&nbsp;US$):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					Exports of goods and services (BoP,&nbsp;current&nbsp;US$):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					Current account balance (BoP,&nbsp;current&nbsp;US$):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					Population below national poverty line (%):
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Number(mostRecentData["SI.POV.NAHC"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-5 modal-data-label mb-0">
 					Gini index:
 					</div>
-					<div class="col-7 modal-data-left modal-data">
+					<div class="col-7 text-end modal-data">
 					${Number(mostRecentData["SI.POV.GINI"].value)} 
 					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
 					</div>
@@ -1018,17 +1015,17 @@ $(document).ready(function () {
 					<div class="col-6 modal-data-label mb-0">
 					Population, total:
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["SP.POP.TOTL"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Land area (sq. km):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Intl.NumberFormat('en-GB').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
 					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
 					</div>
@@ -1037,57 +1034,57 @@ $(document).ready(function () {
 					<div class="col-6 modal-data-label mb-0">
 					Population density (people/sq.km):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["EN.POP.DNST"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Population growth (annual&nbsp;%):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["SP.POP.GROW"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.POP.GROW"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Urban population (%):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Rural population (%):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Life expectancy, male (years):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-6 modal-data-label mb-0">
 					Life expectancy, female (years):
 					</div>
-					<div class="col-6 modal-data-left modal-data">
+					<div class="col-6 text-end modal-data">
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
 					</div>
@@ -1128,77 +1125,77 @@ $(document).ready(function () {
 					<div class="col-7 modal-data-label mb-0">
 					Government expenditure on education, total (% of GDP):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SE.XPD.TOTL.GD.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.XPD.TOTL.GD.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					Pupil-teacher ratio, primary:
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SE.PRM.ENRL.TC.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.ENRL.TC.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					School enrollment,&nbsp;primary&nbsp;(%&nbsp;net):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SE.PRM.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.PRM.NENR"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					School enrollment, secondary&nbsp;(%&nbsp;net):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SE.SEC.NENR"].value)} 
 					<span class="dataYear">(${mostRecentData["SE.SEC.NENR"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					Unemployment, female&nbsp;(%):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SL.UEM.TOTL.FE.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.FE.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					Unemployment, male&nbsp;(%):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SL.UEM.TOTL.MA.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.MA.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					Children in employment, (%&nbsp;of&nbsp;age&nbsp;7-14):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["SL.TLF.0714.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SL.TLF.0714.ZS"].year})</span>
 					</div>
 				</div>
-				<hr class="hr-modal-data">
+				<hr class="hr-modal">
 				<div class="row mb-1">
 					<div class="col-7 modal-data-label mb-0">
 					Population in slums (%):
 					</div>
-					<div class="col-5 modal-data-left modal-data">
+					<div class="col-5 text-end modal-data">
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</div>
@@ -1231,7 +1228,7 @@ $(document).ready(function () {
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
 			// console.log(data);
-			const { capitalName, countryName, main, weatherArr, clouds, wind, epochDateTime } = data;
+			const { main, weatherArr, clouds, wind } = data;
 			// weather is array
 			const weather = weatherArr[0];
 
@@ -1244,41 +1241,38 @@ $(document).ready(function () {
 						</div>
 					</div>
 					<div class="col">
-						<p class="weatherDescription1">${weather.main}</p>
-						<p class="weatherDescription2">${weather.description}</p>
+						<p class="weatherDescription1 mb-0">${weather.main}</p>
+						<p class="weatherDescription2 mb-0">${weather.description}</p>
 					</div>
 				</div>
-
+				<hr class="hr-modal">
 				<div class="row">
 					<div class="col">
-						Temperature:
-						<p class="modal-data-left">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
+						<p class="modal-data-label mb-0">Temperature:</p>
+						<p class="text-start mb-1 modal-data">${Math.round(main.temp)}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 					<div class="col">
-						Feels Like:
-						<p class="modal-data-left">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
+						<p class="modal-data-label mb-0">Feels Like:</p>
+						<p class="text-start mb-1 modal-data">${Math.round(main.feels_like)}<span class="weatherMeasurement">&deg;C</span></p>
+					</div>
+					<div class="col">
+						<p class="modal-data-label mb-0">Humidity:</p>
+						<p class="text-start mb-1 modal-data">${main.humidity}<span class="weatherMeasurement">%</span></p>
 					</div>
 				</div>
-
-				<div class="row">
+				<hr class="hr-modal">
+				<div class="row">					
 					<div class="col">
-						Humidity:
-						<p class="modal-data-left">${main.humidity}<span class="weatherMeasurement">%</span></p>
+						<p class="modal-data-label mb-0">Pressure:</p>
+						<p class="text-start mb-1 modal-data">${main.pressure}<span class="weatherMeasurement">hPa</p>
 					</div>
 					<div class="col">
-						Pressure:
-						<p class="modal-data-left">${main.pressure}<span class="weatherMeasurement">hPa</p>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col">
-						Wind:
-						<p class="modal-data-left">${wind}<span class="weatherMeasurement">m/s</span></p>
+						<p class="modal-data-label mb-0">Wind:</p>
+						<p class="text-start mb-1 modal-data">${wind}<span class="weatherMeasurement">m/s</span></p>
 					</div>
 					<div class="col">
-						Clouds
-						<p class="modal-data-left">${clouds}<span class="weatherMeasurement">%</span></p>
+						<p class="modal-data-label mb-0">Clouds:</p>
+						<p class="text-start mb-1 modal-data">${clouds}<span class="weatherMeasurement">%</span></p>
 					</div>
 				</div>`)
 		}
