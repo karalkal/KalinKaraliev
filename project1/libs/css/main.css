@@ -89,7 +89,7 @@ body {
 
 .weatherIcon img {
     width: 44%;
-    background-color: var(--xanthous);
+    background-color: var(--vanilla);
 }
 
 .weatherDescription1 {

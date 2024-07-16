@@ -90,7 +90,9 @@ In getExchangeRates() the sequence is as follow:
 - money exchange forms render with default value, currency and calculation
 - default overlay (cities) displayed upon initial load
 - restyled modals economy, demographics, education as 2 columns in row
-
+- updating current country name from local file ()
+- getting current capital name while getting its coordinates
+- restyled weather modal, displaying forecast for +24, +47 and +72 hours (approx.)
 
 
 

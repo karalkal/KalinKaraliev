@@ -651,7 +651,10 @@ $(document).ready(function () {
 				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
 			}),
 			success: function (earthQuakeRes) {
-				// sometimes returns timeout error
+				// sometimes returns timeout error, different from wiki timeout
+				if (earthQuakeRes.status == "200" && !earthQuakeRes.data) {
+					alert(`Error: ${earthQuakeRes.status.returnedIn / 1000} seconds passed:\nLoading Earthquakes data timed out.\nIf it is required, please try again later.`)
+				}
 				if (earthQuakeRes.data && earthQuakeRes.data.earthquakes) {
 					for (let equake of earthQuakeRes.data.earthquakes) {
 						createEarthquakeMarker(equake);
@@ -677,9 +680,9 @@ $(document).ready(function () {
 				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
 			}),
 			success: function (wikiRes) {
-				// if requesting too much data returns timeout error
-				if (wikiRes.data.status) {
-					alert(`Error ${wikiRes.data.status.value}:\nLoading Wikipedia data timed out.\nIf it is required, please try again later.`)
+				// if requesting too much data returns timeout error (data.status.message)
+				if (wikiRes.data && wikiRes.data.status) {
+					alert(`Error ${wikiRes.data.status.message}:\nLoading Wikipedia data timed out.\nIf it is required, please try again later.`)
 				}
 				if (wikiRes.data && wikiRes.data.geonames) {
 					// filter for country only
@@ -1227,8 +1230,16 @@ $(document).ready(function () {
 		}
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
-			// console.log(data);
-			const { main, weatherArr, clouds, wind } = data;
+			// forecastData is with 3-hour step
+			const { main, weatherArr, clouds, wind, forecastData } = data;
+			// console.log(forecastData[0]);
+			// console.log(forecastData[8]);
+			// console.log(forecastData[16]);
+			// console.log(forecastData[24]);
+			const tomorrow = forecastData[8];
+			const tomorrowPlusOne = forecastData[16];
+			const tomorrowPlusTwo = forecastData[24];
+
 			// weather is array
 			const weather = weatherArr[0];
 
@@ -1274,7 +1285,36 @@ $(document).ready(function () {
 						<p class="modal-data-label mb-0">Clouds:</p>
 						<p class="text-start mb-1 modal-data">${clouds}<span class="weatherMeasurement">%</span></p>
 					</div>
-				</div>`)
+				</div>
+				
+				<div class="bg-info p-1">
+					<h6 class="text-center">Forecast for next 3 days</h6>
+				</div>
+				<div class="row">					
+					<div class="col mx-auto">
+						<div class="forecast-period">&#x223C;24 hours</div>
+						<div class="weatherIcon">
+							<img src="https://openweathermap.org/img/wn/${tomorrow.weather[0].icon}@2x.png">
+						</div>
+							<p class="text-start mb-1 modal-data">${Math.round(tomorrow.main.temp)}<span class="weatherMeasurement">&deg;C</span></p>
+					</div>
+					<div class="col">
+						<div class="forecast-period">&#x223C;48 hours</div>
+						<div class="weatherIcon">
+							<img src="https://openweathermap.org/img/wn/${tomorrowPlusOne.weather[0].icon}@2x.png">
+						</div>
+							<p class="text-start mb-1 modal-data">${Math.round(tomorrowPlusOne.main.temp)}<span class="weatherMeasurement">&deg;C</span></p>
+					</div>
+					<div class="col">
+						<div class="forecast-period">&#x223C;72 hours</div>
+						<div class="weatherIcon">
+							<img src="https://openweathermap.org/img/wn/${tomorrowPlusTwo.weather[0].icon}@2x.png">
+						</div>
+							<p class="text-start mb-1 modal-data">${Math.round(tomorrowPlusTwo.main.temp)}<span class="weatherMeasurement">&deg;C</span></p>
+					</div>
+				</div>
+
+				`)
 		}
 
 		// ... AND FINALLY, make the modal visible

@@ -39,6 +39,12 @@ $forecastJson = curl_exec($ch);
 
 curl_close($ch);
 
+$decodedForecastData = json_decode($forecastJson, true);
+
+$output['data']['forecastData'] = $decodedForecastData['list'];
+
+curl_close($ch);
+
 $decodedWeatherForecastData = json_decode($forecastJson, true);
 
 // attach status info
