@@ -43,10 +43,6 @@ $decodedForecastData = json_decode($forecastJson, true);
 
 $output['data']['forecastData'] = $decodedForecastData['list'];
 
-curl_close($ch);
-
-$decodedWeatherForecastData = json_decode($forecastJson, true);
-
 // attach status info
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
