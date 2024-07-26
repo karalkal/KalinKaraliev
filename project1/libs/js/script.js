@@ -179,6 +179,8 @@ $(document).ready(function () {
 	map.once('locationfound', setCountryOfUserLocation); // gets code AND sets location and gets cities
 	map.on('locationerror', (e) => {
 		alert(`${e.message}\nBy default map will be set to Greece`);
+		$('#countrySelect').val("GR").change();
+
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
 		getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
