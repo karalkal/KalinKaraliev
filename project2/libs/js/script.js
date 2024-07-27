@@ -1,10 +1,17 @@
+let employees = [];
+let departments = [];
+let locations = [];
+
+getAll();
+
+
 document.onreadystatechange = function (e) {
 	if (document.readyState !== 'complete') {
 		$('#preloader').show();
 	}
 };
 
-// trigger preloader while ajax request is pending
+// trigger preloader while ajax request is pending, else hide it
 $(document).on({
 	ajaxStart: function () {
 		console.log("waiting for ajax response...")
@@ -22,7 +29,6 @@ $('document').ready(function () {
 
 	$("#searchInp").on("keyup", function () {
 
-		// your code
 
 	});
 
@@ -49,31 +55,26 @@ $('document').ready(function () {
 	});
 
 	$("#filterBtn").click(function () {
-
 		// Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
 
 	});
 
 	$("#addBtn").click(function () {
-
 		// Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
 
 	});
 
 	$("#personnelBtn").click(function () {
-
 		// Call function to refresh personnel table
 
 	});
 
 	$("#departmentsBtn").click(function () {
-
 		// Call function to refresh department table
 
 	});
 
 	$("#locationsBtn").click(function () {
-
 		// Call function to refresh location table
 
 	});
@@ -134,7 +135,6 @@ $('document').ready(function () {
 	});
 
 	// Executes when the form button with type="submit" is clicked
-
 	$("#editPersonnelForm").on("submit", function (e) {
 
 		// Executes when the form button with type="submit" is clicked
@@ -146,5 +146,49 @@ $('document').ready(function () {
 
 	})
 })
+
+
+function getAll() {
+	$.ajax({
+		url: "libs/php/getAll.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			console.log(result.data);
+			$.each(result.data, function (index, staffMember) {
+				$('#personnelTableBody')
+					.append($(`<tr>
+                            <td class="align-middle text-nowrap">
+                                ${staffMember.lastName}, ${staffMember.firstName}
+                            </td>
+                            <td class="align-middle text-nowrap d-none d-md-table-cell">
+                                ${staffMember.department}
+                            </td>
+                            <td class="align-middle text-nowrap d-none d-md-table-cell">
+								${staffMember.location}
+                            </td>
+                            <td class="align-middle text-nowrap d-none d-md-table-cell">
+                                ${staffMember.email}
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#editPersonnelModal" data-id="23">
+                                    <i class="fa-solid fa-pencil fa-fw"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#deletePersonnelModal" data-id="23">
+                                    <i class="fa-solid fa-trash fa-fw"></i>
+                                </button>
+                            </td>
+                        </tr>`));
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
+}
 
 

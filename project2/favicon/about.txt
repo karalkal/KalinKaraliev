@@ -1,6 +1,6 @@
 This favicon was generated using the following font:
 
-- Font Title: Akaya Telivigala
-- Font Author: Copyright 2015 The Akaya Telivigala Project Authors (https://github.com/vaishnavimurthy/Akaya-Telivigala)
-- Font Source: https://fonts.gstatic.com/s/akayatelivigala/v22/lJwc-oo_iG9wXqU3rCTD395tp0uifdLdsIH0YH8.ttf
+- Font Title: Metal Mania
+- Font Author: Copyright (c) 2012 by Open Window (dathanboardman@gmail.com) with Reseved Font Name "Metal Mania"
+- Font Source: https://fonts.gstatic.com/s/metalmania/v22/RWmMoKWb4e8kqMfBUdPFJeXCg6UKDXlq.ttf
 - Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))
