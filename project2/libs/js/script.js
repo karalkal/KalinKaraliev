@@ -1,10 +1,10 @@
-let employees = [];
+let staff = [];
 let departments = [];
 let locations = [];
 
-getAll();
+getAllStaff();
 getAllDepartments();
-// getAllLocations();
+getAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -38,17 +38,16 @@ $('document').ready(function () {
 
 		if ($("#personnelBtn").hasClass("active")) {
 			// Refresh personnel table
-			getAll();
-		} else {
-			if ($("#departmentsBtn").hasClass("active")) {
-				// Refresh department table
-				getAllDepartments();
-			} else {
-				// Refresh location table
-				getAllLocations();
-			}
+			getAllStaff();
 		}
-
+		else if ($("#departmentsBtn").hasClass("active")) {
+			// Refresh department table
+			getAllDepartments();
+		}
+		else if ($("#locationsBtn").hasClass("active")) {
+			// Refresh location table
+			getAllLocations();
+		}
 	});
 
 	$("#filterBtn").click(function () {
@@ -63,7 +62,7 @@ $('document').ready(function () {
 
 	$("#personnelBtn").click(function () {
 		// Call function to refresh personnel table
-		getAll();
+		getAllStaff();
 	});
 
 	$("#departmentsBtn").click(function () {
@@ -73,7 +72,7 @@ $('document').ready(function () {
 
 	$("#locationsBtn").click(function () {
 		// Call function to refresh location table
-
+		getAllLocations();
 	});
 
 	$("#editPersonnelModal").on("show.bs.modal", function (e) {
@@ -145,41 +144,15 @@ $('document').ready(function () {
 })
 
 
-function getAll() {
+function getAllStaff() {
 	$.ajax({
 		url: "libs/php/getAll.php",
 		type: 'GET',
 		dataType: 'json',
 
 		success: function (result) {
-			console.log(result.data);
-			$.each(result.data, function (index, staffRow) {
-				$('#personnelTableBody')
-					.append($(`<tr>
-                            <td class="align-middle text-nowrap">
-                                ${staffRow.lastName}, ${staffRow.firstName}
-                            </td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">
-                                ${staffRow.department}
-                            </td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">
-								${staffRow.location}
-                            </td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">
-                                ${staffRow.email}
-                            </td>
-                            <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#editPersonnelModal" data-id="23">
-                                    <i class="fa-solid fa-pencil fa-fw"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#deletePersonnelModal" data-id="23">
-                                    <i class="fa-solid fa-trash fa-fw"></i>
-                                </button>
-                            </td>
-                        </tr>`));
-			});
+			staff = result.data;
+			renderStaffTable(staff);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -195,27 +168,8 @@ function getAllDepartments() {
 		dataType: 'json',
 
 		success: function (result) {
-			console.log(result.data);
-			$.each(result.data, function (index, deptRow) {
-				$('#departmentTableBody')
-					.append($(`<tr>
-                            <td class="align-middle text-nowrap">
-                                ${deptRow.departmentName}
-                            </td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">
-								${deptRow.locationName}
-                            </td>
-                            <td class="align-middle text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#editDepartmentModal" data-id="1">
-                                    <i class="fa-solid fa-pencil fa-fw"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
-                                    <i class="fa-solid fa-trash fa-fw"></i>
-                                </button>
-                            </td>
-                        </tr>`));
-			});
+			departments = result.data;
+			renderDeptData(departments);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -231,18 +185,94 @@ function getAllLocations() {
 		dataType: 'json',
 
 		success: function (result) {
-			console.log(result.data);
-			$.each(result.data, function (index, locationRow) {
-				$('#locationTableBody')
-					.append($(`<tr>
-
-                        </tr>`));
-			});
+			locations = result.data;
+			renderLocationsData(locations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
 			alert("Something went wrong")
 		}
+	});
+}
+
+function renderStaffTable(staff) {
+	// clear table, then render with up to date values
+	$('#personnelTableBody').empty();
+
+	$.each(staff, function (index, staffRow) {
+		$('#personnelTableBody')
+			.append($(`<tr>
+					<td class="align-middle text-nowrap">
+						${staffRow.lastName}, ${staffRow.firstName}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.department}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.location}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.email}
+					</td>
+					<td class="text-end text-nowrap">
+						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+							data-bs-target="#editPersonnelModal" data-id="23">
+							<i class="fa-solid fa-pencil fa-fw"></i>
+						</button>
+						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+							data-bs-target="#deletePersonnelModal" data-id="23">
+							<i class="fa-solid fa-trash fa-fw"></i>
+						</button>
+					</td>
+				</tr>`));
+	});
+}
+
+function renderDeptData(departments) {
+	// clear table, then render with up to date values
+	$('#departmentTableBody').empty()
+
+	$.each(departments, function (index, deptRow) {
+		$('#departmentTableBody')
+			.append($(`<tr>
+					<td class="align-middle text-nowrap">
+						${deptRow.departmentName}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${deptRow.locationName}
+					</td>
+					<td class="align-middle text-end text-nowrap">
+						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+							data-bs-target="#editDepartmentModal" data-id="1">
+							<i class="fa-solid fa-pencil fa-fw"></i>
+						</button>
+						<button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
+							<i class="fa-solid fa-trash fa-fw"></i>
+						</button>
+					</td>
+				</tr>`));
+	});
+}
+
+function renderLocationsData(locations) {
+	// clear table, then render with up to date values
+	$('#locationTableBody').empty()
+
+	$.each(locations, function (index, locationRow) {
+		$('#locationTableBody')
+			.append($(`<tr>
+					<td class="align-middle text-nowrap">
+						${locationRow.locationName}
+					</td>
+					<td class="align-middle text-end text-nowrap">
+						<button type="button" class="btn btn-primary btn-sm">
+							<i class="fa-solid fa-pencil fa-fw"></i>
+						</button>
+						<button type="button" class="btn btn-primary btn-sm">
+							<i class="fa-solid fa-trash fa-fw"></i>
+						</button>
+					</td>
+				</tr>`));
 	});
 }
 

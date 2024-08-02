@@ -28,7 +28,7 @@ if (mysqli_connect_errno()) {
 }
 
 // SQL does not accept parameters and so is not prepared
-$query = 'SELECT department.id as departmentId, department.name as departmentName, location.name as locationName FROM department LEFT JOIN location ON (location.id = department.locationID) ORDER BY location.name;';
+$query = 'SELECT id as locationId, name as locationName FROM location';
 
 $result = $conn->query($query);
 
