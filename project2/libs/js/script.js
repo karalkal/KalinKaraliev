@@ -2,9 +2,9 @@ let staff = [];
 let departments = [];
 let locations = [];
 
-getAllStaff();
-getAllDepartments();
-getAllLocations();
+getAndDisplayAllStaff();
+getAndDisplayAllDepartments();
+getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -38,15 +38,15 @@ $('document').ready(function () {
 
 		if ($("#personnelBtn").hasClass("active")) {
 			// Refresh personnel table
-			getAllStaff();
+			getAndDisplayAllStaff();
 		}
 		else if ($("#departmentsBtn").hasClass("active")) {
 			// Refresh department table
-			getAllDepartments();
+			getAndDisplayAllDepartments();
 		}
 		else if ($("#locationsBtn").hasClass("active")) {
 			// Refresh location table
-			getAllLocations();
+			getAndDisplayAllLocations();
 		}
 	});
 
@@ -64,7 +64,7 @@ $('document').ready(function () {
 		}
 		else if ($("#departmentsBtn").hasClass("active")) {
 			// Create new department entry
-			console.log("clicked #departmentsBtn");
+			createDepartment();
 		}
 		else if ($("#locationsBtn").hasClass("active")) {
 			// Create new location entry
@@ -74,15 +74,15 @@ $('document').ready(function () {
 	});
 
 	$("#personnelBtn").click(function () {
-		getAllStaff();				// refresh personnel table
+		getAndDisplayAllStaff();				// refresh personnel table
 	});
 
 	$("#departmentsBtn").click(function () {
-		getAllDepartments();		// refresh department table
+		getAndDisplayAllDepartments();		// refresh department table
 	});
 
 	$("#locationsBtn").click(function () {
-		getAllLocations();			// refresh location table
+		getAndDisplayAllLocations();			// refresh location table
 	});
 
 	$("#editPersonnelModal").on("show.bs.modal", function (e) {
@@ -154,7 +154,7 @@ $('document').ready(function () {
 })
 
 
-function getAllStaff() {
+function getAndDisplayAllStaff() {
 	$.ajax({
 		url: "libs/php/getAll.php",
 		type: 'GET',
@@ -171,7 +171,7 @@ function getAllStaff() {
 	});
 }
 
-function getAllDepartments() {
+function getAndDisplayAllDepartments() {
 	$.ajax({
 		url: "libs/php/getAllDepartments.php",
 		type: 'GET',
@@ -179,7 +179,7 @@ function getAllDepartments() {
 
 		success: function (result) {
 			departments = result.data;
-			renderDeptData(departments);
+			renderDeptTable(departments);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -188,7 +188,7 @@ function getAllDepartments() {
 	});
 }
 
-function getAllLocations() {
+function getAndDisplayAllLocations() {
 	$.ajax({
 		url: "libs/php/getAllLocations.php",
 		type: 'GET',
@@ -196,7 +196,7 @@ function getAllLocations() {
 
 		success: function (result) {
 			locations = result.data;
-			renderLocationsData(locations);
+			renderLocationsTable(locations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -241,7 +241,7 @@ function renderStaffTable(staff) {
 	});
 }
 
-function renderDeptData(departments) {
+function renderDeptTable(departments) {
 	// clear table, then render with up to date values
 	$('#departmentTableBody').empty()
 
@@ -271,7 +271,7 @@ function renderDeptData(departments) {
 	});
 }
 
-function renderLocationsData(locations) {
+function renderLocationsTable(locations) {
 	// clear table, then render with up to date values
 	$('#locationTableBody').empty()
 
@@ -302,7 +302,7 @@ function renderLocationsData(locations) {
 
 function createLocation() {
 	// populate modal
-	$('#modal-title').text("Create Location");
+	$('#modal-title').text("Create New Location");
 	$('#modal-body').html(`
 		<form id="createLocationForm">
 			<div class="form-floating mb-3">
@@ -355,20 +355,116 @@ function createLocation() {
 						`)
 
 					// send new GET request and display updated data
-					getAllLocations()
+					getAndDisplayAllLocations()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error retrieving data");
+					$("#modal-title").replaceWith("Error writing data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				$("#modal-title").replaceWith(
-					"Error retrieving data"
+					"Error writing data"
 				);
 			}
 		});
 	})
 }
+
+function createDepartment() {
+	// populate modal
+	$('#modal-title').text("Create New Department");
+	$('#modal-body').html(`
+		<form id="createDeptForm">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control" id="newDeptName" placeholder="New department" required>
+				<label for="newDeptName">New department</label>
+			</div>
+
+			<div class="form-floating">
+                <select class="form-select" id="locationsSelect" placeholder="Locations">
+                </select>
+                <label for="locationsSelect">Locations</label>
+             </div>
+		</form>
+		`);
+
+	// populate locations select element
+	console.log(locations);
+	$.each(locations, function (i, location) {
+		$("#locationsSelect").append(
+			$("<option>", {
+				value: location.locationId,
+				text: location.locationName,
+			})
+		);
+	});
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="createDeptForm" class="btn btn-outline-primary btn-sm myBtn">
+			SAVE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+
+	//show modal
+	$("#genericModal").modal("show");
+
+	// get data from form
+	$("#createDeptForm").on("submit", function (e) {
+		e.preventDefault();
+		let newDeptName = $("#newDeptName").val();
+		let capitalizedDeptName = newDeptName
+			.split(' ')
+			.map(w => {
+				if (w.toLowerCase() === "and") {		// Res and Dev (lowercase and)
+					return w.toLowerCase()
+				}		// else
+				return w[0].toUpperCase() + w.substring(1).toLowerCase()
+			})
+			.join(' ');
+
+		let locationId = Number($('#locationsSelect option').filter(':selected').val());
+
+		// AJAX call to save form data
+		$.ajax({
+			url: "libs/php/insertDepartment.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				deptName: capitalizedDeptName,
+				locationId: locationId,
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					console.log("SUCCESS!!");
+					$('#modal-title').text(`Created department ${capitalizedDeptName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments();
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith(
+					"Error writing data"
+				);
+			}
+		});
+	})
+}
+
 
 
 
