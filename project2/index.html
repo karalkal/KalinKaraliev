@@ -42,7 +42,9 @@
                         <button id="filterBtn" type="button" class="btn btn-primary">
                             <i class="fa-solid fa-filter fa-fw"></i>
                         </button>
-                        <button id="addBtn" type="button" class="btn btn-primary">
+                        <!-- ADD button -->
+                        <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#genericModal">
                             <i class="fa-solid fa-plus fa-fw"></i>
                         </button>
                     </div>
@@ -157,6 +159,34 @@
 
                     </form>
 
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" form="editPersonnelForm"
+                        class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">CANCEL</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- GENERIC MODAL -->
+    <div id="genericModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 id="modal-title" class="modal-title">Generic modal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div id="modal-body" class="modal-body">
+                    <!-- Modal body varies -->
                 </div>
 
                 <div class="modal-footer">

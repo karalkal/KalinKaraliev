@@ -58,21 +58,31 @@ $('document').ready(function () {
 	$("#addBtn").click(function () {
 		// Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
 
+		if ($("#personnelBtn").hasClass("active")) {
+			// Create new personnel entry
+			console.log("clicked #personnelBtn");
+		}
+		else if ($("#departmentsBtn").hasClass("active")) {
+			// Create new department entry
+			console.log("clicked #departmentsBtn");
+		}
+		else if ($("#locationsBtn").hasClass("active")) {
+			// Create new location entry
+			createLocation();
+		}
+
 	});
 
 	$("#personnelBtn").click(function () {
-		// Call function to refresh personnel table
-		getAllStaff();
+		getAllStaff();				// refresh personnel table
 	});
 
 	$("#departmentsBtn").click(function () {
-		// Call function to refresh department table
-		getAllDepartments();
+		getAllDepartments();		// refresh department table
 	});
 
 	$("#locationsBtn").click(function () {
-		// Call function to refresh location table
-		getAllLocations();
+		getAllLocations();			// refresh location table
 	});
 
 	$("#editPersonnelModal").on("show.bs.modal", function (e) {
@@ -274,6 +284,139 @@ function renderLocationsData(locations) {
 					</td>
 				</tr>`));
 	});
+}
+
+function createLocation() {
+	console.log("OPPPPA");
+	$("#genericModal").on("show.bs.modal", function (e) {
+
+		console.log(e);
+
+		// $.ajax({
+		// 	url:
+		// 		"https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getPersonnelByID.php",
+		// 	type: "POST",
+		// 	dataType: "json",
+		// 	data: {
+		// 		// Retrieve the data-id attribute from the calling button
+		// 		// see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+		// 		// for the non-jQuery JavaScript alternative
+		// 		id: $(e.relatedTarget).attr("data-id")
+		// 	},
+		// 	success: function (result) {
+		// 		var resultCode = result.status.code;
+
+		// 		if (resultCode == 200) {
+
+		// 			// Update the hidden input with the employee id so that
+		// 			// it can be referenced when the form is submitted
+
+		// 			$("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
+
+		// 			$("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
+		// 			$("#editPersonnelLastName").val(result.data.personnel[0].lastName);
+		// 			$("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
+		// 			$("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
+
+		// 			$("#editPersonnelDepartment").html("");
+
+		// 			$.each(result.data.department, function () {
+		// 				$("#editPersonnelDepartment").append(
+		// 					$("<option>", {
+		// 						value: this.id,
+		// 						text: this.name
+		// 					})
+		// 				);
+		// 			});
+
+		// 			$("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
+
+		// 		} else {
+		// 			$("#editPersonnelModal .modal-title").replaceWith(
+		// 				"Error retrieving data"
+		// 			);
+		// 		}
+		// 	},
+		// 	error: function (jqXHR, textStatus, errorThrown) {
+		// 		$("#editPersonnelModal .modal-title").replaceWith(
+		// 			"Error retrieving data"
+		// 		);
+		// 	}
+		// });
+	});
+
+
+
+	$('#modal-title').text("Create Location");
+	$('#modal-body').html(`
+		<form id="createLocationForm">
+			<input type="hidden" id="editPersonnelEmployeeID">
+
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control" id="createLocationName" placeholder="New location" required>
+				<label for="createLocationName">New location</label>
+			</div>
+		</form>
+		`);
+
+	$("#genericModal").on("show.bs.modal", function (e) {
+
+		console.log(e);
+
+		// $.ajax({
+		// 	url:
+		// 		"https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getPersonnelByID.php",
+		// 	type: "POST",
+		// 	dataType: "json",
+		// 	data: {
+		// 		// Retrieve the data-id attribute from the calling button
+		// 		// see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+		// 		// for the non-jQuery JavaScript alternative
+		// 		id: $(e.relatedTarget).attr("data-id")
+		// 	},
+		// 	success: function (result) {
+		// 		var resultCode = result.status.code;
+
+		// 		if (resultCode == 200) {
+
+		// 			// Update the hidden input with the employee id so that
+		// 			// it can be referenced when the form is submitted
+
+		// 			$("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
+
+		// 			$("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
+		// 			$("#editPersonnelLastName").val(result.data.personnel[0].lastName);
+		// 			$("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
+		// 			$("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
+
+		// 			$("#editPersonnelDepartment").html("");
+
+		// 			$.each(result.data.department, function () {
+		// 				$("#editPersonnelDepartment").append(
+		// 					$("<option>", {
+		// 						value: this.id,
+		// 						text: this.name
+		// 					})
+		// 				);
+		// 			});
+
+		// 			$("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
+
+		// 		} else {
+		// 			$("#editPersonnelModal .modal-title").replaceWith(
+		// 				"Error retrieving data"
+		// 			);
+		// 		}
+		// 	},
+		// 	error: function (jqXHR, textStatus, errorThrown) {
+		// 		$("#editPersonnelModal .modal-title").replaceWith(
+		// 			"Error retrieving data"
+		// 		);
+		// 	}
+		// });
+	});
+
+
 }
 
 
