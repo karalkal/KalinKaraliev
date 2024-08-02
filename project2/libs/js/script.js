@@ -3,8 +3,10 @@ let departments = [];
 let locations = [];
 
 getAll();
+getAllDepartments();
+// getAllLocations();
 
-
+// initial spinner, before page loads
 document.onreadystatechange = function (e) {
 	if (document.readyState !== 'complete') {
 		$('#preloader').show();
@@ -35,21 +37,16 @@ $('document').ready(function () {
 	$("#refreshBtn").click(function () {
 
 		if ($("#personnelBtn").hasClass("active")) {
-
 			// Refresh personnel table
-
+			getAll();
 		} else {
-
 			if ($("#departmentsBtn").hasClass("active")) {
-
 				// Refresh department table
-
+				getAllDepartments();
 			} else {
-
 				// Refresh location table
-
+				getAllLocations();
 			}
-
 		}
 
 	});
@@ -66,12 +63,12 @@ $('document').ready(function () {
 
 	$("#personnelBtn").click(function () {
 		// Call function to refresh personnel table
-
+		getAll();
 	});
 
 	$("#departmentsBtn").click(function () {
 		// Call function to refresh department table
-
+		getAllDepartments();
 	});
 
 	$("#locationsBtn").click(function () {
@@ -156,20 +153,20 @@ function getAll() {
 
 		success: function (result) {
 			console.log(result.data);
-			$.each(result.data, function (index, staffMember) {
+			$.each(result.data, function (index, staffRow) {
 				$('#personnelTableBody')
 					.append($(`<tr>
                             <td class="align-middle text-nowrap">
-                                ${staffMember.lastName}, ${staffMember.firstName}
+                                ${staffRow.lastName}, ${staffRow.firstName}
                             </td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell">
-                                ${staffMember.department}
+                                ${staffRow.department}
                             </td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell">
-								${staffMember.location}
+								${staffRow.location}
                             </td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell">
-                                ${staffMember.email}
+                                ${staffRow.email}
                             </td>
                             <td class="text-end text-nowrap">
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -190,5 +187,65 @@ function getAll() {
 		}
 	});
 }
+
+function getAllDepartments() {
+	$.ajax({
+		url: "libs/php/getAllDepartments.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			console.log(result.data);
+			$.each(result.data, function (index, deptRow) {
+				$('#departmentTableBody')
+					.append($(`<tr>
+                            <td class="align-middle text-nowrap">
+                                ${deptRow.departmentName}
+                            </td>
+                            <td class="align-middle text-nowrap d-none d-md-table-cell">
+								${deptRow.locationName}
+                            </td>
+                            <td class="align-middle text-end text-nowrap">
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#editDepartmentModal" data-id="1">
+                                    <i class="fa-solid fa-pencil fa-fw"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
+                                    <i class="fa-solid fa-trash fa-fw"></i>
+                                </button>
+                            </td>
+                        </tr>`));
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
+}
+
+function getAllLocations() {
+	$.ajax({
+		url: "libs/php/getAllLocations.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			console.log(result.data);
+			$.each(result.data, function (index, locationRow) {
+				$('#locationTableBody')
+					.append($(`<tr>
+
+                        </tr>`));
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
+}
+
+
 
 
