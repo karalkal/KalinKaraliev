@@ -226,11 +226,14 @@ function renderStaffTable(staff) {
 					</td>
 					<td class="text-end text-nowrap">
 						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-							data-bs-target="#editPersonnelModal" data-id="23">
+							data-bs-target="#editPersonnelModal" 
+							data-id="${staffRow.staffId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
+
 						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-							data-bs-target="#deletePersonnelModal" data-id="23">
+							data-bs-target="#deletePersonnelModal" 
+							data-id="${staffRow.staffId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
 					</td>
@@ -253,10 +256,14 @@ function renderDeptData(departments) {
 					</td>
 					<td class="align-middle text-end text-nowrap">
 						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-							data-bs-target="#editDepartmentModal" data-id="1">
+							data-bs-target="#editDepartmentModal" 
+							data-id="${deptRow.departmentId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
-						<button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
+
+						<button type="button" class="btn btn-primary btn-sm" 
+							data-bs-target="#deleteDepartmentModal"
+							data-id="${deptRow.departmentId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
 					</td>
@@ -275,10 +282,17 @@ function renderLocationsData(locations) {
 						${locationRow.locationName}
 					</td>
 					<td class="align-middle text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm">
+						<button type="button" class="btn btn-primary btn-sm"
+						data-bs-toggle="modal"
+							data-bs-target="#editDepartmentModal" 
+							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
-						<button type="button" class="btn btn-primary btn-sm">
+
+						<button type="button" class="btn btn-primary btn-sm"
+						data-bs-toggle="modal"
+							data-bs-target="#deletePersonnelModal" 
+							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
 					</td>
