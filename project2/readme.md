@@ -8,7 +8,14 @@ stop apache server and start xampp in terminal:
 ```sudo /etc/init.d/apache2 stop```
 ```sudo /opt/lampp/lampp start```
 
+# SEARCH
+- Search sends new query upon keyup event
+- Found results are rendered using the same function which displays all staff.
+- Since it expects data like staffRow.department and staffRow.location I have renamed alies locationName and departmentName in query
+
 # CREATE
 - To ensure consistency in DB new staff members cannot be created "on the fly", i.e. the department must already exists in DB and be present in the <select> container. The same rule applies to creating departments - the location needs to already be in the DB.  
 - Names are title-ized (with the exception of words like "and", "de" etc., e.g. "Research and Dev" or "Robert de Niro") before being sent to PHP routes/DB.  
 - Sorting objects by name of property, i.e. departments sorted alphabetically when cerating staff
+
+

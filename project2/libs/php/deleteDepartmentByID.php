@@ -54,7 +54,6 @@
 		echo json_encode($output); 
 
 		exit;
-
 	}
 
 	$output['status']['code'] = "200";

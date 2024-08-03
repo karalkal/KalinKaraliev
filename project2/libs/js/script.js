@@ -3,13 +3,11 @@ import validateEmail from "./utils/emailValidator.js";
 import sortByName from "./utils/sortArrayOfObjects.js";
 
 
-let staff = [];
+let allStaff = [];
 let departments = [];
 let locations = [];
 
-getAndDisplayAllStaff();
-getAndDisplayAllDepartments();
-getAndDisplayAllLocations();
+getAndDisplayAllStaff();	// upon initialization staff table is displayed by default
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -31,16 +29,17 @@ $(document).on({
 });
 
 $('document').ready(function () {
-	//hide preloader when page DOM is ready for JS code to execute
+	// hide preloader when page DOM is ready for JS code to execute
 	$("#preloader").hide();
 
+	// SEARCH in personnel firstName, lastName, email, jobTitle, dept. name, loc. name
 	$("#searchInp").on("keyup", function () {
-
-
+		let searchString = $("#searchInp").val();
+		searchAndDisplayResults(searchString);
 	});
 
+	// REFRESH results on click of button
 	$("#refreshBtn").click(function () {
-
 		if ($("#personnelBtn").hasClass("active")) {
 			// Refresh personnel table
 			getAndDisplayAllStaff();
@@ -162,8 +161,8 @@ function getAndDisplayAllStaff() {
 		dataType: 'json',
 
 		success: function (result) {
-			staff = result.data;
-			renderStaffTable(staff);
+			allStaff = result.data;
+			renderStaffTable(allStaff);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -564,6 +563,28 @@ function createStaffMember() {
 			}
 		});
 	})
+}
+
+function searchAndDisplayResults(searchString) {
+	console.log(searchString)
+	$.ajax({
+		url: "libs/php/searchAll.php",
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			txt: searchString
+		},
+
+		success: function (result) {
+			console.log(result.data.found)
+			allStaff = result.data.found;
+			renderStaffTable(allStaff);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
 }
 
 
