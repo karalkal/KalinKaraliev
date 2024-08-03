@@ -25,7 +25,6 @@ if (mysqli_connect_errno()) {
 	echo json_encode($output);
 
 	exit;
-
 }
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
@@ -47,7 +46,6 @@ if (false === $query) {
 	echo json_encode($output);
 
 	exit;
-
 }
 
 $output['status']['code'] = "200";

@@ -10,5 +10,5 @@ stop apache server and start xampp in terminal:
 
 # CREATE
 - To ensure consistency in DB new staff members cannot be created "on the fly", i.e. the department must already exists in DB and be present in the <select> container. The same rule applies to creating departments - the location needs to already be in the DB.  
-- Names are title-ized (with the exception of "and" word, e.g. "Research and Dev") before being sent to PHP routes/DB.  
+- Names are title-ized (with the exception of words like "and", "de" etc., e.g. "Research and Dev" or "Robert de Niro") before being sent to PHP routes/DB.  
 - 

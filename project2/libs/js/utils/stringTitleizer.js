@@ -1,13 +1,15 @@
 export default function titleizeString(originalWord) {
+    const dontTitalize = ['and', 'von', 'van', 'de'];
+
     let capitalizedWord = originalWord
         .split(' ')
         .map(w => {
-            if (w.toLowerCase() === "and") {		// Res and Dev (lowercase and)
+            if (dontTitalize.includes(w.toLowerCase())) {		// Res and Dev (lowercase and)
                 return w.toLowerCase()
             }		// else
             return w[0].toUpperCase() + w.substring(1).toLowerCase()
         })
         .join(' ');
-        
+
     return capitalizedWord;
 }

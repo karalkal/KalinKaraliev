@@ -524,44 +524,42 @@ function createStaffMember() {
 			return;
 		}
 
-		console.log(newStaffFirstName, newStaffLastName, newStaffJobTitle, newStaffEmail, deptId)
+		// AJAX call to save new staff data
+		$.ajax({
+			url: "libs/php/insertStaff.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				newStaffFirstName: newStaffFirstName,
+				newStaffLastName: newStaffLastName,
+				newStaffJobTitle: newStaffJobTitle,
+				newStaffEmail: newStaffEmail,
+				deptId: deptId,
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					console.log("SUCCESS!!");
+					$('#modal-title').html(`Created staff:<br>${newStaffFirstName, newStaffLastName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
 
-		// AJAX call to save form data
-		// $.ajax({
-		// 	url: "libs/php/insertDepartment.php",
-		// 	type: "POST",
-		// 	dataType: "json",
-		// 	data: {
-		// 		newStaffFirstName: newStaffFirstName,
-		// 		newStaffLastName: newStaffLastName,
-		// 		newStaffJobTitle: newStaffJobTitle,
-		// 		newStaffEmail: newStaffEmail,
-		// 		deptId: deptId,
-		// 	},
-		// 	success: function (result) {
-		// 		if (result && result.status && result.status.code == 200) {
-		// 			console.log("SUCCESS!!");
-		// 			$('#modal-title').html(`Created staff:<br>${newStaffFirstName, newStaffLastName}`);
-		// 			$('#modal-body').empty();
-		// 			$('#modal-footer').html(`						
-		// 				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-		// 					CLOSE
-		// 				</button>
-		// 				`)
+					// send new GET request and display updated data
+					getAndDisplayAllStaff();
 
-		// 			// send new GET request and display updated data
-		// 			getAndDisplayAllStaff();
-
-		// 		} else {	// code is not 200
-		// 			$("#modal-title").replaceWith("Error writing data");
-		// 		}
-		// 	},
-		// 	error: function (jqXHR, textStatus, errorThrown) {
-		// 		$("#modal-title").replaceWith(
-		// 			"Error writing data"
-		// 		);
-		// 	}
-		// });
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith(
+					"Error writing data"
+				);
+			}
+		});
 	})
 }
 

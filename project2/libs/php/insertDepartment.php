@@ -1,17 +1,12 @@
 <?php
 
-// example use from browser
-// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
-
 // remove next two lines for production
-
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
 // this includes the login details
-
 include ("config.php");
 
 header('Content-Type: application/json; charset=UTF-8');
@@ -31,7 +26,6 @@ if (mysqli_connect_errno()) {
 	echo json_encode($output);
 
 	exit;
-
 }
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
@@ -53,7 +47,6 @@ if (false === $query) {
 	echo json_encode($output);
 
 	exit;
-
 }
 
 $output['status']['code'] = "200";
@@ -65,6 +58,3 @@ $output['data'] = [];
 mysqli_close($conn);
 
 echo json_encode($output);
-
-?>
-
