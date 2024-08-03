@@ -1,7 +1,6 @@
 import titleizeString from "./utils/stringTitleizer.js";
-// import validateEmail from "./utils/emailValidator.js";
+import validateEmail from "./utils/emailValidator.js";
 
-console.log(titleizeString("kOKKOokokr"))
 
 let staff = [];
 let departments = [];
@@ -511,8 +510,19 @@ function createStaffMember() {
 		let newStaffFirstName = titleizeString($("#createStaffFirstName").val());
 		let newStaffLastName = titleizeString($("#createStaffLastName").val());
 		let newStaffJobTitle = titleizeString($("#createStaffJobTitle").val());
-		let newStaffEmail = $("#createStaffEmailAddress").val();
+		let newStaffEmail = $("#createStaffEmailAddress").val().toLowerCase();		// convert email to lower
 		let deptId = Number($('#departmentSelect option').filter(':selected').val());
+
+		if (validateEmail(newStaffEmail) == false) {		//invalid email
+			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
+			$('#modal-body').empty();
+			$('#modal-footer').html(`						
+				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+					CLOSE
+				</button>
+				`)
+			return;
+		}
 
 		console.log(newStaffFirstName, newStaffLastName, newStaffJobTitle, newStaffEmail, deptId)
 
