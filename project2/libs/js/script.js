@@ -1,5 +1,6 @@
 import titleizeString from "./utils/stringTitleizer.js";
 import validateEmail from "./utils/emailValidator.js";
+import sortByName from "./utils/sortArrayOfObjects.js";
 
 
 let staff = [];
@@ -385,7 +386,8 @@ function createDepartment() {
 		`);
 
 	// populate locations select element
-	$.each(locations, function (i, location) {
+	const sortedLocations = sortByName(locations, "locationName");	//second param is prop to sort by
+	$.each(sortedLocations, function (i, location) {
 		$("#locationsSelect").append(
 			$("<option>", {
 				value: location.locationId,
@@ -482,7 +484,8 @@ function createStaffMember() {
 		`);
 
 	// populate locations select element
-	$.each(departments, function (i, dept) {
+	const sortedDepartments = sortByName(departments, "departmentName"); //second param is prop to sort by
+	$.each(sortedDepartments, function (i, dept) {
 		$("#departmentSelect").append(
 			$("<option>", {
 				value: dept.departmentId,

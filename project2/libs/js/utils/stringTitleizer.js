@@ -1,5 +1,5 @@
 export default function titleizeString(originalWord) {
-    const dontTitalize = ['and', 'von', 'van', 'de'];
+    const dontTitalize = ['and', 'von', 'van', 'de', 'der', 'da', 'di', 'la'];
 
     let capitalizedWord = originalWord
         .split(' ')
