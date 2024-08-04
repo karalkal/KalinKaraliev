@@ -97,6 +97,14 @@ $('document').ready(function () {
 
 	// DELETE
 	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
+	$('body').on('click', '.deleteStaffBtn', function (e) {
+		let staffId = $(e.currentTarget).attr("data-id");
+		deleteStaff(staffId);
+	});
+	$('body').on('click', '.deleteDepartmentBtn', function (e) {
+		let deptId = $(e.currentTarget).attr("data-id");
+		deleteDepartment(deptId);
+	});
 	$('body').on('click', '.deleteLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
 		deleteLocation(locationId);
@@ -250,8 +258,7 @@ function renderStaffTable(staff) {
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
 
-						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-							data-bs-target="#deletePersonnelModal" 
+						<button type="button" class="btn btn-primary btn-sm deleteStaffBtn"
 							data-id="${staffRow.staffId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
@@ -280,8 +287,7 @@ function renderDeptTable(departments) {
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
 
-						<button type="button" class="btn btn-primary btn-sm" 
-							data-bs-target="#deleteDepartmentModal"
+						<button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" 
 							data-id="${deptRow.departmentId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
@@ -309,18 +315,11 @@ function renderLocationsTable(locations) {
 						</button>
 
 						<button type="button" class="btn btn-primary btn-sm deleteLocationBtn" 
-							data-bs-target="#deleteDepartmentModal"							
 							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
 					</td>
 				</tr>`));
-
-
-		// $(".deleteLocationBtn").click(function (e) {
-		// 	let locationId = $(e.currentTarget).attr("data-id");
-		// 	deleteLocation(locationId);
-		// })
 	});
 }
 
@@ -613,12 +612,12 @@ function searchAndDisplayResults(searchString) {
 function deleteLocation(locationId) {
 	const locationToDeleteName = locations.find(l => l.locationId === locationId).locationName;
 	// populate modal
-	$('#modal-title').text("Delete Location");
+	$('#modal-title').text("Delete Location?");
 	$('#modal-body').html(`
 		<form id="deleteLocationForm">
 		    <input type="hidden" id="${locationId}">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none shadow-none pt-2" value=${locationToDeleteName} readonly>
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${locationToDeleteName}" readonly>
 			</div>
 		</form>
 		`);
@@ -638,8 +637,8 @@ function deleteLocation(locationId) {
 
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
-		const cannotBeDeleted = locationIdInDepartmentForeighKeys(locationId, departments);
-		if (cannotBeDeleted) {
+		const locationCannotBeDeleted = locationIdInDepartmentForeighKeys(locationId, departments);
+		if (locationCannotBeDeleted) {
 			$('#modal-title').html(`Cannot delete`);
 			$('#modal-body').text(`${locationToDeleteName} cannot be deleted while department(s) refer to it.`);
 			$('#modal-footer').html(`						
@@ -672,6 +671,84 @@ function deleteLocation(locationId) {
 
 					// send new GET request and display updated data
 					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error deleting data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith(
+					"Error deleting data"
+				);
+			}
+		});
+	})
+}
+
+function deleteDepartment(departmentId) {
+	console.log(departments);
+	const deptToDeleteName = departments.find(d => d.departmentId === departmentId).departmentName;
+	console.log(departmentId)
+	// populate modal
+	$('#modal-title').text("Delete Department?");
+	$('#modal-body').html(`
+		<form id="deleteDepartmentForm">
+		    <input type="hidden" id="${departmentId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${deptToDeleteName}" readonly>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
+			DELETE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// send delete request with ID param
+	$("#deleteDepartmentForm").on("submit", function (e) {
+		// const deptCannotBeDeleted = locationIdInDepartmentForeighKeys(departmentId, departments);
+		// if (deptCannotBeDeleted) {
+		// 	$('#modal-title').html(`Cannot delete`);
+		// 	$('#modal-body').text(`${deptToDeleteName} cannot be deleted while department(s) refer to it.`);
+		// 	$('#modal-footer').html(`						
+		// 				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+		// 					CLOSE
+		// 				</button>
+		// 	`)
+
+		// 	return
+		// }
+
+		e.preventDefault();
+		$.ajax({
+			url: "libs/php/deleteDepartmentByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: departmentId		// send id param as string
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					console.log("SUCCESS!!");
+					$('#modal-title').html(`Deleted location:<br>${deptToDeleteName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments()
 
 				} else {	// code is not 200
 					$("#modal-title").replaceWith("Error deleting data");
