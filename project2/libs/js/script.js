@@ -639,7 +639,6 @@ function deleteLocation(locationId) {
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
 		const cannotBeDeleted = locationIdInDepartmentForeighKeys(locationId, departments);
-		console.log(cannotBeDeleted);
 		if (cannotBeDeleted) {
 			$('#modal-title').html(`Cannot delete`);
 			$('#modal-body').text(`${locationToDeleteName} cannot be deleted while department(s) refer to it.`);
@@ -648,6 +647,7 @@ function deleteLocation(locationId) {
 							CLOSE
 						</button>
 			`)
+
 			return
 		}
 
