@@ -1,6 +1,7 @@
 import titleizeString from "./utils/stringTitleizer.js";
 import validateEmail from "./utils/emailValidator.js";
 import sortByName from "./utils/sortArrayOfObjects.js";
+import { locationIdInDepartmentForeighKeys } from "./utils/preDeleteFKCheck.js";
 
 
 let allStaff = [];
@@ -36,6 +37,8 @@ $('document').ready(function () {
 
 	// GET data from DB and render relevant table upon clicking menu/tab buttons
 	$("#personnelBtn").click(function () {
+		// Reset search bar each time this btn is clicked
+		$("#searchInp").val('');
 		getAndDisplayAllStaff();
 	});
 	$("#departmentsBtn").click(function () {
@@ -69,7 +72,6 @@ $('document').ready(function () {
 		$('#personnel-tab-pane').addClass('active');
 		$('#personnel-tab-pane').addClass('show');
 
-
 		// Get param and send the get request
 		let searchString = $("#searchInp").val();
 		searchAndDisplayResults(searchString);
@@ -94,7 +96,7 @@ $('document').ready(function () {
 	});
 
 	// DELETE
-	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists
+	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
 	$('body').on('click', '.deleteLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
 		deleteLocation(locationId);
@@ -171,8 +173,6 @@ $('document').ready(function () {
 
 
 function getAndDisplayAllStaff() {
-	// would be nice to reset search bar each time this btn is clicked
-	$("#searchInp").val('');
 	$.ajax({
 		url: "libs/php/getAll.php",
 		type: 'GET',
@@ -224,8 +224,7 @@ function getAndDisplayAllLocations() {
 }
 
 function renderStaffTable(staff) {
-	console.log("staff:", staff)
-	// clear table, then render with up to date values
+	// clear table, then re-render with up to date values
 	$('#personnelTableBody').empty();
 
 	$.each(staff, function (index, staffRow) {
@@ -613,7 +612,6 @@ function searchAndDisplayResults(searchString) {
 
 function deleteLocation(locationId) {
 	const locationToDeleteName = locations.find(l => l.locationId === locationId).locationName;
-	console.log(locationToDeleteName);
 	// populate modal
 	$('#modal-title').text("Delete Location");
 	$('#modal-body').html(`
@@ -638,23 +636,33 @@ function deleteLocation(locationId) {
 	// now show modal
 	$("#genericModal").modal("show");
 
-	// get data from form
-	$("#createLocationForm").on("submit", function (e) {
-		e.preventDefault();
-		let newLocationName = titleizeString($("#newLocationName").val());
+	// send delete request with ID param
+	$("#deleteLocationForm").on("submit", function (e) {
+		const cannotBeDeleted = locationIdInDepartmentForeighKeys(locationId, departments);
+		console.log(cannotBeDeleted);
+		if (cannotBeDeleted) {
+			$('#modal-title').html(`Cannot delete`);
+			$('#modal-body').text(`${locationToDeleteName} cannot be deleted while department(s) refer to it.`);
+			$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+			`)
+			return
+		}
 
-		// AJAX call to save form data
+		e.preventDefault();
 		$.ajax({
-			url: "libs/php/insertLocation.php",
+			url: "libs/php/deleteLocationByID.php",
 			type: "POST",
 			dataType: "json",
 			data: {
-				locationName: newLocationName
+				id: locationId		// send id param as string
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
 					console.log("SUCCESS!!");
-					$('#modal-title').html(`Created location:<br>${newLocationName}`);
+					$('#modal-title').html(`Deleted location:<br>${locationToDeleteName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
@@ -666,12 +674,12 @@ function deleteLocation(locationId) {
 					getAndDisplayAllLocations()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error writing data");
+					$("#modal-title").replaceWith("Error deleting data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				$("#modal-title").replaceWith(
-					"Error writing data"
+					"Error deleting data"
 				);
 			}
 		});

@@ -27,14 +27,16 @@ if (mysqli_connect_errno()) {
 	exit;
 }
 
-// SQL does not accept parameters and so is not prepared
-// GET also departmentID of department to check if location can be deleted safely with CASCADE
-// TODO: need to implement this at DB level too
-$query = 'SELECT p.id as staffId, p.lastName, p.firstName, p.jobTitle, p.email, p. departmentID as departmentId, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.lastName, p.firstName, d.name, l.name';
+// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+$query = $conn->prepare('DELETE FROM location WHERE id = ?');
 
-$result = $conn->query($query);
+$integerID = (int) $_REQUEST['id'];
 
-if (!$result) {
+$query->bind_param("i", $_REQUEST['id']);
+
+$query->execute();
+
+if (false === $query) {
 
 	$output['status']['code'] = "400";
 	$output['status']['name'] = "executed";
@@ -48,19 +50,12 @@ if (!$result) {
 	exit;
 }
 
-$data = [];
-
-while ($row = mysqli_fetch_assoc($result)) {
-	array_push($data, $row);
-}
-
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-$output['data'] = $data;
+$output['data'] = [];
 
 mysqli_close($conn);
 
 echo json_encode($output);
-exit;
