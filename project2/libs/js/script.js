@@ -1,12 +1,12 @@
 import titleizeString from "./utils/stringTitleizer.js";
 import validateEmail from "./utils/emailValidator.js";
 import sortByName from "./utils/sortArrayOfObjects.js";
-import { locationIdInDepartmentForeighKeys } from "./utils/preDeleteFKCheck.js";
+import { checkLocationIdInDeptFKeys, checkDeptIdInPersonnelFKeys } from "./utils/preDeleteFKCheck.js";
 
 
 let allStaff = [];
-let departments = [];
-let locations = [];
+let allDepartments = [];
+let allLocations = [];
 
 getAndDisplayAllStaff();	// upon initialization only staff table is required
 getAndDisplayAllDepartments();
@@ -32,13 +32,11 @@ $(document).on({
 });
 
 $('document').ready(function () {
-	// hide preloader when page DOM is ready for JS code to execute
+	// HIDE PRELOADER when page DOM is ready for JS code to execute
 	$("#preloader").hide();
 
 	// GET data from DB and render relevant table upon clicking menu/tab buttons
 	$("#personnelBtn").click(function () {
-		// Reset search bar each time this btn is clicked
-		$("#searchInp").val('');
 		getAndDisplayAllStaff();
 	});
 	$("#departmentsBtn").click(function () {
@@ -181,8 +179,10 @@ $('document').ready(function () {
 
 
 function getAndDisplayAllStaff() {
+	// Reset search bar each time this btn is clicked
+	$("#searchInp").val('');
 	$.ajax({
-		url: "libs/php/getAll.php",
+		url: "libs/php/getAllStaff.php",
 		type: 'GET',
 		dataType: 'json',
 
@@ -204,8 +204,8 @@ function getAndDisplayAllDepartments() {
 		dataType: 'json',
 
 		success: function (result) {
-			departments = result.data;
-			renderDeptTable(departments);
+			allDepartments = result.data;
+			renderDeptTable(allDepartments);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -221,8 +221,8 @@ function getAndDisplayAllLocations() {
 		dataType: 'json',
 
 		success: function (result) {
-			locations = result.data;
-			renderLocationsTable(locations);
+			allLocations = result.data;
+			renderLocationsTable(allLocations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
@@ -407,7 +407,7 @@ function createDepartment() {
 		`);
 
 	// populate locations select element
-	const sortedLocations = sortByName(locations, "locationName");	//second param is prop to sort by
+	const sortedLocations = sortByName(allLocations, "locationName");	//second param is prop to sort by
 	$.each(sortedLocations, function (i, location) {
 		$("#locationsSelect").append(
 			$("<option>", {
@@ -505,7 +505,7 @@ function createStaffMember() {
 		`);
 
 	// populate locations select element
-	const sortedDepartments = sortByName(departments, "departmentName"); //second param is prop to sort by
+	const sortedDepartments = sortByName(allDepartments, "departmentName"); //second param is prop to sort by
 	$.each(sortedDepartments, function (i, dept) {
 		$("#departmentSelect").append(
 			$("<option>", {
@@ -588,7 +588,6 @@ function createStaffMember() {
 }
 
 function searchAndDisplayResults(searchString) {
-	console.log(searchString)
 	$.ajax({
 		url: "libs/php/searchAll.php",
 		type: 'POST',
@@ -610,7 +609,7 @@ function searchAndDisplayResults(searchString) {
 }
 
 function deleteLocation(locationId) {
-	const locationToDeleteName = locations.find(l => l.locationId === locationId).locationName;
+	const locationToDeleteName = allLocations.find(l => l.locationId === locationId).locationName;
 	// populate modal
 	$('#modal-title').text("Delete Location?");
 	$('#modal-body').html(`
@@ -637,7 +636,7 @@ function deleteLocation(locationId) {
 
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
-		const locationCannotBeDeleted = locationIdInDepartmentForeighKeys(locationId, departments);
+		const locationCannotBeDeleted = checkLocationIdInDeptFKeys(locationId, allDepartments);
 		if (locationCannotBeDeleted) {
 			$('#modal-title').html(`Cannot delete`);
 			$('#modal-body').text(`${locationToDeleteName} cannot be deleted while department(s) refer to it.`);
@@ -686,9 +685,7 @@ function deleteLocation(locationId) {
 }
 
 function deleteDepartment(departmentId) {
-	console.log(departments);
-	const deptToDeleteName = departments.find(d => d.departmentId === departmentId).departmentName;
-	console.log(departmentId)
+	const deptToDeleteName = allDepartments.find(d => d.departmentId === departmentId).departmentName;
 	// populate modal
 	$('#modal-title').text("Delete Department?");
 	$('#modal-body').html(`
@@ -715,18 +712,18 @@ function deleteDepartment(departmentId) {
 
 	// send delete request with ID param
 	$("#deleteDepartmentForm").on("submit", function (e) {
-		// const deptCannotBeDeleted = locationIdInDepartmentForeighKeys(departmentId, departments);
-		// if (deptCannotBeDeleted) {
-		// 	$('#modal-title').html(`Cannot delete`);
-		// 	$('#modal-body').text(`${deptToDeleteName} cannot be deleted while department(s) refer to it.`);
-		// 	$('#modal-footer').html(`						
-		// 				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-		// 					CLOSE
-		// 				</button>
-		// 	`)
+		const deptCannotBeDeleted = checkDeptIdInPersonnelFKeys(departmentId, allStaff);
+		if (deptCannotBeDeleted) {
+			$('#modal-title').html(`Cannot delete`);
+			$('#modal-body').text(`${deptToDeleteName} cannot be deleted while employee(s) refer to it.`);
+			$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+			`)
 
-		// 	return
-		// }
+			return
+		}
 
 		e.preventDefault();
 		$.ajax({
@@ -738,7 +735,6 @@ function deleteDepartment(departmentId) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Deleted location:<br>${deptToDeleteName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
@@ -755,9 +751,70 @@ function deleteDepartment(departmentId) {
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith(
-					"Error deleting data"
-				);
+				$("#modal-title").replaceWith("Error deleting data");
+			}
+		});
+	})
+}
+
+function deleteStaff(staffId) {
+	console.log(staffId, allStaff)
+	const staffToDelete = allStaff.find(s => s.staffId === staffId);
+	const { lastName, firstName } = staffToDelete;
+	// populate modal
+	$('#modal-title').text("Delete Staff?");
+	$('#modal-body').html(`
+		<form id="deleteStaffForm">
+		    <input type="hidden" id="${staffId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${lastName}, ${firstName}" readonly>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
+			DELETE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// send delete request with ID param
+	$("#deleteStaffForm").on("submit", function (e) {
+		e.preventDefault();
+
+		$.ajax({
+			url: "libs/php/deleteStaffByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: staffId		// send id param as string
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Deleted employee:<br>${lastName}, ${firstName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllStaff()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error deleting data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith("Error deleting data");
 			}
 		});
 	})

@@ -1,6 +1,13 @@
-export function locationIdInDepartmentForeighKeys(locationId, departments) {
-    let fkIsFound = departments.find(d => d.locationId == locationId)
+export function checkLocationIdInDeptFKeys(locationId, departments) {
+    let dptIsFound = departments.find(d => d.locationId == locationId)
         ? true
         : false;
-    return fkIsFound
+    return dptIsFound
+}
+
+export function checkDeptIdInPersonnelFKeys(departmentId, staff) {
+    let locIsFound = staff.find(s => s.departmentId == departmentId)
+        ? true
+        : false;
+    return locIsFound
 }
