@@ -68,7 +68,7 @@ $('document').ready(function () {
 		$('#locations-tab-pane').removeClass('show');
 		$('#personnel-tab-pane').addClass('active');
 		$('#personnel-tab-pane').addClass('show');
-		
+
 
 		// Get param and send the get request
 		let searchString = $("#searchInp").val();
@@ -171,6 +171,8 @@ $('document').ready(function () {
 
 
 function getAndDisplayAllStaff() {
+	// would be nice to reset search bar each time this btn is clicked
+	$("#searchInp").val('');
 	$.ajax({
 		url: "libs/php/getAll.php",
 		type: 'GET',
