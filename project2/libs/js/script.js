@@ -7,7 +7,9 @@ let allStaff = [];
 let departments = [];
 let locations = [];
 
-getAndDisplayAllStaff();	// upon initialization staff table is displayed by default
+getAndDisplayAllStaff();	// upon initialization only staff table is required
+getAndDisplayAllDepartments();
+getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -19,11 +21,11 @@ document.onreadystatechange = function (e) {
 // trigger preloader while ajax request is pending, else hide it
 $(document).on({
 	ajaxStart: function () {
-		console.log("waiting for ajax response...")
+		// console.log("waiting for ajax response...")
 		$('#preloader').show();
 	},
 	ajaxStop: function () {
-		console.log("got ajax response!")
+		// console.log("got ajax response!")
 		$('#preloader').hide();
 	}
 });
@@ -32,26 +34,45 @@ $('document').ready(function () {
 	// hide preloader when page DOM is ready for JS code to execute
 	$("#preloader").hide();
 
-	// SEARCH in personnel firstName, lastName, email, jobTitle, dept. name, loc. name
-	$("#searchInp").on("keyup", function () {
-		let searchString = $("#searchInp").val();
-		searchAndDisplayResults(searchString);
+	// GET data from DB and render relevant table upon clicking menu/tab buttons
+	$("#personnelBtn").click(function () {
+		getAndDisplayAllStaff();
+	});
+	$("#departmentsBtn").click(function () {
+		getAndDisplayAllDepartments();
+	});
+	$("#locationsBtn").click(function () {
+		getAndDisplayAllLocations();
 	});
 
-	// REFRESH results on click of button
+	// REFRESH results for relevant table on click of refresh button
 	$("#refreshBtn").click(function () {
 		if ($("#personnelBtn").hasClass("active")) {
-			// Refresh personnel table
-			getAndDisplayAllStaff();
+			getAndDisplayAllStaff();					// Refresh personnel table
+		} else if ($("#departmentsBtn").hasClass("active")) {
+			getAndDisplayAllDepartments();				// Refresh department table
+		} else if ($("#locationsBtn").hasClass("active")) {
+			getAndDisplayAllLocations();				// Refresh location table
 		}
-		else if ($("#departmentsBtn").hasClass("active")) {
-			// Refresh department table
-			getAndDisplayAllDepartments();
-		}
-		else if ($("#locationsBtn").hasClass("active")) {
-			// Refresh location table
-			getAndDisplayAllLocations();
-		}
+	});
+
+	// SEARCH in personnel firstName, lastName, email, jobTitle, dept. name, loc. name
+	$("#searchInp").on("keyup", function () {
+		// if another tab is opened go to default (personnel) tab AND pane, then display results
+		$('.nav').find('.active').removeClass('active');
+		$("#personnelBtn").addClass("active");
+
+		$('#departments-tab-pane').removeClass('active');
+		$('#departments-tab-pane').removeClass('show');
+		$('#locations-tab-pane').removeClass('active');
+		$('#locations-tab-pane').removeClass('show');
+		$('#personnel-tab-pane').addClass('active');
+		$('#personnel-tab-pane').addClass('show');
+		
+
+		// Get param and send the get request
+		let searchString = $("#searchInp").val();
+		searchAndDisplayResults(searchString);
 	});
 
 	$("#filterBtn").click(function () {
@@ -70,20 +91,15 @@ $('document').ready(function () {
 		else if ($("#locationsBtn").hasClass("active")) {
 			createLocation();
 		}
-
 	});
 
-	$("#personnelBtn").click(function () {
-		getAndDisplayAllStaff();				// refresh personnel table
+	// DELETE
+	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists
+	$('body').on('click', '.deleteLocationBtn', function (e) {
+		let locationId = $(e.currentTarget).attr("data-id");
+		deleteLocation(locationId);
 	});
 
-	$("#departmentsBtn").click(function () {
-		getAndDisplayAllDepartments();			// refresh department table
-	});
-
-	$("#locationsBtn").click(function () {
-		getAndDisplayAllLocations();			// refresh location table
-	});
 
 	$("#editPersonnelModal").on("show.bs.modal", function (e) {
 
@@ -206,6 +222,7 @@ function getAndDisplayAllLocations() {
 }
 
 function renderStaffTable(staff) {
+	console.log("staff:", staff)
 	// clear table, then render with up to date values
 	$('#personnelTableBody').empty();
 
@@ -284,20 +301,25 @@ function renderLocationsTable(locations) {
 					</td>
 					<td class="align-middle text-end text-nowrap">
 						<button type="button" class="btn btn-primary btn-sm"
-						data-bs-toggle="modal"
-							data-bs-target="#editDepartmentModal" 
+							data-bs-toggle="modal"
+							data-bs-target="#editLocationModal" 
 							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
 
-						<button type="button" class="btn btn-primary btn-sm"
-						data-bs-toggle="modal"
-							data-bs-target="#deletePersonnelModal" 
+						<button type="button" class="btn btn-primary btn-sm deleteLocationBtn" 
+							data-bs-target="#deleteDepartmentModal"							
 							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-trash fa-fw"></i>
 						</button>
 					</td>
 				</tr>`));
+
+
+		// $(".deleteLocationBtn").click(function (e) {
+		// 	let locationId = $(e.currentTarget).attr("data-id");
+		// 	deleteLocation(locationId);
+		// })
 	});
 }
 
@@ -307,7 +329,7 @@ function createLocation() {
 	$('#modal-body').html(`
 		<form id="createLocationForm">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="newLocationName" placeholder="New location" required>
+				<input type="text" class="form-control shadow-none" id="newLocationName" placeholder="New location" required>
 				<label for="newLocationName">New location</label>
 			</div>
 		</form>
@@ -372,12 +394,12 @@ function createDepartment() {
 	$('#modal-body').html(`
 		<form id="createDeptForm">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="newDeptName" placeholder="New department" required>
+				<input type="text" class="form-control shadow-none" id="newDeptName" placeholder="New department" required>
 				<label for="newDeptName">New department</label>
 			</div>
 
 			<div class="form-floating">
-                <select class="form-select" id="locationsSelect" placeholder="Locations">
+                <select class="form-select shadow-none" id="locationsSelect" placeholder="Locations">
                 </select>
                 <label for="locationsSelect">Locations</label>
              </div>
@@ -454,28 +476,28 @@ function createStaffMember() {
 	$('#modal-body').html(`
 		<form id="createStaffForm">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="createStaffFirstName" placeholder="First name" required>
+				<input type="text" class="form-control shadow-none" id="createStaffFirstName" placeholder="First name" required>
 				<label for="createStaffFirstName">First name</label>
 			</div>
 
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="createStaffLastName" placeholder="Last name" required>
+				<input type="text" class="form-control shadow-none" id="createStaffLastName" placeholder="Last name" required>
 				<label for="createStaffLastName">Last name</label>
 			</div>
 
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control" id="createStaffJobTitle" placeholder="Job title" required>
+				<input type="text" class="form-control shadow-none" id="createStaffJobTitle" placeholder="Job title" required>
 				<label for="createStaffJobTitle">Job Title</label>
 			</div>
 
 			<div class="form-floating mb-3">
-				<input type="email" class="form-control" id="createStaffEmailAddress"
+				<input type="email" class="form-control shadow-none" id="createStaffEmailAddress"
 					placeholder="Email address" required>
 				<label for="createStaffEmailAddress">Email Address</label>
 			</div>
 
 			<div class="form-floating">
-				<select class="form-select" id="departmentSelect" placeholder="Department">
+				<select class="form-select shadow-none" id="departmentSelect" placeholder="Department">
 				</select>
 				<label for="departmentSelect">Department</label>
 			</div>
@@ -577,14 +599,81 @@ function searchAndDisplayResults(searchString) {
 
 		success: function (result) {
 			console.log(result.data.found)
-			allStaff = result.data.found;
-			renderStaffTable(allStaff);
+			let foundStaff = result.data.found;
+			renderStaffTable(foundStaff);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown);
 			alert("Something went wrong")
 		}
 	});
+}
+
+function deleteLocation(locationId) {
+	const locationToDeleteName = locations.find(l => l.locationId === locationId).locationName;
+	console.log(locationToDeleteName);
+	// populate modal
+	$('#modal-title').text("Delete Location");
+	$('#modal-body').html(`
+		<form id="deleteLocationForm">
+		    <input type="hidden" id="${locationId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value=${locationToDeleteName} readonly>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="deleteLocationForm" class="btn btn-outline-primary btn-sm myBtn">
+			DELETE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// get data from form
+	$("#createLocationForm").on("submit", function (e) {
+		e.preventDefault();
+		let newLocationName = titleizeString($("#newLocationName").val());
+
+		// AJAX call to save form data
+		$.ajax({
+			url: "libs/php/insertLocation.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				locationName: newLocationName
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					console.log("SUCCESS!!");
+					$('#modal-title').html(`Created location:<br>${newLocationName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith(
+					"Error writing data"
+				);
+			}
+		});
+	})
 }
 
 
