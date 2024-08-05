@@ -28,9 +28,9 @@ if (mysqli_connect_errno()) {
 }
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-$query = $conn->prepare('DELETE FROM location WHERE id = ?');
+$query = $conn->prepare('UPDATE location SET name = ? WHERE id = ?;');
 
-$query->bind_param("i", $_POST['id']);
+$query->bind_param("si", $_POST['newLocationName'], $_POST['id']);
 
 $query->execute();
 

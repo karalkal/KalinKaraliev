@@ -9,8 +9,8 @@ let allDepartments = [];
 let allLocations = [];
 
 getAndDisplayAllStaff();	// upon initialization only staff table is required
-getAndDisplayAllDepartments();
-getAndDisplayAllLocations();
+// getAndDisplayAllDepartments();
+// getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -108,73 +108,20 @@ $('document').ready(function () {
 		deleteLocation(locationId);
 	});
 
-
-	$("#editPersonnelModal").on("show.bs.modal", function (e) {
-
-		$.ajax({
-			url:
-				"https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getPersonnelByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				// Retrieve the data-id attribute from the calling button
-				// see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
-				// for the non-jQuery JavaScript alternative
-				id: $(e.relatedTarget).attr("data-id")
-			},
-			success: function (result) {
-				var resultCode = result.status.code;
-
-				if (resultCode == 200) {
-
-					// Update the hidden input with the employee id so that
-					// it can be referenced when the form is submitted
-
-					$("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
-
-					$("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
-					$("#editPersonnelLastName").val(result.data.personnel[0].lastName);
-					$("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
-					$("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
-
-					$("#editPersonnelDepartment").html("");
-
-					$.each(result.data.department, function () {
-						$("#editPersonnelDepartment").append(
-							$("<option>", {
-								value: this.id,
-								text: this.name
-							})
-						);
-					});
-
-					$("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
-
-				} else {
-					$("#editPersonnelModal .modal-title").replaceWith(
-						"Error retrieving data"
-					);
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				$("#editPersonnelModal .modal-title").replaceWith(
-					"Error retrieving data"
-				);
-			}
-		});
+	// UPDATE
+	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
+	$('body').on('click', '.updateStaffBtn', function (e) {
+		let staffId = $(e.currentTarget).attr("data-id");
+		updateStaff(staffId);
 	});
-
-	// Executes when the form button with type="submit" is clicked
-	$("#editPersonnelForm").on("submit", function (e) {
-
-		// Executes when the form button with type="submit" is clicked
-		// stop the default browser behviour
-
-		e.preventDefault();
-
-		// AJAX call to save form data
-
-	})
+	$('body').on('click', '.updateDepartmentBtn', function (e) {
+		let deptId = $(e.currentTarget).attr("data-id");
+		updateDepartment(deptId);
+	});
+	$('body').on('click', '.updateLocationBtn', function (e) {
+		let locationId = $(e.currentTarget).attr("data-id");
+		updateLocation(locationId);
+	});
 })
 
 
@@ -251,9 +198,7 @@ function renderStaffTable(staff) {
 						${staffRow.email}
 					</td>
 					<td class="text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm"
-							data-bs-toggle="modal"
-							data-bs-target="#editPersonnelModal" 
+						<button type="button" class="btn btn-primary btn-sm updateStaffBtn"
 							data-id="${staffRow.staffId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
@@ -281,9 +226,8 @@ function renderDeptTable(departments) {
 						${deptRow.locationName}
 					</td>
 					<td class="align-middle text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-							data-bs-target="#editDepartmentModal" 
-							data-id="${deptRow.departmentId}">
+						<button type="button" class="btn btn-primary btn-sm updateDepartmentBtn" 
+						data-id="${deptRow.departmentId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
 
@@ -307,9 +251,7 @@ function renderLocationsTable(locations) {
 						${locationRow.locationName}
 					</td>
 					<td class="align-middle text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm"
-							data-bs-toggle="modal"
-							data-bs-target="#editLocationModal" 
+						<button type="button" class="btn btn-primary btn-sm updateLocationBtn"
 							data-id="${locationRow.locationId}">
 							<i class="fa-solid fa-pencil fa-fw"></i>
 						</button>
@@ -735,7 +677,7 @@ function deleteDepartment(departmentId) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Deleted location:<br>${deptToDeleteName}`);
+					$('#modal-title').html(`Deleted department:<br>${deptToDeleteName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
@@ -819,6 +761,213 @@ function deleteStaff(staffId) {
 		});
 	})
 }
+
+function updateLocation(locationId) {
+	const locationToUpdate = allLocations.find(l => l.locationId === locationId);
+	console.log(locationId, locationToUpdate)
+	const { locationName } = locationToUpdate;
+	// populate modal
+	$('#modal-title').text("Update Location");
+	$('#modal-body').html(`
+		<form id="updateLocationForm">
+		    <input type="hidden" id="${locationId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" 
+				value="${locationName}" 
+				id="newLocationName" required>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="updateLocationForm" class="btn btn-outline-primary btn-sm myBtn">
+			UPDATE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// send delete request with ID param
+	$("#updateLocationForm").on("submit", function (e) {
+		e.preventDefault();
+		let newLocationName = titleizeString($("#newLocationName").val());
+
+		$.ajax({
+			url: "libs/php/updateLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: locationId,
+				newLocationName: newLocationName,
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					console.log("SUCCESS!!");
+					$('#modal-title').html(`Updated location:<br>${locationName} to ${newLocationName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error updating data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith(
+					"Error updating data"
+				);
+			}
+		});
+	})
+}
+
+function updateDepartment(departmentId) {
+	const deptToUpdateName = allDepartments.find(d => d.departmentId === departmentId).departmentName;
+	// populate modal
+	$('#modal-title').text("Delete Department?");
+	$('#modal-body').html(`
+		<form id="deleteDepartmentForm">
+		    <input type="hidden" id="${departmentId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${deptToUpdateName}" readonly>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
+			DELETE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// send delete request with ID param
+	$("#deleteDepartmentForm").on("submit", function (e) {
+		const deptCannotBeDeleted = checkDeptIdInPersonnelFKeys(departmentId, allStaff);
+		if (deptCannotBeDeleted) {
+			$('#modal-title').html(`Cannot delete`);
+			$('#modal-body').text(`${deptToUpdateName} cannot be deleted while employee(s) refer to it.`);
+			$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+			`)
+
+			return
+		}
+
+		e.preventDefault();
+		$.ajax({
+			url: "libs/php/deleteDepartmentByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: departmentId		// send id param as string
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Updated department:<br>${deptToUpdateName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error deleting data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith("Error deleting data");
+			}
+		});
+	})
+}
+
+function updateStaff(staffId) {
+	console.log(staffId, allStaff)
+	const staffToDelete = allStaff.find(s => s.staffId === staffId);
+	const { lastName, firstName } = staffToDelete;
+	// populate modal
+	$('#modal-title').text("Update Staff");
+	$('#modal-body').html(`
+		<form id="deleteStaffForm">
+		    <input type="hidden" id="${staffId}">
+			<div class="form-floating mb-3">
+				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${lastName}, ${firstName}" readonly>
+			</div>
+		</form>
+		`);
+
+	$('#modal-footer').html(`
+		<button type="submit" 
+			form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
+			DELETE
+		</button>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CANCEL
+		</button>
+		`)
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// send delete request with ID param
+	$("#deleteStaffForm").on("submit", function (e) {
+		e.preventDefault();
+
+		$.ajax({
+			url: "libs/php/deleteStaffByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: staffId		// send id param as string
+			},
+			success: function (result) {
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Deleted employee:<br>${lastName}, ${firstName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					// send new GET request and display updated data
+					getAndDisplayAllStaff()
+
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error deleting data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith("Error deleting data");
+			}
+		});
+	})
+}
+
 
 
 
