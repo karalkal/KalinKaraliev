@@ -77,8 +77,8 @@ $('document').ready(function () {
 	});
 
 	$("#filterBtn").click(function () {
-		// Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
-
+		// apply a filter to the personnel table on either department or location
+		filterStaff();
 	});
 
 	// CREATE new staff/dept/location entry depending on which Btn is active
@@ -306,7 +306,6 @@ function createLocation() {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Created location:<br>${newLocationName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
@@ -390,7 +389,6 @@ function createDepartment() {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Created department:<br>${newDeptName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
@@ -505,7 +503,6 @@ function createStaffMember() {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Created staff:<br>${newStaffFirstName, newStaffLastName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
@@ -540,7 +537,6 @@ function searchAndDisplayResults(searchString) {
 		},
 
 		success: function (result) {
-			console.log(result.data.found)
 			let foundStaff = result.data.found;
 			renderStaffTable(foundStaff);
 		},
@@ -549,6 +545,93 @@ function searchAndDisplayResults(searchString) {
 			alert("Something went wrong")
 		}
 	});
+}
+
+function filterStaff() {
+	let departmentId = undefined;
+	let locationId = undefined;
+	let filteredResults = []
+	// populate modal
+	$('#modal-title').text("Filter staff");
+	$('#modal-body').html(`
+		<form id="filterStaffForm">
+			<div class="form-floating mt-1">
+                <select class="form-select shadow-none pt-1 pb-1" id="departmentsSelect" placeholder="Departments">
+				<option selected disabled hidden>All Departments</option>
+                </select>
+				    <!-- <label for="departmentsSelect">Departments</label> -->
+             </div>
+
+			 <div class="form-floating mt-3">
+                <select class="form-select shadow-none pt-1 pb-1" id="locationsSelect" placeholder="Locations">
+				<option selected disabled hidden>All Locations</option>
+                </select>
+             </div>
+		</form>
+		`);
+
+	//second param is prop to sort by
+	const sortedDepartments = sortByName(allDepartments, "departmentName");
+	const sortedLocations = sortByName(allLocations, "locationName");
+
+	// populate select elements
+	$.each(sortedDepartments, function (i, d) {
+		$("#departmentsSelect").append(
+			$("<option>", {
+				value: d.departmentId,
+				text: d.departmentName,
+			})
+		);
+	});
+
+	$.each(sortedLocations, function (i, l) {
+		$("#locationsSelect").append(
+			$("<option>", {
+				value: l.locationId,
+				text: l.locationName,
+			})
+		);
+	});
+
+	// now show modal
+	$("#genericModal").modal("show");
+
+	// id dept is selected disable locations and the other way round
+	$('#departmentsSelect').change(function () {
+		let optionSelected = $(this).find("option:selected");
+		departmentId = optionSelected.val();
+		locationId = undefined;
+		$('#locationsSelect').hide();
+		filteredResults = allStaff.filter(l => l.departmentId === departmentId);
+		displayFilteredResults(filteredResults);
+	});
+
+	$('#locationsSelect').change(function () {
+		let optionSelected = $(this).find("option:selected");
+		locationId = optionSelected.val();
+		departmentId = undefined;
+		$('#departmentsSelect').hide();
+		filteredResults = allStaff.filter(l => l.locationId === locationId);
+		displayFilteredResults(filteredResults);
+	});
+}
+
+function displayFilteredResults(filteredResults) {
+	// hide modal
+	$("#genericModal").modal("hide");
+
+	// if another tab is opened go to default (personnel) tab AND pane
+	$('.nav').find('.active').removeClass('active');
+	$("#personnelBtn").addClass("active");
+
+	$('#departments-tab-pane').removeClass('active');
+	$('#departments-tab-pane').removeClass('show');
+	$('#locations-tab-pane').removeClass('active');
+	$('#locations-tab-pane').removeClass('show');
+	$('#personnel-tab-pane').addClass('active');
+	$('#personnel-tab-pane').addClass('show');
+
+	renderStaffTable(filteredResults)
 }
 
 function deleteLocation(locationId) {
@@ -602,7 +685,6 @@ function deleteLocation(locationId) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Deleted location:<br>${locationToDeleteName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
@@ -701,7 +783,6 @@ function deleteDepartment(departmentId) {
 }
 
 function deleteStaff(staffId) {
-	console.log(staffId, allStaff)
 	const staffToDelete = allStaff.find(s => s.staffId === staffId);
 	const { lastName, firstName } = staffToDelete;
 	// populate modal
@@ -807,7 +888,6 @@ function updateLocation(locationId) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					console.log("SUCCESS!!");
 					$('#modal-title').html(`Updated location:<br>${locationName} to ${newLocationName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						

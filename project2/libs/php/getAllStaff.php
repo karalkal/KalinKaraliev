@@ -29,8 +29,7 @@ if (mysqli_connect_errno()) {
 
 // SQL does not accept parameters and so is not prepared
 // GET also departmentID of department to check if location can be deleted safely with CASCADE
-// TODO: need to implement this at DB level too
-$query = 'SELECT p.id as staffId, p.lastName, p.firstName, p.jobTitle, p.email, p. departmentID as departmentId, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.lastName, p.firstName, d.name, l.name';
+$query = 'SELECT p.id as staffId, p.lastName, p.firstName, p.jobTitle, p.email, p. departmentID as departmentId, d.name as department, l.name as location, l.id as locationId FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.lastName, p.firstName, d.name, l.name';
 
 $result = $conn->query($query);
 
