@@ -8,9 +8,10 @@ let allStaff = [];
 let allDepartments = [];
 let allLocations = [];
 
-getAndDisplayAllStaff();	// upon initialization only staff table is required
-// getAndDisplayAllDepartments();
-// getAndDisplayAllLocations();
+// upon initialization only staff data is required but others are needed for select options
+getAndDisplayAllStaff();
+getAndDisplayAllDepartments();
+getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -764,7 +765,6 @@ function deleteStaff(staffId) {
 
 function updateLocation(locationId) {
 	const locationToUpdate = allLocations.find(l => l.locationId === locationId);
-	console.log(locationId, locationToUpdate)
 	const { locationName } = locationToUpdate;
 	// populate modal
 	$('#modal-title').text("Update Location");
@@ -833,22 +833,54 @@ function updateLocation(locationId) {
 }
 
 function updateDepartment(departmentId) {
-	const deptToUpdateName = allDepartments.find(d => d.departmentId === departmentId).departmentName;
+	const deptToUpdate = allDepartments.find(d => d.departmentId === departmentId);
+	let { departmentName, locationId } = deptToUpdate;
+	const originalLocationId = locationId;		// as locationId will be overwritten when option is seleceted
+	const deptToUpdateLocationName = allLocations.find(l => l.locationId === locationId).locationName;
+	const allLocationsExcludingCurrent = allLocations.filter(l => l.locationId !== locationId);
+
 	// populate modal
-	$('#modal-title').text("Delete Department?");
+	$('#modal-title').text("Update Department");
 	$('#modal-body').html(`
-		<form id="deleteDepartmentForm">
+		<form id="updateDepartmentForm">
 		    <input type="hidden" id="${departmentId}">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${deptToUpdateName}" readonly>
+				<input type="text" class="form-control shadow-none pt-2" 
+				value="${departmentName}" 
+				id="newDeptName" required>
+				<p class="pt-2 ps-2">@${deptToUpdateLocationName}</p>
 			</div>
+
+			<div class="form-floating">
+                <select class="form-select shadow-none" id="locationsSelect" placeholder="Locations">
+                </select>
+                <label for="locationsSelect">Locations</label>
+             </div>
 		</form>
 		`);
 
+	//second param is prop to sort by
+	const sortedLocations = sortByName(allLocationsExcludingCurrent, "locationName");
+
+	// populate locations select element
+	$("#locationsSelect").append($("<option>", {
+		value: locationId,
+		text: deptToUpdateLocationName,
+	}))
+
+	$.each(sortedLocations, function (i, l) {
+		$("#locationsSelect").append(
+			$("<option>", {
+				value: l.locationId,
+				text: l.locationName,
+			})
+		);
+	});
+
 	$('#modal-footer').html(`
 		<button type="submit" 
-			form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
-			DELETE
+			form="updateDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
+			UPDATE
 		</button>
         <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 			CANCEL
@@ -859,31 +891,35 @@ function updateDepartment(departmentId) {
 	$("#genericModal").modal("show");
 
 	// send delete request with ID param
-	$("#deleteDepartmentForm").on("submit", function (e) {
-		const deptCannotBeDeleted = checkDeptIdInPersonnelFKeys(departmentId, allStaff);
-		if (deptCannotBeDeleted) {
-			$('#modal-title').html(`Cannot delete`);
-			$('#modal-body').text(`${deptToUpdateName} cannot be deleted while employee(s) refer to it.`);
-			$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-			`)
+	$("#updateDepartmentForm").on("submit", function (e) {
+		let newDeptName = titleizeString($("#newDeptName").val());
+		// if new location is picked
+		locationId = $('#locationsSelect option').filter(':selected').val();
+		const newDeptLocationName = allLocations.find(l => l.locationId === locationId).locationName;
 
-			return
-		}
+		console.log(departmentId, locationId, newDeptName, newDeptLocationName);
 
 		e.preventDefault();
 		$.ajax({
-			url: "libs/php/deleteDepartmentByID.php",
+			url: "libs/php/updateDepartmentByID.php",
 			type: "POST",
 			dataType: "json",
 			data: {
-				id: departmentId		// send id param as string
+				departmentId: departmentId,
+				locationId: locationId,
+				newDeptName: newDeptName,
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated department:<br>${deptToUpdateName}`);
+					if (departmentName !== newDeptName) {
+						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}`);
+					}
+					if (originalLocationId !== locationId) {
+						$('#modal-title').html(`Moved ${departmentName} to ${newDeptLocationName}`);
+					}
+					if (departmentName !== newDeptName && originalLocationId !== locationId) {
+						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}<br>and moved to to ${newDeptLocationName}`);
+					}
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
@@ -895,11 +931,11 @@ function updateDepartment(departmentId) {
 					getAndDisplayAllDepartments()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error deleting data");
+					$("#modal-title").replaceWith("Error updating data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error deleting data");
+				$("#modal-title").replaceWith("Error updating data");
 			}
 		});
 	})
