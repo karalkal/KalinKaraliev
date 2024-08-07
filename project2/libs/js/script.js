@@ -415,7 +415,7 @@ function createDepartment() {
 
 function createStaffMember() {
 	// populate modal
-	$('#modal-title').text("Create New Staff");
+	$('#modal-title').text("Create New Employee");
 	$('#modal-body').html(`
 		<form id="createStaffForm">
 			<div class="form-floating mb-3">
@@ -848,7 +848,6 @@ function updateDepartment(departmentId) {
 				<input type="text" class="form-control shadow-none pt-2" 
 				value="${departmentName}" 
 				id="newDeptName" required>
-				<p class="pt-2 ps-2">@${deptToUpdateLocationName}</p>
 			</div>
 
 			<div class="form-floating">
@@ -892,14 +891,12 @@ function updateDepartment(departmentId) {
 
 	// send delete request with ID param
 	$("#updateDepartmentForm").on("submit", function (e) {
+		e.preventDefault();
+
 		let newDeptName = titleizeString($("#newDeptName").val());
 		// if new location is picked
 		locationId = $('#locationsSelect option').filter(':selected').val();
 		const newDeptLocationName = allLocations.find(l => l.locationId === locationId).locationName;
-
-		console.log(departmentId, locationId, newDeptName, newDeptLocationName);
-
-		e.preventDefault();
 		$.ajax({
 			url: "libs/php/updateDepartmentByID.php",
 			type: "POST",
@@ -941,25 +938,73 @@ function updateDepartment(departmentId) {
 	})
 }
 
-function updateStaff(staffId) {
-	console.log(staffId, allStaff)
-	const staffToDelete = allStaff.find(s => s.staffId === staffId);
-	const { lastName, firstName } = staffToDelete;
+function updateStaff(idOfStaffToUpdate) {
+	const employeeToUpdate = allStaff.find(s => s.staffId === idOfStaffToUpdate);
+	let { staffId, lastName, firstName, jobTitle, email, departmentId, department, location } = employeeToUpdate;
+	const allDeptsExcludingCurrent = allDepartments.filter(d => d.departmentId !== departmentId);
+
 	// populate modal
-	$('#modal-title').text("Update Staff");
+	$('#modal-title').text("Update Employee");
 	$('#modal-body').html(`
-		<form id="deleteStaffForm">
+		<form id="updateStaffForm">
 		    <input type="hidden" id="${staffId}">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none shadow-none pt-2" value="${lastName}, ${firstName}" readonly>
+			    <div class="form-text">First Name (non-editable):</div>
+				<input type="text" class="form-control shadow-none pt-2" 
+					value="${firstName}" readonly>
 			</div>
+
+			<div class="form-floating mb-3">
+				<div class="form-text">Last Name (non-editable):</div>
+				<input type="text" class="form-control shadow-none pt-2" 
+					value="${lastName}" readonly>
+			</div>
+
+			<div class="form-floating mb-3">
+				<div class="form-text">Job Title:</div>
+				<input type="text" class="form-control shadow-none pt-2" 
+					value="${jobTitle}" 
+					id="updateStaffJobTitle" required>
+			</div>
+
+			<div class="form-floating mb-3">
+				<div class="form-text">Email:</div>
+				<input type="email" 
+					class="form-control shadow-none" id="updateStaffEmailAddress"
+					placeholder="Email address" required
+					value="${email}">
+			</div>
+
+			<div class="form-floating">
+                <select class="form-select shadow-none" id="departmentsSelect" placeholder="Departments">
+                </select>
+                <label for="locationsSelect">Departments</label>
+             </div>
 		</form>
 		`);
 
+	// populate locations select element
+	$("#departmentsSelect").append($("<option>", {
+		value: departmentId,
+		text: department,
+	}))
+
+	//second param is prop to sort by
+	const sortedDepartments = sortByName(allDeptsExcludingCurrent, "departmentName");
+
+	$.each(sortedDepartments, function (i, dept) {
+		$("#departmentsSelect").append(
+			$("<option>", {
+				value: dept.departmentId,
+				text: dept.departmentName,
+			})
+		);
+	});
+
 	$('#modal-footer').html(`
 		<button type="submit" 
-			form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
-			DELETE
+			form="updateStaffForm" class="btn btn-outline-primary btn-sm myBtn">
+			UPDATE
 		</button>
         <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 			CANCEL
@@ -970,19 +1015,38 @@ function updateStaff(staffId) {
 	$("#genericModal").modal("show");
 
 	// send delete request with ID param
-	$("#deleteStaffForm").on("submit", function (e) {
+	$("#updateStaffForm").on("submit", function (e) {
 		e.preventDefault();
 
+		departmentId = $('#departmentsSelect option').filter(':selected').val();
+		let updatedJobTitle = titleizeString($("#updateStaffJobTitle").val());
+		let updatedEmail = $("#updateStaffEmailAddress").val().toLowerCase();		// convert email to lower
+
+		if (validateEmail(updatedEmail) == false) {		//invalid email
+			$("#modal-title").html(`Invalid email format for:<br>${updatedEmail}`);
+			$('#modal-body').empty();
+			$('#modal-footer').html(`						
+				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+					CLOSE
+				</button>
+				`)
+			return;
+		}
+
+		// update locationId with selected value
 		$.ajax({
-			url: "libs/php/deleteStaffByID.php",
+			url: "libs/php/updateStaffByID.php",
 			type: "POST",
 			dataType: "json",
 			data: {
-				id: staffId		// send id param as string
+				staffId: staffId,
+				updatedJobTitle: updatedJobTitle,
+				updatedEmail: updatedEmail,
+				departmentId: departmentId
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Deleted employee:<br>${lastName}, ${firstName}`);
+					$('#modal-title').html(`Updated staff:<br>${firstName, lastName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
@@ -994,15 +1058,16 @@ function updateStaff(staffId) {
 					getAndDisplayAllStaff()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error deleting data");
+					$("#modal-title").replaceWith("Error updating data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error deleting data");
+				$("#modal-title").replaceWith("Error updating data");
 			}
 		});
 	})
 }
+
 
 
 
