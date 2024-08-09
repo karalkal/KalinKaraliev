@@ -995,7 +995,7 @@ function updateDepartment(departmentId) {
 						$('#modal-title').html(`Moved ${departmentName} to ${newDeptLocationName}`);
 					}
 					if (departmentName !== newDeptName && originalLocationId !== locationId) {
-						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}<br>and moved to to ${newDeptLocationName}`);
+						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}<br>and moved to ${newDeptLocationName}`);
 					}
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
