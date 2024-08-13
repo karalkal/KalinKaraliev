@@ -185,30 +185,30 @@ function renderStaffTable(staff) {
 
 	let documentFragment = document.createDocumentFragment();
 
-	staff.forEach(function (staffRow, index) {
+	staff.forEach(function (employee, index) {
 		let tableRow = document.createElement("tr");
 		// name	 
 		let staffNameEl = document.createElement("td");
 		staffNameEl.classList.add("align-middle", "text-nowrap");
-		let staffNameText = document.createTextNode(`${staffRow.lastName}, ${staffRow.firstName}`);
+		let staffNameText = document.createTextNode(`${employee.lastName}, ${employee.firstName}`);
 		staffNameEl.append(staffNameText);
 		tableRow.append(staffNameEl);
 		// department	 
 		let staffDeptEl = document.createElement("td");
 		staffDeptEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffDeptText = document.createTextNode(staffRow.department);
+		let staffDeptText = document.createTextNode(employee.department);
 		staffDeptEl.append(staffDeptText);
 		tableRow.append(staffDeptEl);
 		// location	 
 		let staffLocationEl = document.createElement("td");
 		staffLocationEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffLocationText = document.createTextNode(staffRow.location);
+		let staffLocationText = document.createTextNode(employee.location);
 		staffLocationEl.appendChild(staffLocationText);
 		tableRow.appendChild(staffLocationEl);
 		// email	 
 		let staffEmailEl = document.createElement("td");
 		staffEmailEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffEmailText = document.createTextNode(staffRow.email);
+		let staffEmailText = document.createTextNode(employee.email);
 		staffEmailEl.append(staffEmailText);
 		tableRow.appendChild(staffLocationEl);
 		//buttons
@@ -217,14 +217,14 @@ function renderStaffTable(staff) {
 
 		let updateStaffBtn = document.createElement("button");
 		updateStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "updateStaffBtn");
-		updateStaffBtn.setAttribute("data-id", staffRow.staffId);
+		updateStaffBtn.setAttribute("data-id", employee.staffId);
 		let updateStaffBtnIcon = document.createElement("i");
 		updateStaffBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
 		updateStaffBtn.appendChild(updateStaffBtnIcon);
 
 		let deleteStaffBtn = document.createElement("button");
-		deleteStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "deleteStaffBtn");
-		deleteStaffBtn.setAttribute("data-id", staffRow.staffId);
+		deleteStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "deleteStaffBtn");
+		deleteStaffBtn.setAttribute("data-id", employee.staffId);
 		let deleteStaffBtnIcon = document.createElement("i");
 		deleteStaffBtnIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
 		deleteStaffBtn.appendChild(deleteStaffBtnIcon);
@@ -237,60 +237,100 @@ function renderStaffTable(staff) {
 		documentFragment.appendChild(tableRow);
 	});
 
-	$('#personnelTableBody').append(documentFragment);	
+	$('#personnelTableBody').append(documentFragment);
 }
 
 function renderDeptTable(departments) {
 	// clear table, then render with up to date values
-	$('#departmentTableBody').empty()
+	$('#departmentTableBody').empty();
 
-	$.each(departments, function (index, deptRow) {
-		$('#departmentTableBody')
-			.append($(`<tr>
-					<td class="align-middle text-nowrap">
-						${deptRow.departmentName}
-					</td>
-					<td class="align-middle text-nowrap d-none d-md-table-cell">
-						${deptRow.locationName}
-					</td>
-					<td class="align-middle text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm updateDepartmentBtn" 
-						data-id="${deptRow.departmentId}">
-							<i class="fa-solid fa-pencil fa-fw"></i>
-						</button>
+	let documentFragment = document.createDocumentFragment();
 
-						<button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" 
-							data-id="${deptRow.departmentId}">
-							<i class="fa-solid fa-trash fa-fw"></i>
-						</button>
-					</td>
-				</tr>`));
+	departments.forEach(function (dpt, index) {
+		let tableRow = document.createElement("tr");
+		// dpt name	 
+		let dptNameEl = document.createElement("td");
+		dptNameEl.classList.add("align-middle", "text-nowrap");
+		let dptNameText = document.createTextNode(dpt.departmentName);
+		dptNameEl.append(dptNameText);
+		tableRow.append(dptNameEl);
+		// location	 
+		let dptLocationEl = document.createElement("td");
+		dptLocationEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
+		let dptLocationText = document.createTextNode(dpt.locationName);
+		dptLocationEl.appendChild(dptLocationText);
+		tableRow.appendChild(dptLocationEl);
+
+		//buttons
+		let buttonsContainer = document.createElement("td");
+		buttonsContainer.classList.add("text-end", "text-nowrap");
+
+		let updateDptBtn = document.createElement("button");
+		updateDptBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateDepartmentBtn");
+		updateDptBtn.setAttribute("data-id", dpt.departmentId);
+		let updateDptBtnIcon = document.createElement("i");
+		updateDptBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
+		updateDptBtn.appendChild(updateDptBtnIcon);
+
+		let deleteDptBtn = document.createElement("button");
+		deleteDptBtn.classList.add("btn", "btn-primary", "btn-sm", "deleteDepartmentBtn");
+		deleteDptBtn.setAttribute("data-id", dpt.departmentId);
+		let deleteDptBtnIcon = document.createElement("i");
+		deleteDptBtnIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
+		deleteDptBtn.appendChild(deleteDptBtnIcon);
+
+		buttonsContainer.appendChild(updateDptBtn);
+		buttonsContainer.appendChild(deleteDptBtn);
+		tableRow.appendChild(buttonsContainer);
+
+		// append fragment
+		documentFragment.appendChild(tableRow);
 	});
+
+	$('#departmentTableBody').append(documentFragment);
 }
 
 function renderLocationsTable(locations) {
 	// clear table, then render with up to date values
-	$('#locationTableBody').empty()
+	$('#locationTableBody').empty();
 
-	$.each(locations, function (index, locationRow) {
-		$('#locationTableBody')
-			.append($(`<tr>
-					<td class="align-middle text-nowrap">
-						${locationRow.locationName}
-					</td>
-					<td class="align-middle text-end text-nowrap">
-						<button type="button" class="btn btn-primary btn-sm updateLocationBtn"
-							data-id="${locationRow.locationId}">
-							<i class="fa-solid fa-pencil fa-fw"></i>
-						</button>
+	let documentFragment = document.createDocumentFragment();
 
-						<button type="button" class="btn btn-primary btn-sm deleteLocationBtn" 
-							data-id="${locationRow.locationId}">
-							<i class="fa-solid fa-trash fa-fw"></i>
-						</button>
-					</td>
-				</tr>`));
+	locations.forEach(function (location, index) {
+		let tableRow = document.createElement("tr");
+		// dpt name	 
+		let locationNameEl = document.createElement("td");
+		locationNameEl.classList.add("align-middle", "text-nowrap");
+		let locationNameText = document.createTextNode(location.locationName);
+		locationNameEl.append(locationNameText);
+		tableRow.append(locationNameEl);
+		//buttons
+		let buttonsContainer = document.createElement("td");
+		buttonsContainer.classList.add("text-end", "text-nowrap");
+
+		let updateLocationBtn = document.createElement("button");
+		updateLocationBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateLocationBtn");
+		updateLocationBtn.setAttribute("data-id", location.locationId);
+		let updateLocationBtnIcon = document.createElement("i");
+		updateLocationBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
+		updateLocationBtn.appendChild(updateLocationBtnIcon);
+
+		let deleteLocationBtn = document.createElement("button");
+		deleteLocationBtn.classList.add("btn", "btn-primary", "btn-sm", "deleteLocationBtn");
+		deleteLocationBtn.setAttribute("data-id", location.locationId);
+		let deleteLocationBtnIcon = document.createElement("i");
+		deleteLocationBtnIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
+		deleteLocationBtn.appendChild(deleteLocationBtnIcon);
+
+		buttonsContainer.appendChild(updateLocationBtn);
+		buttonsContainer.appendChild(deleteLocationBtn);
+		tableRow.appendChild(buttonsContainer);
+
+		// append fragment
+		documentFragment.appendChild(tableRow);
 	});
+
+	$('#locationTableBody').append(documentFragment);
 }
 
 function createLocation() {
