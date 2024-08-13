@@ -1,8 +1,6 @@
 # <p style="text-align: center;">Company directory</p>
 - A basic CRUD application connected to a relataional database 
-- Built with  PHP, MySQLMariaDB, Jquery & JavaScript 
----   
----   
+- Built with  PHP, MariaDB, Jquery & JavaScript 
 ---   
 ---   
 
