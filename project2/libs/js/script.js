@@ -107,7 +107,28 @@ $('document').ready(function () {
 	});
 	$('body').on('click', '.deleteLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
-		deleteLocation(locationId);
+		$.ajax({
+			url: "libs/php/preDeleteLocationCheck.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: locationId },
+			success: function (result) {
+				const { locationName, departmentsCount } = result.data[0];
+				if (result.status.code == 200) {
+					if (departmentsCount == 0) {		// if NO entry in another table refers to this ID
+						deleteLocation(locationId, locationName)
+					} else {
+						// message will be like Location London cannot be deleted while 3 department(s)...
+						renderCannotDeleteModal("Location", locationName, departmentsCount, "department(s)");
+					}
+				} else {	// code is not 200
+					$("#modal-title").replaceWith("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#modal-title").replaceWith("Error writing data");
+			}
+		});
 	});
 
 	// UPDATE
@@ -702,11 +723,12 @@ function displayFilteredResults(filteredResults) {
 	renderStaffTable(filteredResults)
 }
 
-function deleteLocation(locationId) {
-	const locationToDeleteName = allLocations.find(l => l.locationId === locationId).locationName;
+function deleteLocation(locationId, locationToDeleteName) {
 	// populate modal
-	$('#modal-title').text("Delete Location?");
+	$('#modal-title').text("Remove Location?");
+
 	$('#modal-body').html(`
+		<p>Please confirm you wish to remove location:</p>
 		<form id="deleteLocationForm">
 		    <input type="hidden" id="${locationId}">
 			<div class="form-floating mb-3">
@@ -718,10 +740,10 @@ function deleteLocation(locationId) {
 	$('#modal-footer').html(`
 		<button type="submit" 
 			form="deleteLocationForm" class="btn btn-outline-primary btn-sm myBtn">
-			DELETE
+			YES
 		</button>
         <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
+			NO
 		</button>
 		`)
 
@@ -730,19 +752,6 @@ function deleteLocation(locationId) {
 
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
-		const locationCannotBeDeleted = checkLocationIdInDeptFKeys(locationId, allDepartments);
-		if (locationCannotBeDeleted) {
-			$('#modal-title').html(`Cannot delete`);
-			$('#modal-body').text(`${locationToDeleteName} cannot be deleted while department(s) refer to it.`);
-			$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-			`)
-
-			return
-		}
-
 		e.preventDefault();
 		$.ajax({
 			url: "libs/php/deleteLocationByID.php",
@@ -780,7 +789,7 @@ function deleteLocation(locationId) {
 function deleteDepartment(departmentId) {
 	const deptToDeleteName = allDepartments.find(d => d.departmentId === departmentId).departmentName;
 	// populate modal
-	$('#modal-title').text("Delete Department?");
+	$('#modal-title').text("Remove Department?");
 	$('#modal-body').html(`
 		<form id="deleteDepartmentForm">
 		    <input type="hidden" id="${departmentId}">
@@ -854,7 +863,7 @@ function deleteStaff(staffId) {
 	const staffToDelete = allStaff.find(s => s.staffId === staffId);
 	const { lastName, firstName } = staffToDelete;
 	// populate modal
-	$('#modal-title').text("Delete Staff?");
+	$('#modal-title').text("Remove Staff?");
 	$('#modal-body').html(`
 		<form id="deleteStaffForm">
 		    <input type="hidden" id="${staffId}">
@@ -910,6 +919,18 @@ function deleteStaff(staffId) {
 			}
 		});
 	})
+}
+
+function renderCannotDeleteModal(parentTypeStr, parentName, childCount, childTypeStr) {
+	$('#modal-title').html(`Cannot delete`);
+	$('#modal-body').text(`${parentTypeStr} ${parentName} cannot be deleted while ${childCount} ${childTypeStr} refer to it.`);
+	$('#modal-footer').html(`						
+									<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+										CLOSE
+									</button>
+						`)
+	// now show modal
+	$("#genericModal").modal("show");
 }
 
 function updateLocation(locationId) {
