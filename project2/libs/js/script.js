@@ -1,7 +1,6 @@
 import titleizeString from "./utils/stringTitleizer.js";
 import validateEmail from "./utils/emailValidator.js";
 import sortByName from "./utils/sortArrayOfObjects.js";
-import { checkLocationIdInDeptFKeys, checkDeptIdInPersonnelFKeys } from "./utils/preDeleteFKCheck.js";
 
 
 let allStaff = [];
@@ -99,11 +98,13 @@ $('document').ready(function () {
 	/*  Instead of creating event handlers after elements are mounted to DOM it looks neater 
 		to move this functionality outside rendering functions. 
 		Use this syntax to register DOM events before an element exists. Note that "data-id" is string.*/
+
 	//delete Employee
 	$('body').on('click', '.deleteStaffBtn', function (e) {
 		let staffId = $(e.currentTarget).attr("data-id");
 		deleteStaff(staffId);
 	});
+
 	// delete Department
 	$('body').on('click', '.deleteDepartmentBtn', function (e) {
 		let deptId = $(e.currentTarget).attr("data-id");
@@ -113,11 +114,10 @@ $('document').ready(function () {
 			dataType: "json",
 			data: { id: deptId },
 			success: function (result) {
-				console.log(result.status.code == 200)
 				const { departmentName, personnelCount } = result.data[0];
 				if (result.status.code == 200) {
 					if (personnelCount == 0) {		// if NO entry in another table refers to this ID
-						deleteLocation(deptIdId, departmentName)
+						deleteDepartment(deptId, departmentName)
 					} else {
 						// message will be like Location London cannot be deleted while 3 department(s)...
 						renderCannotDeleteModal("Department", departmentName, personnelCount, "employee(s)");
@@ -130,8 +130,8 @@ $('document').ready(function () {
 				renderErrorModal("Something went wrong.")
 			}
 		});
-		deleteDepartment(deptId);
 	});
+
 	// delete Location
 	$('body').on('click', '.deleteLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
@@ -171,7 +171,22 @@ $('document').ready(function () {
 	});
 	$('body').on('click', '.updateLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
-		updateLocation(locationId);
+		$.ajax({
+			url: "libs/php/getLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: locationId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					updateLocation(locationId, result.data[0].locationName);
+				} else {	// code is not 200
+					renderErrorModal("Something went wrong.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Something went wrong.")
+			}
+		});
 	});
 })
 
@@ -265,14 +280,14 @@ function renderStaffTable(staff) {
 		buttonsContainer.classList.add("text-end", "text-nowrap");
 
 		let updateStaffBtn = document.createElement("button");
-		updateStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "updateStaffBtn");
+		updateStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateStaffBtn");
 		updateStaffBtn.setAttribute("data-id", employee.staffId);
 		let updateStaffBtnIcon = document.createElement("i");
 		updateStaffBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
 		updateStaffBtn.appendChild(updateStaffBtnIcon);
 
 		let deleteStaffBtn = document.createElement("button");
-		deleteStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "deleteStaffBtn");
+		deleteStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "deleteStaffBtn");
 		deleteStaffBtn.setAttribute("data-id", employee.staffId);
 		let deleteStaffBtnIcon = document.createElement("i");
 		deleteStaffBtnIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
@@ -405,7 +420,7 @@ function createLocation() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createLocationForm").on("submit", function (e) {
@@ -486,7 +501,7 @@ function createDepartment() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createDeptForm").on("submit", function (e) {
@@ -583,7 +598,7 @@ function createStaffMember() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createStaffForm").on("submit", function (e) {
@@ -631,13 +646,11 @@ function createStaffMember() {
 					getAndDisplayAllStaff();
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error writing data");
+					renderErrorModal("Error writing data")
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith(
-					"Error writing data"
-				);
+				renderErrorModal("Error writing data");
 			}
 		});
 	})
@@ -650,7 +663,7 @@ function renderErrorModal(message) {
 		<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 			CLOSE
 		</button>`)
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 }
 
 function searchAndDisplayResults(searchString) {
@@ -720,7 +733,7 @@ function filterStaff() {
 	});
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// id dept is selected disable locations and the other way round
 	$('#departmentsSelect').change(function () {
@@ -744,7 +757,7 @@ function filterStaff() {
 
 function displayFilteredResults(filteredResults) {
 	// hide modal
-	$("#genericModal").modal("hide");
+	$(".genericModal").modal("hide");
 
 	// if another tab is opened go to default (personnel) tab AND pane
 	$('.nav').find('.active').removeClass('active');
@@ -785,7 +798,7 @@ function deleteLocation(locationId, locationToDeleteName) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
@@ -848,7 +861,7 @@ function deleteDepartment(departmentId, deptToDeleteName) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteDepartmentForm").on("submit", function (e) {
@@ -909,7 +922,7 @@ function deleteStaff(staffId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteStaffForm").on("submit", function (e) {
@@ -955,21 +968,22 @@ function renderCannotDeleteModal(parentTypeStr, parentName, childCount, childTyp
 									</button>
 						`)
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 }
 
-function updateLocation(locationId) {
-	const locationToUpdate = allLocations.find(l => l.locationId === locationId);
-	const { locationName } = locationToUpdate;
+function updateLocation(locationId, locationName) {
+	console.log(locationId, locationName)
 	// populate modal
 	$('#modal-title').text("Update Location");
 	$('#modal-body').html(`
 		<form id="updateLocationForm">
-		    <input type="hidden" id="${locationId}">
+		    <input type="hidden" id="${locationId}">		
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none shadow-none pt-2" 
+				<input type="text" class="form-control shadow-none" 
 				value="${locationName}" 
+				placeholder="Location name"
 				id="newLocationName" required>
+				<label for="newLocationName">Location name</label>
 			</div>
 		</form>
 		`);
@@ -985,7 +999,7 @@ function updateLocation(locationId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateLocationForm").on("submit", function (e) {
@@ -1081,7 +1095,7 @@ function updateDepartment(departmentId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateDepartmentForm").on("submit", function (e) {
@@ -1206,7 +1220,7 @@ function updateStaff(idOfStaffToUpdate) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateStaffForm").on("submit", function (e) {

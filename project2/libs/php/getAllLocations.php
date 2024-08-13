@@ -28,7 +28,7 @@ if (mysqli_connect_errno()) {
 }
 
 // SQL does not accept parameters and so is not prepared
-$query = 'SELECT id as locationId, name as locationName FROM location';
+$query = 'SELECT id as locationId, name as locationName FROM location ORDER BY location.name;';
 
 $result = $conn->query($query);
 

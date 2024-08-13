@@ -1,6 +1,6 @@
 <?php
 
-// remove next two lines for production	
+// remove next two lines for production
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
@@ -27,15 +27,15 @@ if (mysqli_connect_errno()) {
 	exit;
 }
 
-// SQL does not accept parameters and so is not prepared
-// GET also locationID of department to check if location can be deleted safely with CASCADE
-// TODO: need to implement this at DB level too
-// $query = 'SELECT department.id as departmentId, department.name as departmentName, department. locationID as locationId, location.name as locationName FROM department LEFT JOIN location ON (location.id = department.locationID) ORDER BY location.name;';
-$query = 'SELECT department.id as departmentId, department.name as departmentName, department. locationID as locationId, location.name as locationName FROM department LEFT JOIN location ON (location.id = department.locationID) ORDER BY department.name;';
 
-$result = $conn->query($query);
+// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+$query = $conn->prepare('SELECT id as locationId, name as locationName FROM location WHERE id = ?');
 
-if (!$result) {
+$query->bind_param("i", $_POST['id']);
+
+$query->execute();
+
+if (false === $query) {
 
 	$output['status']['code'] = "400";
 	$output['status']['name'] = "executed";
@@ -47,8 +47,10 @@ if (!$result) {
 	echo json_encode($output);
 
 	exit;
+
 }
 
+$result = $query->get_result();
 $data = [];
 
 while ($row = mysqli_fetch_assoc($result)) {

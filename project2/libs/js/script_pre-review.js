@@ -289,7 +289,7 @@ function createLocation() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createLocationForm").on("submit", function (e) {
@@ -370,7 +370,7 @@ function createDepartment() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createDeptForm").on("submit", function (e) {
@@ -467,7 +467,7 @@ function createStaffMember() {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// get data from form
 	$("#createStaffForm").on("submit", function (e) {
@@ -594,7 +594,7 @@ function filterStaff() {
 	});
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// id dept is selected disable locations and the other way round
 	$('#departmentsSelect').change(function () {
@@ -618,7 +618,7 @@ function filterStaff() {
 
 function displayFilteredResults(filteredResults) {
 	// hide modal
-	$("#genericModal").modal("hide");
+	$(".genericModal").modal("hide");
 
 	// if another tab is opened go to default (personnel) tab AND pane
 	$('.nav').find('.active').removeClass('active');
@@ -658,7 +658,7 @@ function deleteLocation(locationId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteLocationForm").on("submit", function (e) {
@@ -733,7 +733,7 @@ function deleteDepartment(departmentId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteDepartmentForm").on("submit", function (e) {
@@ -807,7 +807,7 @@ function deleteStaff(staffId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#deleteStaffForm").on("submit", function (e) {
@@ -871,7 +871,7 @@ function updateLocation(locationId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateLocationForm").on("submit", function (e) {
@@ -967,7 +967,7 @@ function updateDepartment(departmentId) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateDepartmentForm").on("submit", function (e) {
@@ -1092,7 +1092,7 @@ function updateStaff(idOfStaffToUpdate) {
 		`)
 
 	// now show modal
-	$("#genericModal").modal("show");
+	$(".genericModal").modal("show");
 
 	// send delete request with ID param
 	$("#updateStaffForm").on("submit", function (e) {
