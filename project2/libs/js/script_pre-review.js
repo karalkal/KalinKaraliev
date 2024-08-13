@@ -183,61 +183,34 @@ function renderStaffTable(staff) {
 	// clear table, then re-render with up to date values
 	$('#personnelTableBody').empty();
 
-	let documentFragment = document.createDocumentFragment();
+	$.each(staff, function (index, staffRow) {
+		$('#personnelTableBody')
+			.append($(`<tr>
+					<td class="align-middle text-nowrap">
+						${staffRow.lastName}, ${staffRow.firstName}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.department}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.location}
+					</td>
+					<td class="align-middle text-nowrap d-none d-md-table-cell">
+						${staffRow.email}
+					</td>
+					<td class="text-end text-nowrap">
+						<button type="button" class="btn btn-primary btn-sm updateStaffBtn"
+							data-id="${staffRow.staffId}">
+							<i class="fa-solid fa-pencil fa-fw"></i>
+						</button>
 
-	staff.forEach(function (staffRow, index) {
-		let tableRow = document.createElement("tr");
-		// name	 
-		let staffNameEl = document.createElement("td");
-		staffNameEl.classList.add("align-middle", "text-nowrap");
-		let staffNameText = document.createTextNode(`${staffRow.lastName}, ${staffRow.firstName}`);
-		staffNameEl.append(staffNameText);
-		tableRow.append(staffNameEl);
-		// department	 
-		let staffDeptEl = document.createElement("td");
-		staffDeptEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffDeptText = document.createTextNode(staffRow.department);
-		staffDeptEl.append(staffDeptText);
-		tableRow.append(staffDeptEl);
-		// location	 
-		let staffLocationEl = document.createElement("td");
-		staffLocationEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffLocationText = document.createTextNode(staffRow.location);
-		staffLocationEl.appendChild(staffLocationText);
-		tableRow.appendChild(staffLocationEl);
-		// email	 
-		let staffEmailEl = document.createElement("td");
-		staffEmailEl.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell");
-		let staffEmailText = document.createTextNode(staffRow.email);
-		staffEmailEl.append(staffEmailText);
-		tableRow.appendChild(staffLocationEl);
-		//buttons
-		let buttonsContainer = document.createElement("td");
-		buttonsContainer.classList.add("text-end", "text-nowrap");
-
-		let updateStaffBtn = document.createElement("button");
-		updateStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "updateStaffBtn");
-		updateStaffBtn.setAttribute("data-id", staffRow.staffId);
-		let updateStaffBtnIcon = document.createElement("i");
-		updateStaffBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
-		updateStaffBtn.appendChild(updateStaffBtnIcon);
-
-		let deleteStaffBtn = document.createElement("button");
-		deleteStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "deleteStaffBtn");
-		deleteStaffBtn.setAttribute("data-id", staffRow.staffId);
-		let deleteStaffBtnIcon = document.createElement("i");
-		deleteStaffBtnIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
-		deleteStaffBtn.appendChild(deleteStaffBtnIcon);
-
-		buttonsContainer.appendChild(updateStaffBtn);
-		buttonsContainer.appendChild(deleteStaffBtn);
-		tableRow.appendChild(buttonsContainer);
-
-		// append fragment
-		documentFragment.appendChild(tableRow);
+						<button type="button" class="btn btn-primary btn-sm deleteStaffBtn"
+							data-id="${staffRow.staffId}">
+							<i class="fa-solid fa-trash fa-fw"></i>
+						</button>
+					</td>
+				</tr>`));
 	});
-
-	$('#personnelTableBody').append(documentFragment);	
 }
 
 function renderDeptTable(departments) {
