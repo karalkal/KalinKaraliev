@@ -28,7 +28,7 @@ if (mysqli_connect_errno()) {
 }
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-$query = $conn->prepare('SELECT location.name AS locationName, COUNT(department.id) as departmentsCount FROM location LEFT JOIN department ON (department.locationID = location.id) WHERE location.id = ?');
+$query = $conn->prepare('SELECT d.name AS departmentName, COUNT(p.id) as personnelCount FROM department d LEFT JOIN personnel p ON (p.departmentID = d.id) WHERE d.id  = ?');
 
 $query->bind_param("i", $_POST['id']);
 
@@ -55,7 +55,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 	array_push($data, $row);
 }
 
-$output['status']['code'] = "200";
+$output['status']['code'] = "2040";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";

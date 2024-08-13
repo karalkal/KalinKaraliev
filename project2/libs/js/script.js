@@ -96,15 +96,43 @@ $('document').ready(function () {
 	});
 
 	// DELETE
-	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
+	/*  Instead of creating event handlers after elements are mounted to DOM it looks neater 
+		to move this functionality outside rendering functions. 
+		Use this syntax to register DOM events before an element exists. Note that "data-id" is string.*/
+	//delete Employee
 	$('body').on('click', '.deleteStaffBtn', function (e) {
 		let staffId = $(e.currentTarget).attr("data-id");
 		deleteStaff(staffId);
 	});
+	// delete Department
 	$('body').on('click', '.deleteDepartmentBtn', function (e) {
 		let deptId = $(e.currentTarget).attr("data-id");
+		$.ajax({
+			url: "libs/php/preDeleteDepartmentCheck.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: deptId },
+			success: function (result) {
+				console.log(result.status.code == 200)
+				const { departmentName, personnelCount } = result.data[0];
+				if (result.status.code == 200) {
+					if (personnelCount == 0) {		// if NO entry in another table refers to this ID
+						deleteLocation(deptIdId, departmentName)
+					} else {
+						// message will be like Location London cannot be deleted while 3 department(s)...
+						renderCannotDeleteModal("Department", departmentName, personnelCount, "employee(s)");
+					}
+				} else {	// code is not 200
+					renderErrorModal("Something went wrong.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Something went wrong.")
+			}
+		});
 		deleteDepartment(deptId);
 	});
+	// delete Location
 	$('body').on('click', '.deleteLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
 		$.ajax({
@@ -122,11 +150,11 @@ $('document').ready(function () {
 						renderCannotDeleteModal("Location", locationName, departmentsCount, "department(s)");
 					}
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error writing data");
+					renderErrorModal("Something went wrong.")
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error writing data");
+				renderErrorModal("Something went wrong.")
 			}
 		});
 	});
@@ -146,7 +174,6 @@ $('document').ready(function () {
 		updateLocation(locationId);
 	});
 })
-
 
 function getAndDisplayAllStaff() {
 	// Reset search bar each time this btn is clicked
@@ -616,6 +643,16 @@ function createStaffMember() {
 	})
 }
 
+function renderErrorModal(message) {
+	$("#modal-title").replaceWith(message);
+	$('#modal-body').empty();
+	$('#modal-footer').html(`						
+		<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+			CLOSE
+		</button>`)
+	$("#genericModal").modal("show");
+}
+
 function searchAndDisplayResults(searchString) {
 	$.ajax({
 		url: "libs/php/searchAll.php",
@@ -786,11 +823,12 @@ function deleteLocation(locationId, locationToDeleteName) {
 	})
 }
 
-function deleteDepartment(departmentId) {
-	const deptToDeleteName = allDepartments.find(d => d.departmentId === departmentId).departmentName;
+function deleteDepartment(departmentId, deptToDeleteName) {
 	// populate modal
 	$('#modal-title').text("Remove Department?");
+
 	$('#modal-body').html(`
+		<p>Please confirm you wish to remove department:</p>
 		<form id="deleteDepartmentForm">
 		    <input type="hidden" id="${departmentId}">
 			<div class="form-floating mb-3">
@@ -802,10 +840,10 @@ function deleteDepartment(departmentId) {
 	$('#modal-footer').html(`
 		<button type="submit" 
 			form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
-			DELETE
+			YES
 		</button>
         <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
+			NO
 		</button>
 		`)
 
@@ -814,19 +852,6 @@ function deleteDepartment(departmentId) {
 
 	// send delete request with ID param
 	$("#deleteDepartmentForm").on("submit", function (e) {
-		const deptCannotBeDeleted = checkDeptIdInPersonnelFKeys(departmentId, allStaff);
-		if (deptCannotBeDeleted) {
-			$('#modal-title').html(`Cannot delete`);
-			$('#modal-body').text(`${deptToDeleteName} cannot be deleted while employee(s) refer to it.`);
-			$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-			`)
-
-			return
-		}
-
 		e.preventDefault();
 		$.ajax({
 			url: "libs/php/deleteDepartmentByID.php",
