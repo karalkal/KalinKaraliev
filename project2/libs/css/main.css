@@ -6,7 +6,7 @@ body {
   overflow: hidden;
 }
 
-section {
+body{
   display: flex;
   flex-flow: column;
   height: calc(100vh - 20px);

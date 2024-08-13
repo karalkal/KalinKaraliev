@@ -27,87 +27,87 @@
 </head>
 
 <body>
-    <section>
-        <div class="appHeader">
-            <div class="row">
-                <div class="col">
-                    <input id="searchInp" class="form-control mb-3" placeholder="search">
+    <header>
+        <div class="row">
+            <div class="col">
+                <input id="searchInp" class="form-control mb-3" placeholder="search">
+            </div>
+
+            <div class="col-6 text-end me-2">
+                <div class="btn-group" role="group" aria-label="buttons">
+                    <button id="refreshBtn" type="button" class="btn btn-primary">
+                        <i class="fa-solid fa-refresh fa-fw"></i>
+                    </button>
+                    <button id="filterBtn" type="button" class="btn btn-primary">
+                        <i class="fa-solid fa-filter fa-fw"></i>
+                    </button>
+                    <!-- ADD button -->
+                    <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#genericModal">
+                        <i class="fa-solid fa-plus fa-fw"></i>
+                    </button>
                 </div>
-
-                <div class="col-6 text-end me-2">
-                    <div class="btn-group" role="group" aria-label="buttons">
-                        <button id="refreshBtn" type="button" class="btn btn-primary">
-                            <i class="fa-solid fa-refresh fa-fw"></i>
-                        </button>
-                        <button id="filterBtn" type="button" class="btn btn-primary">
-                            <i class="fa-solid fa-filter fa-fw"></i>
-                        </button>
-                        <!-- ADD button -->
-                        <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#genericModal">
-                            <i class="fa-solid fa-plus fa-fw"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="personnelBtn" data-bs-toggle="tab"
-                        data-bs-target="#personnel-tab-pane" type="button" role="tab" aria-controls="home-tab-pane"
-                        aria-selected="true">
-                        <i class="fa-solid fa-person fa-lg fa-fw"></i><span class="d-none d-sm-block">Personnel</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="departmentsBtn" data-bs-toggle="tab"
-                        data-bs-target="#departments-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane"
-                        aria-selected="false">
-                        <i class="fa-solid fa-building fa-lg fa-fw"></i><span
-                            class="d-none d-sm-block">Departments</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="locationsBtn" data-bs-toggle="tab" data-bs-target="#locations-tab-pane"
-                        type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">
-                        <i class="fa-solid fa-map-location-dot fa-lg fa-fw"></i><span
-                            class="d-none d-sm-block">Locations</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-        <div class="tab-content bg-white">
-            <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab"
-                tabindex="0">
-                <table class="table table-hover">
-                    <tbody id="personnelTableBody">
-                        <!-- <tr> elements with staff data will render here -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                <table class="table table-hover">
-                    <tbody id="departmentTableBody">
-                        <!-- <tr> elements with department data will render here -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                <table class="table table-hover">
-                    <tbody id="locationTableBody">
-                        <!-- <tr> elements with locations data will render here -->
-                    </tbody>
-                </table>
             </div>
         </div>
 
-        <footer class="border-top text-center fw-bold">
-            <p class="fw-light my-3">Company Directory version 1.0</p>
-        </footer>
-    </section>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="personnelBtn" data-bs-toggle="tab"
+                    data-bs-target="#personnel-tab-pane" type="button" role="tab" aria-controls="home-tab-pane"
+                    aria-selected="true">
+                    <i class="fa-solid fa-person fa-lg fa-fw"></i><span class="d-none d-sm-block">Personnel</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="departmentsBtn" data-bs-toggle="tab" data-bs-target="#departments-tab-pane"
+                    type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
+                    <i class="fa-solid fa-building fa-lg fa-fw"></i><span class="d-none d-sm-block">Departments</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="locationsBtn" data-bs-toggle="tab" data-bs-target="#locations-tab-pane"
+                    type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">
+                    <i class="fa-solid fa-map-location-dot fa-lg fa-fw"></i><span
+                        class="d-none d-sm-block">Locations</span>
+                </button>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Header will render straight away, pre-loader/spinner will appear only while awaiting response -->
+    <div id="preloader">
+    </div>
+
+    <main id="mainSection" class="tab-content bg-white">
+        <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+            tabindex="0">
+            <table class="table table-hover">
+                <tbody id="personnelTableBody">
+                    <!-- <tr> elements with staff data will render here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <table class="table table-hover">
+                <tbody id="departmentTableBody">
+                    <!-- <tr> elements with department data will render here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <table class="table table-hover">
+                <tbody id="locationTableBody">
+                    <!-- <tr> elements with locations data will render here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="border-top text-center fw-bold mt-auto">
+        <p class="fw-light my-3">Company Directory version 1.0</p>
+    </footer>
 
     <!-- GENERIC MODAL -->
     <div id="genericModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
@@ -132,9 +132,6 @@
 
         </div>
 
-    </div>
-
-    <div id="preloader">
     </div>
 
     <!-- SCRIPTS -->

@@ -61,5 +61,7 @@ $output['data'] = $data;
 
 mysqli_close($conn);
 
+// sleep(2);
+
 echo json_encode($output);
 exit;

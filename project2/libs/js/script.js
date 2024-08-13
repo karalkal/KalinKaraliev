@@ -24,10 +24,11 @@ document.onreadystatechange = function (e) {
 $(document).on({
 	ajaxStart: function () {
 		// console.log("waiting for ajax response...")
+		$('#mainSection').hide();
 		$('#preloader').show();
 	},
 	ajaxStop: function () {
-		// console.log("got ajax response!")
+		$('#mainSection').show();
 		$('#preloader').hide();
 	}
 });
