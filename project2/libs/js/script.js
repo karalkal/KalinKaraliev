@@ -170,8 +170,7 @@ $('document').ready(function () {
 			data: { id: staffId },
 			success: function (result) {
 				if (result.status.code == 200) {
-					console.log(result.data);
-					// updateStaff(staffId, departmentName, locationId);
+					updateStaff(result.data);
 				} else {	// code is not 200
 					renderErrorModal("Something went wrong.")
 				}
@@ -479,7 +478,7 @@ function createLocation() {
 					getAndDisplayAllLocations()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error writing data");
+					renderErrorModal("Error writing data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -874,13 +873,11 @@ function deleteLocation(locationId, locationToDeleteName) {
 					getAndDisplayAllLocations()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error deleting data");
+					renderErrorModal("Error deleting data.");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith(
-					"Error deleting data"
-				);
+				renderErrorModal("Error deleting data.");
 			}
 		});
 	})
@@ -937,11 +934,11 @@ function deleteDepartment(departmentId, deptToDeleteName) {
 					getAndDisplayAllDepartments()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error deleting data");
+					renderErrorModal("Error deleting data.");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error deleting data");
+				renderErrorModal("Error deleting data.");
 			}
 		});
 	})
@@ -999,11 +996,11 @@ function deleteStaff(staffId) {
 					getAndDisplayAllStaff()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error deleting data");
+					renderErrorModal("Error deleting data.");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error deleting data");
+				renderErrorModal("Error deleting data.");
 			}
 		});
 	})
@@ -1077,13 +1074,11 @@ function updateLocation(locationId, locationName) {
 					getAndDisplayAllLocations()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error updating data");
+					renderErrorModal("Error updating data.")
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith(
-					"Error updating data"
-				);
+				renderErrorModal("Error updating data.");
 			}
 		});
 	})
@@ -1175,11 +1170,11 @@ function updateDepartment(data) {
 					getAndDisplayAllDepartments()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error updating data");
+					renderErrorModal("Error updating data.");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error updating data");
+				renderErrorModal("Error updating data.");
 			}
 		});
 	})
@@ -1305,11 +1300,11 @@ function updateStaff(idOfStaffToUpdate) {
 					getAndDisplayAllStaff()
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error updating data");
+					renderErrorModal("Error updating data.");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error updating data");
+				renderErrorModal("Error updating data.");
 			}
 		});
 	})
