@@ -9,8 +9,8 @@ let allLocations = [];
 
 // upon initialization only staff data is required but others are needed for select options
 getAndDisplayAllStaff();
-getAndDisplayAllDepartments();
-getAndDisplayAllLocations();
+// getAndDisplayAllDepartments();
+// getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -203,8 +203,7 @@ function getAndDisplayAllStaff() {
 			renderStaffTable(allStaff);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(jqXHR, textStatus, errorThrown);
-			alert("Something went wrong")
+			renderErrorModal("Error getting personnel data.");
 		}
 	});
 }
@@ -220,8 +219,7 @@ function getAndDisplayAllDepartments() {
 			renderDeptTable(allDepartments);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(jqXHR, textStatus, errorThrown);
-			alert("Something went wrong")
+			renderErrorModal("Error getting departments data.");
 		}
 	});
 }
@@ -237,8 +235,7 @@ function getAndDisplayAllLocations() {
 			renderLocationsTable(allLocations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(jqXHR, textStatus, errorThrown);
-			alert("Something went wrong")
+			renderErrorModal("Error getting locations data.");
 		}
 	});
 }
@@ -453,9 +450,7 @@ function createLocation() {
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith(
-					"Error writing data"
-				);
+				renderErrorModal("Error writing data");
 			}
 		});
 	})
@@ -480,14 +475,25 @@ function createDepartment() {
 		`);
 
 	// populate locations select element
-	const sortedLocations = sortByName(allLocations, "locationName");	//second param is prop to sort by
-	$.each(sortedLocations, function (i, location) {
-		$("#locationsSelect").append(
-			$("<option>", {
-				value: location.locationId,
-				text: location.locationName,
-			})
-		);
+	$.ajax({
+		url: "libs/php/getAllLocations.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			allLocations = result.data;
+			$.each(allLocations, function (i, location) {
+				$("#locationsSelect").append(
+					$("<option>", {
+						value: location.locationId,
+						text: location.locationName,
+					})
+				);
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error getting locations data.");
+		}
 	});
 
 	$('#modal-footer').html(`
@@ -532,11 +538,11 @@ function createDepartment() {
 					getAndDisplayAllDepartments();
 
 				} else {	// code is not 200
-					$("#modal-title").replaceWith("Error writing data");
+					renderErrorModal("Error writing data");
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$("#modal-title").replaceWith("Error writing data");
+				renderErrorModal("Error writing data");
 			}
 		});
 	})
@@ -577,14 +583,25 @@ function createStaffMember() {
 		`);
 
 	// populate locations select element
-	const sortedDepartments = sortByName(allDepartments, "departmentName"); //second param is prop to sort by
-	$.each(sortedDepartments, function (i, dept) {
-		$("#departmentSelect").append(
-			$("<option>", {
-				value: dept.departmentId,
-				text: dept.departmentName,
-			})
-		);
+	$.ajax({
+		url: "libs/php/getAllDepartments.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			allDepartments = result.data;
+			$.each(allDepartments, function (i, dept) {
+				$("#departmentSelect").append(
+					$("<option>", {
+						value: dept.departmentId,
+						text: dept.departmentName,
+					})
+				);
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error getting departments data.");
+		}
 	});
 
 	$('#modal-footer').html(`
