@@ -29,10 +29,12 @@ if (mysqli_connect_errno()) {
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
 // staffId, updatedJobTitle, updatedEmail, departmentId     	jobTitle 	email 	departmentID 	
-$query = $conn->prepare('UPDATE personnel SET jobTitle = ?,  email = ?, departmentID = ? WHERE id = ?;');
+$query = $conn->prepare('UPDATE personnel SET firstName = ?, lastName = ?, jobTitle = ?,  email = ?, departmentID = ? WHERE id = ?');
 
 $query->bind_param(
-	"ssii",
+	"ssssii",
+	$_POST['updatedFirst'],
+	$_POST['updatedLast'],
 	$_POST['updatedJobTitle'],
 	$_POST['updatedEmail'],
 	$_POST['departmentId'],
@@ -42,7 +44,6 @@ $query->bind_param(
 $query->execute();
 
 if (false === $query) {
-
 	$output['status']['code'] = "400";
 	$output['status']['name'] = "executed";
 	$output['status']['description'] = "query failed";

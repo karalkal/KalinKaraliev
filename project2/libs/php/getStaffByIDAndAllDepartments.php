@@ -27,7 +27,7 @@ if (mysqli_connect_errno()) {
 }
 
 // first query - staffId, firstName, lastName, jobTitle, email, departmentId (SQL statement accepts parameters and so is prepared to avoid SQL injection)
-$query = $conn->prepare('SELECT p.lastName as staffId, p.lastName, p.firstName, p.jobTitle, p.email, d.id as departmentId FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) WHERE p.id = ?');
+$query = $conn->prepare('SELECT p.id as staffId, p.lastName, p.firstName, p.jobTitle, p.email, d.id as departmentId FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) WHERE p.id = ?');
 
 $query->bind_param("i", $_POST['id']);
 

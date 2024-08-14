@@ -1,16 +1,13 @@
 import titleizeString from "./utils/stringTitleizer.js";
 import validateEmail from "./utils/emailValidator.js";
-import sortByName from "./utils/sortArrayOfObjects.js";
 
 
 let allStaff = [];
 let allDepartments = [];
-let locations = [];
+let allLocations = [];
 
-// upon initialization only staff data is required but others are needed for select options
+// upon initialization only staff data is required
 getAndDisplayAllStaff();
-// getAndDisplayAllDepartments();
-// getAndDisplayAllLocations();
 
 // initial spinner, before page loads
 document.onreadystatechange = function (e) {
@@ -263,8 +260,8 @@ function getAndDisplayAllLocations() {
 		dataType: 'json',
 
 		success: function (result) {
-			locations = result.data;
-			renderLocationsTable(locations);
+			allLocations = result.data;
+			renderLocationsTable(allLocations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			renderErrorModal("Error getting locations data.");
@@ -513,8 +510,8 @@ function createDepartment() {
 		dataType: 'json',
 
 		success: function (result) {
-			locations = result.data;
-			$.each(locations, function (i, location) {
+			allLocations = result.data;
+			$.each(allLocations, function (i, location) {
 				$("#locationsSelect").append(
 					$("<option>", {
 						value: location.locationId,
@@ -587,12 +584,12 @@ function createStaffMember() {
 		<form id="createStaffForm">
 			<div class="form-floating mb-3">
 				<input type="text" class="form-control shadow-none" id="createStaffFirstName" placeholder="First name" required>
-				<label for="createStaffFirstName">First name</label>
+				<label for="createStaffFirstName">First Name</label>
 			</div>
 
 			<div class="form-floating mb-3">
 				<input type="text" class="form-control shadow-none" id="createStaffLastName" placeholder="Last name" required>
-				<label for="createStaffLastName">Last name</label>
+				<label for="createStaffLastName">Last Name</label>
 			</div>
 
 			<div class="form-floating mb-3">
@@ -683,7 +680,7 @@ function createStaffMember() {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Created staff:<br>${newStaffFirstName, newStaffLastName}`);
+					$('#modal-title').html(`Created employee:<br>${newStaffFirstName}, ${newStaffFirstName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
@@ -742,70 +739,89 @@ function filterStaff() {
 	$('#modal-title').text("Filter staff");
 	$('#modal-body').html(`
 		<form id="filterStaffForm">
-			<div class="form-floating mt-1">
-                <select class="form-select shadow-none pt-1 pb-1" id="departmentsSelect" placeholder="Departments">
-				<option selected disabled hidden>All Departments</option>
-                </select>
-				    <!-- <label for="departmentsSelect">Departments</label> -->
-             </div>
+			<div class="form-floating mb-3">
+				<select class="form-select" id="filterByDepartment" placeholder="Department">
+					<option value="0">All</option>
+				</select>
+				<label for="filterByDepartment">Department</label>
+			</div>
 
-			 <div class="form-floating mt-3">
-                <select class="form-select shadow-none pt-1 pb-1" id="locationsSelect" placeholder="Locations">
-				<option selected disabled hidden>All Locations</option>
-                </select>
-             </div>
-		</form>
+			<div class="form-floating">
+				<select class="form-select" id="filterByLocation" placeholder="Location">
+					<option value="0">All</option>
+				</select>
+				<label for="filterByLocation">Location</label>
+			</div>
+		</form>			
 		`);
 
-	//second param is prop to sort by
-	const sortedDepartments = sortByName(allDepartments, "departmentName");
-	const sortedLocations = sortByName(locations, "locationName");
+	// populate both select elements
+	$.ajax({
+		url: "libs/php/getAllDepartments.php",
+		type: 'GET',
+		dataType: 'json',
 
-	// populate select elements
-	$.each(sortedDepartments, function (i, d) {
-		$("#departmentsSelect").append(
-			$("<option>", {
-				value: d.departmentId,
-				text: d.departmentName,
-			})
-		);
+		success: function (result) {
+			allDepartments = result.data;
+			$.each(allDepartments, function (i, dept) {
+				$("#filterByDepartment").append(
+					$("<option>", {
+						value: dept.departmentId,
+						text: dept.departmentName,
+					})
+				);
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error getting departments data.");
+		}
 	});
 
-	$.each(sortedLocations, function (i, l) {
-		$("#locationsSelect").append(
-			$("<option>", {
-				value: l.locationId,
-				text: l.locationName,
-			})
-		);
+	$.ajax({
+		url: "libs/php/getAllLocations.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			allLocations = result.data;
+			$.each(allLocations, function (i, location) {
+				$("#filterByLocation").append(
+					$("<option>", {
+						value: location.locationId,
+						text: location.locationName,
+					})
+				);
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error getting locations data.");
+		}
 	});
 
 	// now show modal
 	$(".genericModal").modal("show");
 
 	// id dept is selected disable locations and the other way round
-	$('#departmentsSelect').change(function () {
+	$('#filterByDepartment').change(function () {
 		let optionSelected = $(this).find("option:selected");
 		departmentId = optionSelected.val();
-		locationId = undefined;
-		$('#locationsSelect').hide();
+		$("#filterByLocation").val("0");
 		filteredResults = allStaff.filter(l => l.departmentId === departmentId);
 		displayFilteredResults(filteredResults);
 	});
 
-	$('#locationsSelect').change(function () {
+	$('#filterByLocation').change(function () {
 		let optionSelected = $(this).find("option:selected");
 		locationId = optionSelected.val();
-		departmentId = undefined;
-		$('#departmentsSelect').hide();
+		$("#filterByDepartment").val("0");
 		filteredResults = allStaff.filter(l => l.locationId === locationId);
 		displayFilteredResults(filteredResults);
 	});
 }
 
 function displayFilteredResults(filteredResults) {
-	// hide modal
-	$(".genericModal").modal("hide");
+	// DO NOT hide modal
+	// $(".genericModal").modal("hide");
 
 	// if another tab is opened go to default (personnel) tab AND pane
 	$('.nav').find('.active').removeClass('active');
@@ -949,6 +965,7 @@ function deleteStaff(staffId) {
 	// populate modal
 	$('#modal-title').text("Remove Staff?");
 	$('#modal-body').html(`
+		<p>Please confirm you wish to remove employee:</p>
 		<form id="deleteStaffForm">
 		    <input type="hidden" id="${staffId}">
 			<div class="form-floating mb-3">
@@ -958,14 +975,14 @@ function deleteStaff(staffId) {
 		`);
 
 	$('#modal-footer').html(`
-		<button type="submit" 
-			form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
-			DELETE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
+			<button type="submit" 
+				form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
+				YES
+			</button>
+			<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+				NO
+			</button>
+			`)
 
 	// now show modal
 	$(".genericModal").modal("show");
@@ -1093,9 +1110,10 @@ function updateDepartment(data) {
 		<form id="updateDepartmentForm">
 		    <input type="hidden" id="${departmentId}">
 			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none pt-2" 
+				<input type="text" class="form-control shadow-none" 
 				value="${departmentName}" 
 				id="newDeptName" required>
+				<label for="newDeptName">Department name</label>
 			</div>
 
 			<div class="form-floating">
@@ -1187,38 +1205,41 @@ function updateStaff(data) {
 	$('#modal-title').text("Update Employee");
 	$('#modal-body').html(`
 		<form id="updateStaffForm">
-		    <input type="hidden" id="${staffId}">
+		    <input type="hidden" id="${staffId}">			
+			
 			<div class="form-floating mb-3">
-			    <div class="form-text">First Name (non-editable):</div>
-				<input type="text" class="form-control shadow-none pt-2" 
-					value="${firstName}" readonly>
-			</div>
+				<input type="text" class="form-control shadow-none" 
+				value="${firstName}" 
+				id="newFirstName" required>
+				<label for="newFirstName">First Name</label>
+			</div>	
 
 			<div class="form-floating mb-3">
-				<div class="form-text">Last Name (non-editable):</div>
-				<input type="text" class="form-control shadow-none pt-2" 
-					value="${lastName}" readonly>
-			</div>
+				<input type="text" class="form-control shadow-none" 
+				value="${lastName}" 
+				id="newLastName" required>
+				<label for="newLastName">Last Name</label>
+			</div>			
 
 			<div class="form-floating mb-3">
-				<div class="form-text">Job Title:</div>
-				<input type="text" class="form-control shadow-none pt-2" 
+				<input type="text" class="form-control shadow-none" 
 					value="${jobTitle}" 
-					id="updateStaffJobTitle" required>
+					id="newStaffJobTitle" required>
+					<label for="newStaffJobTitle">Job Title</label>
 			</div>
 
 			<div class="form-floating mb-3">
-				<div class="form-text">Email:</div>
-				<input type="email" 
-					class="form-control shadow-none" id="updateStaffEmailAddress"
-					placeholder="Email address" required
-					value="${email}">
+				<input type="email" class="form-control shadow-none"
+					value="${email}"
+				 	id="newStaffEmailAddress" required>
+					<label for="newStaffJobTitle">Email Address</label>
+
 			</div>
 
 			<div class="form-floating">
                 <select class="form-select shadow-none" id="departmentsSelect" placeholder="Departments">
                 </select>
-                <label for="locationsSelect">Departments</label>
+                <label for="locationsSelect">Department</label>
              </div>
 		</form>
 		`);
@@ -1253,18 +1274,13 @@ function updateStaff(data) {
 		e.preventDefault();
 
 		departmentId = $('#departmentsSelect option').filter(':selected').val();
-		let updatedJobTitle = titleizeString($("#updateStaffJobTitle").val());
-		let updatedEmail = $("#updateStaffEmailAddress").val().toLowerCase();		// convert email to lower
+		firstName = titleizeString($("#newFirstName").val());
+		lastName = titleizeString($("#newLastName").val());
+		jobTitle = titleizeString($("#newStaffJobTitle").val());
+		email = $("#newStaffEmailAddress").val().toLowerCase();		// convert email to lower
 
-		if (validateEmail(updatedEmail) == false) {		//invalid email
-			$("#modal-title").html(`Invalid email format for:<br>${updatedEmail}`);
-			$('#modal-body').empty();
-			$('#modal-footer').html(`						
-				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-					CLOSE
-				</button>
-				`)
-			return;
+		if (validateEmail(email) == false) {		//invalid email
+			renderErrorModal(`Invalid email format for:<br>${email}`)
 		}
 
 		// update locationId with selected value
@@ -1274,13 +1290,15 @@ function updateStaff(data) {
 			dataType: "json",
 			data: {
 				staffId: staffId,
-				updatedJobTitle: updatedJobTitle,
-				updatedEmail: updatedEmail,
+				updatedFirst: firstName,
+				updatedLast: lastName,
+				updatedJobTitle: jobTitle,
+				updatedEmail: email,
 				departmentId: departmentId
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated staff:<br>${firstName, lastName}`);
+					$('#modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
 					$('#modal-body').empty();
 					$('#modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
