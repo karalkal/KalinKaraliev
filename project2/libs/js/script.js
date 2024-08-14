@@ -167,7 +167,23 @@ $('document').ready(function () {
 	});
 	$('body').on('click', '.updateDepartmentBtn', function (e) {
 		let deptId = $(e.currentTarget).attr("data-id");
-		updateDepartment(deptId);
+		$.ajax({
+			url: "libs/php/getDepartmentByID.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: deptId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					const { departmentName, locationId } = result.data[0];
+					updateDepartment(deptId, departmentName, locationId);
+				} else {	// code is not 200
+					renderErrorModal("Something went wrong.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Something went wrong.")
+			}
+		});
 	});
 	$('body').on('click', '.updateLocationBtn', function (e) {
 		let locationId = $(e.currentTarget).attr("data-id");
@@ -989,7 +1005,6 @@ function renderCannotDeleteModal(parentTypeStr, parentName, childCount, childTyp
 }
 
 function updateLocation(locationId, locationName) {
-	console.log(locationId, locationName)
 	// populate modal
 	$('#modal-title').text("Update Location");
 	$('#modal-body').html(`
@@ -1018,7 +1033,7 @@ function updateLocation(locationId, locationName) {
 	// now show modal
 	$(".genericModal").modal("show");
 
-	// send delete request with ID param
+	// send update/POST request with ID param
 	$("#updateLocationForm").on("submit", function (e) {
 		e.preventDefault();
 		let newLocationName = titleizeString($("#newLocationName").val());
@@ -1057,13 +1072,8 @@ function updateLocation(locationId, locationName) {
 	})
 }
 
-function updateDepartment(departmentId) {
-	const deptToUpdate = allDepartments.find(d => d.departmentId === departmentId);
-	let { departmentName, locationId } = deptToUpdate;
-	const originalLocationId = locationId;		// as locationId will be overwritten when option is seleceted
-	const deptToUpdateLocationName = allLocations.find(l => l.locationId === locationId).locationName;
-	const allLocationsExcludingCurrent = allLocations.filter(l => l.locationId !== locationId);
-
+function updateDepartment(departmentId, departmentName, locationId) {
+	let originalLocationId = locationId;
 	// populate modal
 	$('#modal-title').text("Update Department");
 	$('#modal-body').html(`
@@ -1083,22 +1093,29 @@ function updateDepartment(departmentId) {
 		</form>
 		`);
 
-	//second param is prop to sort by
-	const sortedLocations = sortByName(allLocationsExcludingCurrent, "locationName");
-
 	// populate locations select element
-	$("#locationsSelect").append($("<option>", {
-		value: locationId,
-		text: deptToUpdateLocationName,
-	}))
+	$.ajax({
+		url: "libs/php/getAllLocations.php",
+		type: 'GET',
+		dataType: 'json',
 
-	$.each(sortedLocations, function (i, l) {
-		$("#locationsSelect").append(
-			$("<option>", {
-				value: l.locationId,
-				text: l.locationName,
-			})
-		);
+		success: function (result) {
+			allLocations = result.data;
+			$.each(allLocations, function (i, l) {
+				$("#locationsSelect").append(
+					$("<option>", {
+						value: l.locationId,
+						text: l.locationName,
+					})
+				);
+			});
+			//set value of select to current 
+			$("#locationsSelect").val(locationId);
+
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error getting locations data.");
+		}
 	});
 
 	$('#modal-footer').html(`

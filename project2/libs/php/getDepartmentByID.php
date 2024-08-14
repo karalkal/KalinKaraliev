@@ -29,7 +29,7 @@ if (mysqli_connect_errno()) {
 
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-$query = $conn->prepare('SELECT id as locationId, name as locationName FROM location WHERE id = ?');
+$query = $conn->prepare('SELECT id, name as departmentName, locationID as locationId FROM department WHERE id = ?');
 
 $query->bind_param("i", $_POST['id']);
 
