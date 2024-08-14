@@ -729,8 +729,7 @@ function searchAndDisplayResults(searchString) {
 			renderStaffTable(foundStaff);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(jqXHR, textStatus, errorThrown);
-			alert("Something went wrong")
+			renderErrorModal("Something went wrong");
 		}
 	});
 }
@@ -1180,10 +1179,9 @@ function updateDepartment(data) {
 	})
 }
 
-function updateStaff(idOfStaffToUpdate) {
-	const employeeToUpdate = allStaff.find(s => s.staffId === idOfStaffToUpdate);
-	let { staffId, lastName, firstName, jobTitle, email, departmentId, department, location } = employeeToUpdate;
-	const allDeptsExcludingCurrent = allDepartments.filter(d => d.departmentId !== departmentId);
+function updateStaff(data) {
+	const { employee, departments } = data;
+	let { staffId, firstName, lastName, jobTitle, email, departmentId } = employee;
 
 	// populate modal
 	$('#modal-title').text("Update Employee");
@@ -1225,23 +1223,17 @@ function updateStaff(idOfStaffToUpdate) {
 		</form>
 		`);
 
-	// populate locations select element
-	$("#departmentsSelect").append($("<option>", {
-		value: departmentId,
-		text: department,
-	}))
-
-	//second param is prop to sort by
-	const sortedDepartments = sortByName(allDeptsExcludingCurrent, "departmentName");
-
-	$.each(sortedDepartments, function (i, dept) {
+	// populate departments select element
+	$.each(departments, function (i, d) {
 		$("#departmentsSelect").append(
 			$("<option>", {
-				value: dept.departmentId,
-				text: dept.departmentName,
+				value: d.departmentId,
+				text: d.departmentName,
 			})
 		);
 	});
+	//set value of select to current 
+	$("#departmentsSelect").val(departmentId);
 
 	$('#modal-footer').html(`
 		<button type="submit" 
