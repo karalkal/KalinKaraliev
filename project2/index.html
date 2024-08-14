@@ -27,87 +27,389 @@
 </head>
 
 <body>
-    <header>
-        <div class="row">
-            <div class="col">
-                <input id="searchInp" class="form-control mb-3" placeholder="search">
+    <section>
+
+        <div class="appHeader">
+
+            <div class="row">
+
+                <div class="col">
+                    <input class="form-control mb-3" placeholder="search">
+                </div>
+
+                <div class="col-5 text-end me-2">
+
+                    <div class="btn-group" role="group" aria-label="buttons">
+
+                        <button id="refreshBtn" type="button" class="btn btn-primary">
+                            <i class="fa-solid fa-refresh fa-fw"></i>
+                        </button>
+                        <button id="filterBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#filterPersonnelModal">
+                            <i class="fa-solid fa-filter fa-fw"></i>
+                        </button>
+                        <button id="addBtn" type="button" class="btn btn-primary">
+                            <i class="fa-solid fa-plus fa-fw"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="col-6 text-end me-2">
-                <div class="btn-group" role="group" aria-label="buttons">
-                    <button id="refreshBtn" type="button" class="btn btn-primary">
-                        <i class="fa-solid fa-refresh fa-fw"></i>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="personnelBtn" data-bs-toggle="tab"
+                        data-bs-target="#personnel-tab-pane" type="button" role="tab" aria-controls="home-tab-pane"
+                        aria-selected="true">
+                        <i class="fa-solid fa-person fa-lg fa-fw"></i><span class="d-none d-sm-block">Personnel</span>
                     </button>
-                    <button id="filterBtn" type="button" class="btn btn-primary">
-                        <i class="fa-solid fa-filter fa-fw"></i>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="departmentsBtn" data-bs-toggle="tab"
+                        data-bs-target="#departments-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane"
+                        aria-selected="false">
+                        <i class="fa-solid fa-building fa-lg fa-fw"></i><span
+                            class="d-none d-sm-block">Departments</span>
                     </button>
-                    <!-- ADD button -->
-                    <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target=".genericModal">
-                        <i class="fa-solid fa-plus fa-fw"></i>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="locationsBtn" data-bs-toggle="tab" data-bs-target="#locations-tab-pane"
+                        type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">
+                        <i class="fa-solid fa-map-location-dot fa-lg fa-fw"></i><span
+                            class="d-none d-sm-block">Locations</span>
                     </button>
-                </div>
-            </div>
+                </li>
+
+            </ul>
+
         </div>
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="personnelBtn" data-bs-toggle="tab"
-                    data-bs-target="#personnel-tab-pane" type="button" role="tab" aria-controls="home-tab-pane"
-                    aria-selected="true">
-                    <i class="fa-solid fa-person fa-lg fa-fw"></i><span class="d-none d-sm-block">Personnel</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="departmentsBtn" data-bs-toggle="tab" data-bs-target="#departments-tab-pane"
-                    type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
-                    <i class="fa-solid fa-building fa-lg fa-fw"></i><span class="d-none d-sm-block">Departments</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="locationsBtn" data-bs-toggle="tab" data-bs-target="#locations-tab-pane"
-                    type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">
-                    <i class="fa-solid fa-map-location-dot fa-lg fa-fw"></i><span
-                        class="d-none d-sm-block">Locations</span>
-                </button>
-            </li>
-        </ul>
-    </header>
+        <div class="tab-content bg-white">
 
-    <!-- Header will render straight away, pre-loader/spinner will appear only while awaiting response -->
-    <div id="preloader">
+            <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                tabindex="0">
+                <table class="table table-hover">
+                    <tbody id="personnelTableBody">
+                        <!-- <tr> elements with staff data will render here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <table class="table table-hover">
+                    <tbody id="departmentTableBody">
+                        <!-- <tr> elements with department data will render here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+                <table class="table table-hover">
+                    <tbody id="locationTableBody">
+                        <!-- <tr> elements with locations data will render here -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <footer class="border-top text-center fw-bold">
+
+            <p class="fw-light my-3">Company Directory by KK</p>
+
+        </footer>
+
+    </section>
+
+    <div id="editLocationModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+
+            <div class="modal-content shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Edit employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="editPersonnelForm">
+
+                        <input type="hidden" id="editPersonnelEmployeeID">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name"
+                                required>
+                            <label for="editPersonnelFirstName">First name</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name"
+                                required>
+                            <label for="editPersonnelLastName">Last name</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title"
+                                required>
+                            <label for="editPersonnelJobTitle">Job Title</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="editPersonnelEmailAddress"
+                                placeholder="Email address" required>
+                            <label for="editPersonnelEmailAddress">Email Address</label>
+                        </div>
+
+                        <div class="form-floating">
+                            <select class="form-select" id="editPersonnelDepartment" placeholder="Department">
+                            </select>
+                            <label for="editPersonnelDepartment">Department</label>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" form="editPersonnelForm"
+                        class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">CANCEL</button>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <main id="mainSection" class="tab-content bg-white">
-        <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab"
-            tabindex="0">
-            <table class="table table-hover">
-                <tbody id="personnelTableBody">
-                    <!-- <tr> elements with staff data will render here -->
-                </tbody>
-            </table>
+    <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+
+            <div class="modal-content shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Edit employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="editPersonnelForm">
+
+                        <input type="hidden" id="editPersonnelEmployeeID">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name"
+                                required>
+                            <label for="editPersonnelFirstName">First name</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name"
+                                required>
+                            <label for="editPersonnelLastName">Last name</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title"
+                                required>
+                            <label for="editPersonnelJobTitle">Job Title</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="editPersonnelEmailAddress"
+                                placeholder="Email address" required>
+                            <label for="editPersonnelEmailAddress">Email Address</label>
+                        </div>
+
+                        <div class="form-floating">
+                            <select class="form-select" id="editPersonnelDepartment" placeholder="Department">
+                            </select>
+                            <label for="editPersonnelDepartment">Department</label>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" form="editPersonnelForm"
+                        class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">CANCEL</button>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-            <table class="table table-hover">
-                <tbody id="departmentTableBody">
-                    <!-- <tr> elements with department data will render here -->
-                </tbody>
-            </table>
+    </div>
+
+    <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+
+            <div class="modal-content modal-sm shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Filter employees</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="filterPersonnelForm">
+
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="filterPersonnelByDepartment" placeholder="Department">
+                                <option value="0">All</option>
+                                <option value="12">Business Development</option>
+                            </select>
+                            <label for="filterPersonnelByDepartment">Department</label>
+                        </div>
+
+                        <div class="form-floating">
+                            <select class="form-select" id="filterPersonnelByLocation" placeholder="Location">
+                                <option value="0">All</option>
+                                <option value="1">London</option>
+                            </select>
+                            <label for="filterPersonnelByLocation">Location</label>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">CLOSE</button>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-            <table class="table table-hover">
-                <tbody id="locationTableBody">
-                    <!-- <tr> elements with locations data will render here -->
-                </tbody>
-            </table>
-        </div>
-    </main>
+    </div>
 
-    <footer class="border-top text-center fw-bold mt-auto">
-        <p class="fw-light my-3">Company Directory version 1.0</p>
-    </footer>
+    <div id="areYouSurePersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
+        data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+            <!-- As the backdrop is disabled we can use the Bootstrap shadow class to add definition to the dialog -->
+
+            <div class="modal-content shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Remove employee entry?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="areYouSurePersonnelForm">
+
+                        <input id="areYouSurePersonnelID" type="hidden">
+
+                    </form>
+
+                    Are you sure that you want to remove the entry for <span id="areYouSurePersonnelName"
+                        class="fw-bold"></span>?
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" form="areYouSurePersonnelForm" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">YES</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">NO</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="cantDeleteDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
+        data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+            <!-- As the backdrop is disabled we can use the Bootstrap shadow class to add definition to the dialog -->
+
+            <div class="modal-content shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Cannot remove department ...</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    You cannot remove the entry for <span id="cantDeleteDeptName" class="fw-bold"></span> because it has
+                    <span id="personnelCount" class="fw-bold"></span> employees assigned to it.
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">OK</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="areYouSureDeleteDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
+        data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+            <!-- As the backdrop is disabled we can use the Bootstrap shadow class to add definition to the dialog -->
+
+            <div class="modal-content shadow">
+
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Remove department?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    Are you sure that you want to remove the entry for <span id="areYouSureDeptName"
+                        class="fw-bold"></span>?
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">YES</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">NO</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- GENERIC MODAL -->
     <div class="modal fade genericModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
@@ -130,6 +432,10 @@
 
             </div>
         </div>
+    </div>
+
+    <!-- SPINNER - Header will render straight away, pre-loader/spinner will appear only while awaiting response -->
+    <div id="preloader">
     </div>
 
     <!-- SCRIPTS -->
