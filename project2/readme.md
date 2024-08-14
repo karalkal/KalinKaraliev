@@ -30,6 +30,31 @@ LEFT JOIN location l ON (l.id = d.locationID)
 ORDER BY p.lastName, p.firstName, d.name, l.name
 ```
 
+## Update 14 August 2024 
+#### (some notes below might be irrelevant)
+
+- introduced semantic elements - removed `<section>`, replaced with `<header>`, `<main>`, `<footer>`.
+
+- rendering tables using Vanilla JS instead of jQuery.
+
+- spinner hides only `<main>` while awaiting response, not whole `<body>`.
+
+- created generic error modal rendering function, errors or non-200 statuses will trigger it.
+
+- pre-delete check of location/department enabled (new query to DB to confirm no dependencies will be affected).
+
+- departments and locations php routes refactored to return data ordered alphabetically.
+
+- select options rendered with the results from the above request instead of using cached data obtained at initial render. `<select>` of departments gets its locations data by making a second request in relevant php route, same applies to `<select>` of personnel and its  departments data .
+
+- before updating location it would be good to display its name value locationName, hence created new php routine getLocationByID.php.
+
+- the same allies before updating department and personnel.
+
+- updating staff as per the requirements, incl. names (which were readonly before).
+
+- filtering staff as per the requirements, modal does not hide, alternates` <select>`s.
+
 ## Notes on Functionality
 
 - The application allows for the addition, update and deletion of entries in all tables.
