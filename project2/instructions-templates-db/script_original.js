@@ -60,7 +60,7 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
 
     $.ajax({
         url:
-            "https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getPersonnelByID.php",
+            "https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getStaffByIDAndAllDepartments.php",
         type: "POST",
         dataType: "json",
         data: {

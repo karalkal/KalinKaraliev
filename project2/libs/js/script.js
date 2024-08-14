@@ -5,7 +5,7 @@ import sortByName from "./utils/sortArrayOfObjects.js";
 
 let allStaff = [];
 let allDepartments = [];
-let allLocations = [];
+let locations = [];
 
 // upon initialization only staff data is required but others are needed for select options
 getAndDisplayAllStaff();
@@ -163,19 +163,15 @@ $('document').ready(function () {
 	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
 	$('body').on('click', '.updateStaffBtn', function (e) {
 		let staffId = $(e.currentTarget).attr("data-id");
-		updateStaff(staffId);
-	});
-	$('body').on('click', '.updateDepartmentBtn', function (e) {
-		let deptId = $(e.currentTarget).attr("data-id");
 		$.ajax({
-			url: "libs/php/getDepartmentByID.php",
+			url: "libs/php/getStaffByIDAndAllDepartments.php",
 			type: "POST",
 			dataType: "json",
-			data: { id: deptId },
+			data: { id: staffId },
 			success: function (result) {
 				if (result.status.code == 200) {
-					const { departmentName, locationId } = result.data[0];
-					updateDepartment(deptId, departmentName, locationId);
+					console.log(result.data);
+					// updateStaff(staffId, departmentName, locationId);
 				} else {	// code is not 200
 					renderErrorModal("Something went wrong.")
 				}
@@ -185,26 +181,47 @@ $('document').ready(function () {
 			}
 		});
 	});
-	$('body').on('click', '.updateLocationBtn', function (e) {
-		let locationId = $(e.currentTarget).attr("data-id");
-		$.ajax({
-			url: "libs/php/getLocationByID.php",
-			type: "POST",
-			dataType: "json",
-			data: { id: locationId },
-			success: function (result) {
-				if (result.status.code == 200) {
-					updateLocation(locationId, result.data[0].locationName);
-				} else {	// code is not 200
-					renderErrorModal("Something went wrong.")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
+});
+
+$('body').on('click', '.updateDepartmentBtn', function (e) {
+	let deptId = $(e.currentTarget).attr("data-id");
+	$.ajax({
+		url: "libs/php/getDepartmentByIDAndAllLocations.php",
+		type: "POST",
+		dataType: "json",
+		data: { id: deptId },
+		success: function (result) {
+			if (result.status.code == 200) {
+				updateDepartment(result.data);
+			} else {	// code is not 200
 				renderErrorModal("Something went wrong.")
 			}
-		});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Something went wrong.")
+		}
 	});
-})
+});
+
+$('body').on('click', '.updateLocationBtn', function (e) {
+	let locationId = $(e.currentTarget).attr("data-id");
+	$.ajax({
+		url: "libs/php/getLocationByID.php",
+		type: "POST",
+		dataType: "json",
+		data: { id: locationId },
+		success: function (result) {
+			if (result.status.code == 200) {
+				updateLocation(locationId, result.data[0].locationName);
+			} else {	// code is not 200
+				renderErrorModal("Something went wrong.")
+			}
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Something went wrong.")
+		}
+	});
+});
 
 function getAndDisplayAllStaff() {
 	// Reset search bar each time this btn is clicked
@@ -247,8 +264,8 @@ function getAndDisplayAllLocations() {
 		dataType: 'json',
 
 		success: function (result) {
-			allLocations = result.data;
-			renderLocationsTable(allLocations);
+			locations = result.data;
+			renderLocationsTable(locations);
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			renderErrorModal("Error getting locations data.");
@@ -497,8 +514,8 @@ function createDepartment() {
 		dataType: 'json',
 
 		success: function (result) {
-			allLocations = result.data;
-			$.each(allLocations, function (i, location) {
+			locations = result.data;
+			$.each(locations, function (i, location) {
 				$("#locationsSelect").append(
 					$("<option>", {
 						value: location.locationId,
@@ -744,7 +761,7 @@ function filterStaff() {
 
 	//second param is prop to sort by
 	const sortedDepartments = sortByName(allDepartments, "departmentName");
-	const sortedLocations = sortByName(allLocations, "locationName");
+	const sortedLocations = sortByName(locations, "locationName");
 
 	// populate select elements
 	$.each(sortedDepartments, function (i, d) {
@@ -1072,7 +1089,9 @@ function updateLocation(locationId, locationName) {
 	})
 }
 
-function updateDepartment(departmentId, departmentName, locationId) {
+function updateDepartment(data) {
+	const { department, locations } = data;
+	let { departmentId, departmentName, locationId } = department;
 	let originalLocationId = locationId;
 	// populate modal
 	$('#modal-title').text("Update Department");
@@ -1093,30 +1112,16 @@ function updateDepartment(departmentId, departmentName, locationId) {
 		</form>
 		`);
 
-	// populate locations select element
-	$.ajax({
-		url: "libs/php/getAllLocations.php",
-		type: 'GET',
-		dataType: 'json',
-
-		success: function (result) {
-			allLocations = result.data;
-			$.each(allLocations, function (i, l) {
-				$("#locationsSelect").append(
-					$("<option>", {
-						value: l.locationId,
-						text: l.locationName,
-					})
-				);
-			});
-			//set value of select to current 
-			$("#locationsSelect").val(locationId);
-
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error getting locations data.");
-		}
+	$.each(locations, function (i, l) {
+		$("#locationsSelect").append(
+			$("<option>", {
+				value: l.locationId,
+				text: l.locationName,
+			})
+		);
 	});
+	//set value of select to current 
+	$("#locationsSelect").val(locationId);
 
 	$('#modal-footer').html(`
 		<button type="submit" 
@@ -1138,7 +1143,7 @@ function updateDepartment(departmentId, departmentName, locationId) {
 		let newDeptName = titleizeString($("#newDeptName").val());
 		// if new location is picked
 		locationId = $('#locationsSelect option').filter(':selected').val();
-		const newDeptLocationName = allLocations.find(l => l.locationId === locationId).locationName;
+		const newDeptLocationName = locations.find(l => l.locationId === locationId).locationName;
 		$.ajax({
 			url: "libs/php/updateDepartmentByID.php",
 			type: "POST",

@@ -1,7 +1,7 @@
 <?php
 
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getPersonnelByID.php?id=<id>
+	// http://localhost/companydirectory/libs/php/getStaffByIDAndAllDepartments.php?id=<id>
 
 	// remove next two lines for production
 	
