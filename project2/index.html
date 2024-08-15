@@ -28,19 +28,13 @@
 
 <body>
     <section>
-
         <div class="appHeader">
-
             <div class="row">
-
                 <div class="col">
                     <input class="form-control mb-3" placeholder="search">
                 </div>
-
                 <div class="col-5 text-end me-2">
-
                     <div class="btn-group" role="group" aria-label="buttons">
-
                         <button id="refreshBtn" type="button" class="btn btn-primary">
                             <i class="fa-solid fa-refresh fa-fw"></i>
                         </button>
@@ -51,11 +45,8 @@
                         <button id="addBtn" type="button" class="btn btn-primary">
                             <i class="fa-solid fa-plus fa-fw"></i>
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -81,13 +72,10 @@
                             class="d-none d-sm-block">Locations</span>
                     </button>
                 </li>
-
             </ul>
-
         </div>
 
         <div class="tab-content bg-white">
-
             <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab"
                 tabindex="0">
                 <table class="table table-hover">
@@ -112,13 +100,10 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
 
         <footer class="border-top text-center fw-bold">
-
             <p class="fw-light my-3">Company Directory by KK</p>
-
         </footer>
 
     </section>
@@ -126,178 +111,122 @@
     <!-- UPDATE LOCATION -->
     <div id="editLocationModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
-
         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-
             <div class="modal-content shadow">
-
                 <div class="modal-header bg-primary bg-gradient text-white">
                     <h5 class="modal-title">Edit location</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
 
                     <form id="editLocationForm">
-
                         <input type="hidden" id="editLocationID">
-
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="editLocationName" placeholder="New location"
                                 required>
                             <label for="editLocationName">New location</label>
                         </div>
-
                     </form>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="submit" form="editLocationForm"
                         class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
                     <button type="button" class="btn btn-outline-primary btn-sm myBtn"
                         data-bs-dismiss="modal">CANCEL</button>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <!-- UPDATE DEPARTMENT -->
-    <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+    <div id="editDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
-
         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-
             <div class="modal-content shadow">
-
                 <div class="modal-header bg-primary bg-gradient text-white">
-                    <h5 class="modal-title">Edit employee</h5>
+                    <h5 class="modal-title">Edit department</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
 
-                    <form id="editPersonnelForm">
-
-                        <input type="hidden" id="editPersonnelEmployeeID">
-
+                    <form id="editDepartmentForm">
+                        <input type="hidden" id="editDepartmentID">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name"
-                                required>
-                            <label for="editPersonnelFirstName">First name</label>
+                            <input type="text" class="form-control" id="editDepartmentName"
+                                placeholder="Department name" required>
+                            <label for="editDepartmentName">Department name</label>
                         </div>
-
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name"
-                                required>
-                            <label for="editPersonnelLastName">Last name</label>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title"
-                                required>
-                            <label for="editPersonnelJobTitle">Job Title</label>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="editPersonnelEmailAddress"
-                                placeholder="Email address" required>
-                            <label for="editPersonnelEmailAddress">Email Address</label>
-                        </div>
-
                         <div class="form-floating">
-                            <select class="form-select" id="editPersonnelDepartment" placeholder="Department">
+                            <select class="form-select" id="editDepartmentLocation" placeholder="Location">
                             </select>
-                            <label for="editPersonnelDepartment">Department</label>
+                            <label for="editDepartmentLocation">Location</label>
                         </div>
-
                     </form>
 
                 </div>
-
                 <div class="modal-footer">
-                    <button type="submit" form="editPersonnelForm"
+                    <button type="submit" form="editDepartmentForm"
                         class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
                     <button type="button" class="btn btn-outline-primary btn-sm myBtn"
                         data-bs-dismiss="modal">CANCEL</button>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <!-- UPDATE EMPLOYEE -->
     <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
-
         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-
             <div class="modal-content shadow">
-
                 <div class="modal-header bg-primary bg-gradient text-white">
                     <h5 class="modal-title">Edit employee</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
 
                     <form id="editPersonnelForm">
-
                         <input type="hidden" id="editPersonnelEmployeeID">
-
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name"
                                 required>
                             <label for="editPersonnelFirstName">First name</label>
                         </div>
-
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name"
                                 required>
                             <label for="editPersonnelLastName">Last name</label>
                         </div>
-
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title"
                                 required>
                             <label for="editPersonnelJobTitle">Job Title</label>
                         </div>
-
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="editPersonnelEmailAddress"
                                 placeholder="Email address" required>
                             <label for="editPersonnelEmailAddress">Email Address</label>
                         </div>
-
                         <div class="form-floating">
                             <select class="form-select" id="editPersonnelDepartment" placeholder="Department">
                             </select>
                             <label for="editPersonnelDepartment">Department</label>
                         </div>
-
                     </form>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="submit" form="editPersonnelForm"
                         class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
                     <button type="button" class="btn btn-outline-primary btn-sm myBtn"
                         data-bs-dismiss="modal">CANCEL</button>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"

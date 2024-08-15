@@ -243,6 +243,74 @@ $('document').ready(function () {
 		});
 	});
 
+	// update Department
+	$("#editDepartmentModal").on("show.bs.modal", function (e) {
+		$.ajax({
+			url: "libs/php/getDepartmentByIDAndAllLocations.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: $(e.relatedTarget).attr("data-id")		// Retrieves the data-id attribute from the calling button
+			},
+			success: function (result) {
+				if (result.status.code == 200) {
+					populateEditDepartmentModal(result.data);
+				} else {
+					renderErrorModal("Error retrieving data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error retrieving data");
+			}
+		});
+	});
+
+	$("#editDepartmentForm").on("submit", function (e) {
+		e.preventDefault();
+		let departmentId = $("#editDepartmentID").val();
+		let newDeptName = titleizeString($("#editDepartmentName").val());
+		let locationId = $('#editDepartmentLocation option').filter(':selected').val();
+
+		console.log(departmentId, newDeptName, locationId)
+		$.ajax({
+			url: "libs/php/updateDepartmentByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				departmentId: departmentId,
+				locationId: locationId,
+				newDeptName: newDeptName,
+			},
+			success: function (result) {
+				$("#editDepartmentModal").modal("toggle");
+				$('#editDepartmentModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					$('.genericModal #modal-title').html(`Updated department ${newDeptName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+							<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+								CLOSE
+							</button>
+							`)
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments();
+
+				} else {	// code is not 200
+					renderErrorModal("Error updating data.");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error updating data.");
+			}
+		});
+	});
+
 	// update Location
 	$("#editLocationModal").on("show.bs.modal", function (e) {
 		const locationId = $(e.relatedTarget).attr("data-id");
@@ -304,28 +372,6 @@ $('document').ready(function () {
 			}
 		});
 	})
-
-	$('body').on('click', '.updateDepartmentBtn', function (e) {
-		let deptId = $(e.currentTarget).attr("data-id");
-		$.ajax({
-			url: "libs/php/getDepartmentByIDAndAllLocations.php",
-			type: "POST",
-			dataType: "json",
-			data: { id: deptId },
-			success: function (result) {
-				if (result.status.code == 200) {
-					updateDepartment(result.data);
-				} else {	// code is not 200
-					renderErrorModal("Something went wrong.")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Something went wrong.")
-			}
-		});
-	});
-
-
 });
 
 
@@ -1150,32 +1196,25 @@ function renderCannotDeleteModal(parentTypeStr, parentName, childCount, childTyp
 	$(".genericModal").modal("show");
 }
 
-function updateDepartment(data) {
+function populateEditLocationModal(data) {
+	const { locationId, locationName } = data[0]; //data is array here
+	$('#editLocationForm #editLocationID').val(locationId);
+	$('#editLocationForm #editLocationName').val(locationName);
+}
+
+function populateEditDepartmentModal(data) {
 	const { department, locations } = data;
 	let { departmentId, departmentName, locationId } = department;
-	let originalLocationId = locationId;
+
 	// populate modal
-	$('#modal-title').text("Update Department");
-	$('#modal-body').html(`
-		<form id="updateDepartmentForm">
-		    <input type="hidden" id="${departmentId}">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" 
-				value="${departmentName}" 
-				id="newDeptName" required>
-				<label for="newDeptName">Department name</label>
-			</div>
+	$('#editDepartmentForm #editDepartmentID').val(departmentId);
+	$('#editDepartmentForm #editDepartmentName').val(departmentName);
 
-			<div class="form-floating">
-                <select class="form-select shadow-none" id="locationsSelect" placeholder="Locations">
-                </select>
-                <label for="locationsSelect">Locations</label>
-             </div>
-		</form>
-		`);
-
+	// clear select element
+	$("#editDepartmentForm #editDepartmentLocation").html("");
+	// populate locations select element
 	$.each(locations, function (i, l) {
-		$("#locationsSelect").append(
+		$("#editDepartmentForm #editDepartmentLocation").append(
 			$("<option>", {
 				value: l.locationId,
 				text: l.locationName,
@@ -1183,86 +1222,13 @@ function updateDepartment(data) {
 		);
 	});
 	//set value of select to current 
-	$("#locationsSelect").val(locationId);
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="updateDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
-			UPDATE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// send delete request with ID param
-	$("#updateDepartmentForm").on("submit", function (e) {
-		e.preventDefault();
-
-		let newDeptName = titleizeString($("#newDeptName").val());
-		// if new location is picked
-		locationId = $('#locationsSelect option').filter(':selected').val();
-		const newDeptLocationName = locations.find(l => l.locationId === locationId).locationName;
-		$.ajax({
-			url: "libs/php/updateDepartmentByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				departmentId: departmentId,
-				locationId: locationId,
-				newDeptName: newDeptName,
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					if (departmentName !== newDeptName) {
-						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}`);
-					}
-					if (originalLocationId !== locationId) {
-						$('#modal-title').html(`Moved ${departmentName} to ${newDeptLocationName}`);
-					}
-					if (departmentName !== newDeptName && originalLocationId !== locationId) {
-						$('#modal-title').html(`${departmentName} renamed to ${newDeptName}<br>and moved to ${newDeptLocationName}`);
-					}
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllDepartments()
-
-				} else {	// code is not 200
-					renderErrorModal("Error updating data.");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
-	})
-}
-
-function populateEditLocationModal(data) {
-	const { locationId, locationName } = data[0]; //data is array here
-	$('#editLocationModal #editLocationID').val(locationId);
-	$('#editLocationModal #editLocationName').val(locationName);
-}
-
-function populateEditDepartmentModal(data) {
-	console.log(data)
-	// const { locationId, locationName } = data[0]; //data is array here
-	// $('#editLocationModal #editLocationID').val(locationId);
-	// $('#editLocationModal #editLocationName').val(locationName);
+	$("#editDepartmentForm #editDepartmentLocation").val(locationId);
 }
 
 function populateEditPersonnelModal(data) {
 	const { employee, departments } = data;
 	let { staffId, firstName, lastName, jobTitle, email, departmentId } = employee;
+
 	// populate modal
 	$('#editPersonnelForm #editPersonnelEmployeeID').val(staffId);
 	$('#editPersonnelForm #editPersonnelFirstName').val(firstName);
@@ -1271,20 +1237,18 @@ function populateEditPersonnelModal(data) {
 	$('#editPersonnelForm #editPersonnelEmailAddress').val(email);
 
 	// clear departments select element
-	$("#editPersonnelModal #editPersonnelDepartment").html("");
-
+	$("#editPersonnelForm #editPersonnelDepartment").html("");
 	// populate departments select element
 	$.each(departments, function (i, d) {
-		$("#editPersonnelModal #editPersonnelDepartment").append(
+		$("#editPersonnelForm #editPersonnelDepartment").append(
 			$("<option>", {
 				value: d.departmentId,
 				text: d.departmentName,
 			})
 		);
 	});
-
 	//set value of select to current 
-	$("#editPersonnelModal #editPersonnelDepartment").val(departmentId);
+	$("#editPersonnelForm #editPersonnelDepartment").val(departmentId);
 }
 
 
