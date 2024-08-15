@@ -84,7 +84,7 @@ $('document').ready(function () {
 		filterStaff();
 	});
 
-	// CREATE new staff/dept/location entry depending on which Btn is active
+	// display create staff/dept/location modal depending on which Btn is active
 	$("#addBtn").click(function () {
 		if ($("#personnelBtn").hasClass("active")) {
 			$("#createPersonnelModal").modal("show");
@@ -93,9 +93,53 @@ $('document').ready(function () {
 			$("#createDepartmentModal").modal("show");
 		}
 		else if ($("#locationsBtn").hasClass("active")) {
-			createLocation();
+			$("#createLocationModal").modal("show");
 		}
 	});
+
+	// create Location
+	$("#createLocationForm").on("submit", function (e) {
+		e.preventDefault();
+		let newLocationName = titleizeString($("#createLocationName").val());
+
+		// AJAX call to save form data
+		$.ajax({
+			url: "libs/php/insertLocation.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				locationName: newLocationName
+			},
+			success: function (result) {
+				$("#createLocationModal").modal("toggle");
+				$('#createLocationModal').on('hidden.bs.modal', function () {
+					$(this).find('form')[0].reset();
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					$('.genericModal #modal-title').html(`Created location ${newLocationName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					renderErrorModal("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error writing data");
+			}
+		});
+	})
+
 
 	// create Department
 	$("#createDepartmentModal").on("show.bs.modal", function (e) {
@@ -735,233 +779,6 @@ function renderLocationsTable(locations) {
 	});
 
 	$('#locationTableBody').append(documentFragment);
-}
-
-function createLocation() {
-	// populate modal
-	$('#modal-title').text("Create New Location");
-	$('#modal-body').html(`
-		<form id="createLocationForm">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" id="newLocationName" placeholder="New location" required>
-				<label for="newLocationName">New location</label>
-			</div>
-		</form>
-		`);
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="createLocationForm" class="btn btn-outline-primary btn-sm myBtn">
-			SAVE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// get data from form
-	$("#createLocationForm").on("submit", function (e) {
-		e.preventDefault();
-		let newLocationName = titleizeString($("#newLocationName").val());
-
-		// AJAX call to save form data
-		$.ajax({
-			url: "libs/php/insertLocation.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				locationName: newLocationName
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Created location:<br>${newLocationName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllLocations()
-
-				} else {	// code is not 200
-					renderErrorModal("Error writing data");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error writing data");
-			}
-		});
-	})
-}
-
-function createDepartment() {
-	// get data from form
-	$("#createDeptForm").on("submit", function (e) {
-		e.preventDefault();
-		let newDeptName = titleizeString($("#newDeptName").val());
-		let locationId = Number($('#locationsSelect option').filter(':selected').val());
-
-		// AJAX call to save form data
-		$.ajax({
-			url: "libs/php/insertDepartment.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				deptName: newDeptName,
-				locationId: locationId,
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Created department:<br>${newDeptName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllDepartments();
-
-				} else {	// code is not 200
-					renderErrorModal("Error writing data");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error writing data");
-			}
-		});
-	})
-}
-
-function createStaffMember() {
-	// populate modal
-	$('#modal-title').text("Create New Employee");
-	$('#modal-body').html(`
-		<form id="createStaffForm">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" id="createStaffFirstName" placeholder="First name" required>
-				<label for="createStaffFirstName">First Name</label>
-			</div>
-
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" id="createStaffLastName" placeholder="Last name" required>
-				<label for="createStaffLastName">Last Name</label>
-			</div>
-
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" id="createStaffJobTitle" placeholder="Job title" required>
-				<label for="createStaffJobTitle">Job Title</label>
-			</div>
-
-			<div class="form-floating mb-3">
-				<input type="email" class="form-control shadow-none" id="createStaffEmailAddress"
-					placeholder="Email address" required>
-				<label for="createStaffEmailAddress">Email Address</label>
-			</div>
-
-			<div class="form-floating">
-				<select class="form-select shadow-none" id="departmentSelect" placeholder="Department">
-				</select>
-				<label for="departmentSelect">Department</label>
-			</div>
-		</form>
-		`);
-
-	// populate locations select element
-	$.ajax({
-		url: "libs/php/getAllDepartments.php",
-		type: 'GET',
-		dataType: 'json',
-
-		success: function (result) {
-			allDepartments = result.data;
-			$.each(allDepartments, function (i, dept) {
-				$("#departmentSelect").append(
-					$("<option>", {
-						value: dept.departmentId,
-						text: dept.departmentName,
-					})
-				);
-			});
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error getting departments data.");
-		}
-	});
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="createStaffForm" class="btn btn-outline-primary btn-sm myBtn">
-			SAVE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// get data from form
-	$("#createStaffForm").on("submit", function (e) {
-		e.preventDefault();
-		let newStaffFirstName = titleizeString($("#createStaffFirstName").val());
-		let newStaffLastName = titleizeString($("#createStaffLastName").val());
-		let newStaffJobTitle = titleizeString($("#createStaffJobTitle").val());
-		let newStaffEmail = $("#createStaffEmailAddress").val().toLowerCase();		// convert email to lower
-		let deptId = Number($('#departmentSelect option').filter(':selected').val());
-
-		if (validateEmail(newStaffEmail) == false) {		//invalid email
-			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
-			$('#modal-body').empty();
-			$('#modal-footer').html(`						
-				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-					CLOSE
-				</button>
-				`)
-			return;
-		}
-
-		// AJAX call to save new staff data
-		$.ajax({
-			url: "libs/php/insertStaff.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				newStaffFirstName: newStaffFirstName,
-				newStaffLastName: newStaffLastName,
-				newStaffJobTitle: newStaffJobTitle,
-				newStaffEmail: newStaffEmail,
-				deptId: deptId,
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Created employee:<br>${newStaffFirstName}, ${newStaffFirstName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllStaff();
-
-				} else {	// code is not 200
-					renderErrorModal("Error writing data")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error writing data");
-			}
-		});
-	})
 }
 
 function renderErrorModal(message) {
