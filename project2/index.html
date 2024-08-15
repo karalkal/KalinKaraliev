@@ -31,7 +31,7 @@
         <div class="appHeader">
             <div class="row">
                 <div class="col">
-                    <input class="form-control mb-3" placeholder="search">
+                    <input id="searchInp" class="form-control mb-3" placeholder="search">
                 </div>
                 <div class="col-5 text-end me-2">
                     <div class="btn-group" role="group" aria-label="buttons">
@@ -136,6 +136,57 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" form="createDepartmentForm"
+                        class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm myBtn"
+                        data-bs-dismiss="modal">CANCEL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE EMPLOYEE -->
+    <div id="createPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 class="modal-title">Create New employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="createPersonnelForm">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="createPersonnelFirstName"
+                                placeholder="First name" required>
+                            <label for="createPersonnelFirstName">First name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="createPersonnelLastName" placeholder="Last name"
+                                required>
+                            <label for="createPersonnelLastName">Last name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="createPersonnelJobTitle" placeholder="Job title"
+                                required>
+                            <label for="createPersonnelJobTitle">Job Title</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="createPersonnelEmailAddress"
+                                placeholder="Email address" required>
+                            <label for="createPersonnelEmailAddress">Email Address</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="createPersonnelDepartment" placeholder="Department">
+                            </select>
+                            <label for="createPersonnelDepartment">Department</label>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="createPersonnelForm"
                         class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
                     <button type="button" class="btn btn-outline-primary btn-sm myBtn"
                         data-bs-dismiss="modal">CANCEL</button>
