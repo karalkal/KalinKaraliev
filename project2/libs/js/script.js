@@ -201,7 +201,6 @@ $('document').ready(function () {
 			renderErrorModal(`Invalid email format for:<br>${email}`)
 		}
 
-		// update locationId with selected value
 		$.ajax({
 			url: "libs/php/updateStaffByID.php",
 			type: "POST",
@@ -221,7 +220,6 @@ $('document').ready(function () {
 				});
 
 				if (result && result.status && result.status.code == 200) {
-					console.log("here")
 					$('.genericModal #modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
 					$('.genericModal #modal-body').empty();
 					$('.genericModal #modal-footer').html(`						
@@ -245,6 +243,68 @@ $('document').ready(function () {
 		});
 	});
 
+	// update Location
+	$("#editLocationModal").on("show.bs.modal", function (e) {
+		const locationId = $(e.relatedTarget).attr("data-id");
+		$.ajax({
+			url: "libs/php/getLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: locationId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					populateEditLocationModal(result.data);
+				} else {
+					renderErrorModal("Error retrieving data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error retrieving data");
+			}
+		});
+	});
+
+	$("#editLocationForm").on("submit", function (e) {
+		e.preventDefault();
+		let locationId = $("#editLocationID").val();
+		let newLocationName = titleizeString($("#editLocationName").val());
+
+		$.ajax({
+			url: "libs/php/updateLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: locationId,
+				newLocationName: newLocationName,
+			},
+			success: function (result) {
+				$("#editLocationModal").modal("toggle");
+				$('#editLocationModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Updated location to ${newLocationName}`);
+					$('#modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+					// send new GET request and display updated data
+					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					renderErrorModal("Error updating data.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error updating data.");
+			}
+		});
+	})
+
 	$('body').on('click', '.updateDepartmentBtn', function (e) {
 		let deptId = $(e.currentTarget).attr("data-id");
 		$.ajax({
@@ -265,25 +325,7 @@ $('document').ready(function () {
 		});
 	});
 
-	$('body').on('click', '.updateLocationBtn', function (e) {
-		let locationId = $(e.currentTarget).attr("data-id");
-		$.ajax({
-			url: "libs/php/getLocationByID.php",
-			type: "POST",
-			dataType: "json",
-			data: { id: locationId },
-			success: function (result) {
-				if (result.status.code == 200) {
-					updateLocation(locationId, result.data[0].locationName);
-				} else {	// code is not 200
-					renderErrorModal("Something went wrong.")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Something went wrong.")
-			}
-		});
-	});
+
 });
 
 
@@ -427,6 +469,8 @@ function renderDeptTable(departments) {
 
 		let updateDptBtn = document.createElement("button");
 		updateDptBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateDepartmentBtn");
+		updateDptBtn.setAttribute("data-bs-toggle", "modal");
+		updateDptBtn.setAttribute("data-bs-target", "#editDepartmentModal");
 		updateDptBtn.setAttribute("data-id", dpt.departmentId);
 		let updateDptBtnIcon = document.createElement("i");
 		updateDptBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
@@ -470,6 +514,8 @@ function renderLocationsTable(locations) {
 
 		let updateLocationBtn = document.createElement("button");
 		updateLocationBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateLocationBtn");
+		updateLocationBtn.setAttribute("data-bs-toggle", "modal");
+		updateLocationBtn.setAttribute("data-bs-target", "#editLocationModal");
 		updateLocationBtn.setAttribute("data-id", location.locationId);
 		let updateLocationBtnIcon = document.createElement("i");
 		updateLocationBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
@@ -724,8 +770,6 @@ function createStaffMember() {
 		let newStaffJobTitle = titleizeString($("#createStaffJobTitle").val());
 		let newStaffEmail = $("#createStaffEmailAddress").val().toLowerCase();		// convert email to lower
 		let deptId = Number($('#departmentSelect option').filter(':selected').val());
-
-		console.log(newStaffEmail);
 
 		if (validateEmail(newStaffEmail) == false) {		//invalid email
 			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
@@ -1106,72 +1150,6 @@ function renderCannotDeleteModal(parentTypeStr, parentName, childCount, childTyp
 	$(".genericModal").modal("show");
 }
 
-function updateLocation(locationId, locationName) {
-	// populate modal
-	$('#modal-title').text("Update Location");
-	$('#modal-body').html(`
-		<form id="updateLocationForm">
-		    <input type="hidden" id="${locationId}">		
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" 
-				value="${locationName}" 
-				placeholder="Location name"
-				id="newLocationName" required>
-				<label for="newLocationName">Location name</label>
-			</div>
-		</form>
-		`);
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="updateLocationForm" class="btn btn-outline-primary btn-sm myBtn">
-			UPDATE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// send update/POST request with ID param
-	$("#updateLocationForm").on("submit", function (e) {
-		e.preventDefault();
-		let newLocationName = titleizeString($("#newLocationName").val());
-
-		$.ajax({
-			url: "libs/php/updateLocationByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				id: locationId,
-				newLocationName: newLocationName,
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated location:<br>${locationName} to ${newLocationName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllLocations()
-
-				} else {	// code is not 200
-					renderErrorModal("Error updating data.")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
-	})
-}
-
 function updateDepartment(data) {
 	const { department, locations } = data;
 	let { departmentId, departmentName, locationId } = department;
@@ -1269,51 +1247,17 @@ function updateDepartment(data) {
 	})
 }
 
-function updateStaff(data) {
-	departmentId = $('#departmentsSelect option').filter(':selected').val();
-	firstName = titleizeString($("#newFirstName").val());
-	lastName = titleizeString($("#newLastName").val());
-	jobTitle = titleizeString($("#newStaffJobTitle").val());
-	email = $("#newStaffEmailAddress").val().toLowerCase();		// convert email to lower
+function populateEditLocationModal(data) {
+	const { locationId, locationName } = data[0]; //data is array here
+	$('#editLocationModal #editLocationID').val(locationId);
+	$('#editLocationModal #editLocationName').val(locationName);
+}
 
-	if (validateEmail(email) == false) {		//invalid email
-		renderErrorModal(`Invalid email format for:<br>${email}`)
-	}
-
-	// update locationId with selected value
-	$.ajax({
-		url: "libs/php/updateStaffByID.php",
-		type: "POST",
-		dataType: "json",
-		data: {
-			staffId: staffId,
-			updatedFirst: firstName,
-			updatedLast: lastName,
-			updatedJobTitle: jobTitle,
-			updatedEmail: email,
-			departmentId: departmentId
-		},
-		success: function (result) {
-			if (result && result.status && result.status.code == 200) {
-				$('#modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
-				$('#modal-body').empty();
-				$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-				// send new GET request and display updated data
-				getAndDisplayAllStaff()
-
-			} else {	// code is not 200
-				renderErrorModal("Error updating data.");
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error updating data.");
-		}
-	});
+function populateEditDepartmentModal(data) {
+	console.log(data)
+	// const { locationId, locationName } = data[0]; //data is array here
+	// $('#editLocationModal #editLocationID').val(locationId);
+	// $('#editLocationModal #editLocationName').val(locationName);
 }
 
 function populateEditPersonnelModal(data) {
