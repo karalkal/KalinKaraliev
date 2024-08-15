@@ -108,6 +108,27 @@
 
     </section>
 
+    <!-- ERROR MODAL -->
+    <div id="errorModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-primary bg-gradient text-white">
+                    <h5 id="modal-title" class="modal-title">
+
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div id="modal-body" class="modal-body">
+
+                </div>
+                <div id="modal-footer" class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- CREATE LOCATION -->
     <div id="createLocationModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
@@ -139,6 +160,7 @@
             </div>
         </div>
     </div>
+
     <!-- CREATE DEPARTMENT -->
     <div id="createDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -347,51 +369,40 @@
         </div>
     </div>
 
+    <!-- FILTER -->
     <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
-
         <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-
             <div class="modal-content modal-sm shadow">
-
                 <div class="modal-header bg-primary bg-gradient text-white">
                     <h5 class="modal-title">Filter employees</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
 
                     <form id="filterPersonnelForm">
-
                         <div class="form-floating mb-3">
                             <select class="form-select" id="filterPersonnelByDepartment" placeholder="Department">
                                 <option value="0">All</option>
-                                <option value="12">Business Development</option>
                             </select>
                             <label for="filterPersonnelByDepartment">Department</label>
                         </div>
-
                         <div class="form-floating">
                             <select class="form-select" id="filterPersonnelByLocation" placeholder="Location">
                                 <option value="0">All</option>
-                                <option value="1">London</option>
                             </select>
                             <label for="filterPersonnelByLocation">Location</label>
                         </div>
                     </form>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-primary btn-sm myBtn"
                         data-bs-dismiss="modal">CLOSE</button>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <div id="areYouSurePersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"

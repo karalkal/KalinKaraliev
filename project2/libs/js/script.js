@@ -30,13 +30,15 @@ $(document).on({
 });
 
 $('document').ready(function () {
+
 	// HIDE PRELOADER when page DOM is ready for JS code to execute
 	$("#preloader").hide();
 
 	$('.genericModal').on('hidden.bs.modal', function () {
-		$('#modal-title').html("");
-		$('#modal-body').html("");
-		$('#modal-footer').html("");
+		console.log("claering modal?...")
+		$('.genericModal #modal-title').html("");
+		$('.genericModal #modal-body').html("");
+		$('.genericModal #modal-footer').html("");
 	});
 
 	// GET data from DB and render relevant table upon clicking menu/tab buttons
@@ -61,7 +63,9 @@ $('document').ready(function () {
 		}
 	});
 
-	// SEARCH in personnel firstName, lastName, email, jobTitle, dept. name, loc. name
+
+	/*     ========     SEARCH     ========     */
+	// In personnel firstName, lastName, email, jobTitle, dept. name, loc. name
 	$("#searchInp").on("keyup", function () {
 		// if another tab is opened go to default (personnel) tab AND pane, then display results
 		$('.nav').find('.active').removeClass('active');
@@ -79,9 +83,84 @@ $('document').ready(function () {
 		searchAndDisplayResults(searchString);
 	});
 
+
+	/*     ========     FILTER     ========     */
 	$("#filterBtn").click(function () {
 		// apply a filter to the personnel table on either department or location
-		filterStaff();
+		$("#filterPersonnelModal").modal("show");
+		// reset optins values each re-render
+		$("#filterPersonnelByLocation").val("0");
+		$("#filterPersonnelByDepartment").val("0");
+	});
+
+	// Once modal is shown populate both select elements
+	$("#filterPersonnelModal").on("show.bs.modal", function (e) {
+		$.ajax({
+			url: "libs/php/getAllDepartments.php",
+			type: 'GET',
+			dataType: 'json',
+
+			success: function (result) {
+				allDepartments = result.data;
+				$.each(allDepartments, function (i, dept) {
+					$("#filterPersonnelByDepartment").append(
+						$("<option>", {
+							value: dept.departmentId,
+							text: dept.departmentName,
+						})
+					);
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error getting departments data.");
+			}
+		});
+
+		$.ajax({
+			url: "libs/php/getAllLocations.php",
+			type: 'GET',
+			dataType: 'json',
+
+			success: function (result) {
+				allLocations = result.data;
+				$.each(allLocations, function (i, location) {
+					$("#filterPersonnelByLocation").append(
+						$("<option>", {
+							value: location.locationId,
+							text: location.locationName,
+						})
+					);
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error getting locations data.");
+			}
+		});
+	});
+
+	// If dept is selected disable locations and the other way round
+	$('#filterPersonnelByDepartment').change(function () {
+		let optionSelected = $(this).find("option:selected");
+		let departmentId = optionSelected.val();
+		$("#filterPersonnelByLocation").val("0");
+		if (departmentId == 0) {
+			getAndDisplayAllStaff();
+		} else {
+			let filteredResults = allStaff.filter(l => l.departmentId === departmentId);
+			displayFilteredResults(filteredResults);
+		}
+	});
+
+	$('#filterPersonnelByLocation').change(function () {
+		let optionSelected = $(this).find("option:selected");
+		let locationId = optionSelected.val();
+		$("#filterPersonnelByDepartment").val("0");
+		if (locationId == 0) {
+			getAndDisplayAllStaff();
+		} else {
+			let filteredResults = allStaff.filter(l => l.locationId === locationId);
+			displayFilteredResults(filteredResults);
+		}
 	});
 
 	// display create staff/dept/location modal depending on which Btn is active
@@ -97,6 +176,8 @@ $('document').ready(function () {
 		}
 	});
 
+
+	/*     ========     CREATE     ========     */
 	// create Location
 	$("#createLocationForm").on("submit", function (e) {
 		e.preventDefault();
@@ -139,7 +220,6 @@ $('document').ready(function () {
 			}
 		});
 	})
-
 
 	// create Department
 	$("#createDepartmentModal").on("show.bs.modal", function (e) {
@@ -241,59 +321,55 @@ $('document').ready(function () {
 		let newStaffEmail = $("#createPersonnelEmailAddress").val().toLowerCase();		// convert email to lower
 		let deptId = Number($('#createPersonnelDepartment option').filter(':selected').val());
 
+
 		if (validateEmail(newStaffEmail) == false) {		//invalid email
-			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
-			$('#modal-body').empty();
-			$('#modal-footer').html(`						
-				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-					CLOSE
-				</button>
-				`)
-			return;
+			$("#createPersonnelModal").modal("toggle");
+			renderErrorModal(`Invalid email format for:<br>${newStaffEmail}`);
 		}
+		else {
+			// AJAX call to save new staff data
+			$.ajax({
+				url: "libs/php/insertStaff.php",
+				type: "POST",
+				dataType: "json",
+				data: {
+					newStaffFirstName: newStaffFirstName,
+					newStaffLastName: newStaffLastName,
+					newStaffJobTitle: newStaffJobTitle,
+					newStaffEmail: newStaffEmail,
+					deptId: deptId,
+				},
+				success: function (result) {
+					$("#createPersonnelModal").modal("toggle");
+					$('#createPersonnelModal').on('hidden.bs.modal', function () {
+						$(this).find('form').trigger('reset');
+					});
 
-		// AJAX call to save new staff data
-		$.ajax({
-			url: "libs/php/insertStaff.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				newStaffFirstName: newStaffFirstName,
-				newStaffLastName: newStaffLastName,
-				newStaffJobTitle: newStaffJobTitle,
-				newStaffEmail: newStaffEmail,
-				deptId: deptId,
-			},
-			success: function (result) {
-				$("#editPersonnelModal").modal("toggle");
-				$('#editPersonnelModal').on('hidden.bs.modal', function () {
-					$(this).find('form').trigger('reset');
-				});
-
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Created employee:<br>${newStaffFirstName}, ${newStaffFirstName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
+					if (result && result.status && result.status.code == 200) {
+						$('.genericModal #modal-title').html(`Created employee:<br>${newStaffFirstName}, ${newStaffFirstName}`);
+						$('.genericModal #modal-body').empty();
+						$('.genericModal #modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 							CLOSE
 						</button>
 					`)
 
+						$(".genericModal").modal("show");
 
-					$(".genericModal").modal("show");
+						// send new GET request and display updated data
+						getAndDisplayAllStaff()
 
-					// send new GET request and display updated data
-					getAndDisplayAllStaff()
-
-				} else {	// code is not 200
+					} else {	// code is not 200
+						renderErrorModal("Error writing data")
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
 					renderErrorModal("Error writing data")
 				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error writing data")
-			}
-		});
+			});
+		}
 	});
+
 
 	// DELETE
 	/*  Instead of creating event handlers after elements are mounted to DOM it looks neater 
@@ -360,6 +436,7 @@ $('document').ready(function () {
 		});
 	});
 
+	/*     ========     UPDATE     ========     */
 	// update Location
 	$("#editLocationModal").on("show.bs.modal", function (e) {
 		const locationId = $(e.relatedTarget).attr("data-id");
@@ -400,8 +477,8 @@ $('document').ready(function () {
 					$(this).find('form').trigger('reset');
 				});
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated location to ${newLocationName}`);
-					$('#modal-body').empty();
+					$('.genericModal #modal-title').html(`Updated location to ${newLocationName}`);
+					$('.genericModal #modal-body').empty();
 					$('.genericModal #modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 							CLOSE
@@ -523,50 +600,51 @@ $('document').ready(function () {
 		let departmentId = $('#editPersonnelDepartment option').filter(':selected').val();
 
 		if (validateEmail(email) == false) {		//invalid email
-			console.log(email)
+			$("#editPersonnelModal").modal("toggle");
 			renderErrorModal(`Invalid email format for:<br>${email}`)
 		}
+		else {
+			$.ajax({
+				url: "libs/php/updateStaffByID.php",
+				type: "POST",
+				dataType: "json",
+				data: {
+					staffId: staffId,
+					updatedFirst: firstName,
+					updatedLast: lastName,
+					updatedJobTitle: jobTitle,
+					updatedEmail: email,
+					departmentId: departmentId,
+				},
+				success: function (result) {
+					$("#editPersonnelModal").modal("toggle");
+					$('#editPersonnelModal').on('hidden.bs.modal', function () {
+						$(this).find('form').trigger('reset');
+					});
 
-		$.ajax({
-			url: "libs/php/updateStaffByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				staffId: staffId,
-				updatedFirst: firstName,
-				updatedLast: lastName,
-				updatedJobTitle: jobTitle,
-				updatedEmail: email,
-				departmentId: departmentId,
-			},
-			success: function (result) {
-				$("#editPersonnelModal").modal("toggle");
-				$('#editPersonnelModal').on('hidden.bs.modal', function () {
-					$(this).find('form').trigger('reset');
-				});
-
-				if (result && result.status && result.status.code == 200) {
-					$('.genericModal #modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
-					$('.genericModal #modal-body').empty();
-					$('.genericModal #modal-footer').html(`						
+					if (result && result.status && result.status.code == 200) {
+						$('.genericModal #modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
+						$('.genericModal #modal-body').empty();
+						$('.genericModal #modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 							CLOSE
 						</button>
 						`)
 
-					$(".genericModal").modal("show");
+						$(".genericModal").modal("show");
 
-					// send new GET request and display updated data
-					getAndDisplayAllStaff()
+						// send new GET request and display updated data
+						getAndDisplayAllStaff()
 
-				} else {	// code is not 200
+					} else {	// code is not 200
+						renderErrorModal("Error updating data.");
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
 					renderErrorModal("Error updating data.");
 				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
+			});
+		}
 	});
 });
 
@@ -782,13 +860,14 @@ function renderLocationsTable(locations) {
 }
 
 function renderErrorModal(message) {
-	$("#modal-title").replaceWith(message);
-	$('#modal-body').empty();
-	$('#modal-footer').html(`						
+	console.log("ERROR", message)
+	$("#errorModal #modal-title").html(message);
+	$('#errorModal #modal-body').empty();
+	$('#errorModal #modal-footer').html(`						
 		<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 			CLOSE
 		</button>`)
-	$(".genericModal").modal("show");
+	$("#errorModal").modal("show");
 }
 
 function searchAndDisplayResults(searchString) {
@@ -807,94 +886,6 @@ function searchAndDisplayResults(searchString) {
 		error: function (jqXHR, textStatus, errorThrown) {
 			renderErrorModal("Something went wrong");
 		}
-	});
-}
-
-function filterStaff() {
-	let departmentId = undefined;
-	let locationId = undefined;
-	let filteredResults = []
-	// populate modal
-	$('#modal-title').text("Filter staff");
-	$('#modal-body').html(`
-		<form id="filterStaffForm">
-			<div class="form-floating mb-3">
-				<select class="form-select" id="filterByDepartment" placeholder="Department">
-					<option value="0">All</option>
-				</select>
-				<label for="filterByDepartment">Department</label>
-			</div>
-
-			<div class="form-floating">
-				<select class="form-select" id="filterByLocation" placeholder="Location">
-					<option value="0">All</option>
-				</select>
-				<label for="filterByLocation">Location</label>
-			</div>
-		</form>			
-		`);
-
-	// populate both select elements
-	$.ajax({
-		url: "libs/php/getAllDepartments.php",
-		type: 'GET',
-		dataType: 'json',
-
-		success: function (result) {
-			allDepartments = result.data;
-			$.each(allDepartments, function (i, dept) {
-				$("#filterByDepartment").append(
-					$("<option>", {
-						value: dept.departmentId,
-						text: dept.departmentName,
-					})
-				);
-			});
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error getting departments data.");
-		}
-	});
-
-	$.ajax({
-		url: "libs/php/getAllLocations.php",
-		type: 'GET',
-		dataType: 'json',
-
-		success: function (result) {
-			allLocations = result.data;
-			$.each(allLocations, function (i, location) {
-				$("#filterByLocation").append(
-					$("<option>", {
-						value: location.locationId,
-						text: location.locationName,
-					})
-				);
-			});
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error getting locations data.");
-		}
-	});
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// id dept is selected disable locations and the other way round
-	$('#filterByDepartment').change(function () {
-		let optionSelected = $(this).find("option:selected");
-		departmentId = optionSelected.val();
-		$("#filterByLocation").val("0");
-		filteredResults = allStaff.filter(l => l.departmentId === departmentId);
-		displayFilteredResults(filteredResults);
-	});
-
-	$('#filterByLocation').change(function () {
-		let optionSelected = $(this).find("option:selected");
-		locationId = optionSelected.val();
-		$("#filterByDepartment").val("0");
-		filteredResults = allStaff.filter(l => l.locationId === locationId);
-		displayFilteredResults(filteredResults);
 	});
 }
 
@@ -918,9 +909,8 @@ function displayFilteredResults(filteredResults) {
 
 function deleteLocation(locationId, locationToDeleteName) {
 	// populate modal
-	$('#modal-title').text("Remove Location?");
-
-	$('#modal-body').html(`
+	$('.genericModal #modal-title').text("Remove Location?");
+	$('.genericModal #modal-body').html(`
 		<p>Please confirm you wish to remove location:</p>
 		<form id="deleteLocationForm">
 		    <input type="hidden" id="${locationId}">
@@ -930,7 +920,7 @@ function deleteLocation(locationId, locationToDeleteName) {
 		</form>
 		`);
 
-	$('#modal-footer').html(`
+	$('.genericModal #modal-footer').html(`
 		<button type="submit" 
 			form="deleteLocationForm" class="btn btn-outline-primary btn-sm myBtn">
 			YES
@@ -955,9 +945,9 @@ function deleteLocation(locationId, locationToDeleteName) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Deleted location:<br>${locationToDeleteName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
+					$('.genericModal #modal-title').html(`Deleted location:<br>${locationToDeleteName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 							CLOSE
 						</button>
@@ -979,9 +969,8 @@ function deleteLocation(locationId, locationToDeleteName) {
 
 function deleteDepartment(departmentId, deptToDeleteName) {
 	// populate modal
-	$('#modal-title').text("Remove Department?");
-
-	$('#modal-body').html(`
+	$('.genericModal #modal-title').text("Remove Department?");
+	$('.genericModal #modal-body').html(`
 		<p>Please confirm you wish to remove department:</p>
 		<form id="deleteDepartmentForm">
 		    <input type="hidden" id="${departmentId}">
@@ -990,8 +979,7 @@ function deleteDepartment(departmentId, deptToDeleteName) {
 			</div>
 		</form>
 		`);
-
-	$('#modal-footer').html(`
+	$('.genericModal #modal-footer').html(`
 		<button type="submit" 
 			form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">
 			YES
@@ -1016,9 +1004,9 @@ function deleteDepartment(departmentId, deptToDeleteName) {
 			},
 			success: function (result) {
 				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Deleted department:<br>${deptToDeleteName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
+					$('.genericModal #modal-title').html(`Deleted department:<br>${deptToDeleteName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
 						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
 							CLOSE
 						</button>
@@ -1042,8 +1030,8 @@ function deleteStaff(staffId) {
 	const staffToDelete = allStaff.find(s => s.staffId === staffId);
 	const { lastName, firstName } = staffToDelete;
 	// populate modal
-	$('#modal-title').text("Remove Staff?");
-	$('#modal-body').html(`
+	$('.genericModal #modal-title').text("Remove Staff?");
+	$('.genericModal #modal-body').html(`
 		<p>Please confirm you wish to remove employee:</p>
 		<form id="deleteStaffForm">
 		    <input type="hidden" id="${staffId}">
@@ -1053,7 +1041,7 @@ function deleteStaff(staffId) {
 		</form>
 		`);
 
-	$('#modal-footer').html(`
+	$('.genericModal #modal-footer').html(`
 			<button type="submit" 
 				form="deleteStaffForm" class="btn btn-outline-primary btn-sm myBtn">
 				YES
