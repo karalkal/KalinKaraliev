@@ -191,6 +191,7 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
 $("#editPersonnelForm").on("submit", function (e) {
 
     // Executes when the form button with type="submit" is clicked
+    // stop the default browser behviour
 
     e.preventDefault();
 

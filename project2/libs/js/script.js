@@ -33,6 +33,13 @@ $('document').ready(function () {
 	// HIDE PRELOADER when page DOM is ready for JS code to execute
 	$("#preloader").hide();
 
+	$('.genericModal').on('hidden.bs.modal', function () {
+		console.log("clearing modal...")
+		$('#modal-title').html("");
+		$('#modal-body').html("");
+		$('#modal-footer').html("");
+	});
+
 	// GET data from DB and render relevant table upon clicking menu/tab buttons
 	$("#personnelBtn").click(function () {
 		getAndDisplayAllStaff();
@@ -156,18 +163,118 @@ $('document').ready(function () {
 		});
 	});
 
-	// UPDATE
-	// Instead of creating event handlers after elements are mounted to DOM it looks neater to move this functionality outside rendering functions. Use this syntax to register DOM events before an element exists. Note that "data-id" is string.
-	$('body').on('click', '.updateStaffBtn', function (e) {
-		let staffId = $(e.currentTarget).attr("data-id");
+	// update Personnel
+	$("#editPersonnelModal").on("show.bs.modal", function (e) {
 		$.ajax({
 			url: "libs/php/getStaffByIDAndAllDepartments.php",
 			type: "POST",
 			dataType: "json",
-			data: { id: staffId },
+			data: {
+				id: $(e.relatedTarget).attr("data-id")		// Retrieves the data-id attribute from the calling button
+			},
 			success: function (result) {
 				if (result.status.code == 200) {
-					updateStaff(result.data);
+					populateEditPersonnelModal(result.data);
+				} else {
+					renderErrorModal("Error retrieving data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error retrieving data");
+			}
+		});
+	});
+
+	$("#editPersonnelForm").on("submit", function (e) {
+		e.preventDefault();
+
+		let staffId = $("#editPersonnelEmployeeID").val()
+		let firstName = titleizeString($("#editPersonnelFirstName").val());
+		let lastName = titleizeString($("#editPersonnelLastName").val());
+		let jobTitle = titleizeString($("#editPersonnelJobTitle").val());
+		let email = $("#editPersonnelEmailAddress").val().toLowerCase();		// convert email to lower
+		// let departmentId = $('#editPersonnelEmployeeID').val();
+		let departmentId = $('#editPersonnelDepartment option').filter(':selected').val();
+
+		if (validateEmail(email) == false) {		//invalid email
+			console.log(email)
+			renderErrorModal(`Invalid email format for:<br>${email}`)
+		}
+
+		// update locationId with selected value
+		$.ajax({
+			url: "libs/php/updateStaffByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				staffId: staffId,
+				updatedFirst: firstName,
+				updatedLast: lastName,
+				updatedJobTitle: jobTitle,
+				updatedEmail: email,
+				departmentId: departmentId,
+			},
+			success: function (result) {
+				$("#editPersonnelModal").modal("toggle");
+				$('#editPersonnelModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					console.log("here")
+					$('.genericModal #modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllStaff()
+
+				} else {	// code is not 200
+					renderErrorModal("Error updating data.");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error updating data.");
+			}
+		});
+	});
+
+	$('body').on('click', '.updateDepartmentBtn', function (e) {
+		let deptId = $(e.currentTarget).attr("data-id");
+		$.ajax({
+			url: "libs/php/getDepartmentByIDAndAllLocations.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: deptId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					updateDepartment(result.data);
+				} else {	// code is not 200
+					renderErrorModal("Something went wrong.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Something went wrong.")
+			}
+		});
+	});
+
+	$('body').on('click', '.updateLocationBtn', function (e) {
+		let locationId = $(e.currentTarget).attr("data-id");
+		$.ajax({
+			url: "libs/php/getLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: locationId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					updateLocation(locationId, result.data[0].locationName);
 				} else {	// code is not 200
 					renderErrorModal("Something went wrong.")
 				}
@@ -179,45 +286,6 @@ $('document').ready(function () {
 	});
 });
 
-$('body').on('click', '.updateDepartmentBtn', function (e) {
-	let deptId = $(e.currentTarget).attr("data-id");
-	$.ajax({
-		url: "libs/php/getDepartmentByIDAndAllLocations.php",
-		type: "POST",
-		dataType: "json",
-		data: { id: deptId },
-		success: function (result) {
-			if (result.status.code == 200) {
-				updateDepartment(result.data);
-			} else {	// code is not 200
-				renderErrorModal("Something went wrong.")
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Something went wrong.")
-		}
-	});
-});
-
-$('body').on('click', '.updateLocationBtn', function (e) {
-	let locationId = $(e.currentTarget).attr("data-id");
-	$.ajax({
-		url: "libs/php/getLocationByID.php",
-		type: "POST",
-		dataType: "json",
-		data: { id: locationId },
-		success: function (result) {
-			if (result.status.code == 200) {
-				updateLocation(locationId, result.data[0].locationName);
-			} else {	// code is not 200
-				renderErrorModal("Something went wrong.")
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Something went wrong.")
-		}
-	});
-});
 
 function getAndDisplayAllStaff() {
 	// Reset search bar each time this btn is clicked
@@ -307,6 +375,8 @@ function renderStaffTable(staff) {
 
 		let updateStaffBtn = document.createElement("button");
 		updateStaffBtn.classList.add("btn", "btn-primary", "btn-sm", "me-1", "updateStaffBtn");
+		updateStaffBtn.setAttribute("data-bs-toggle", "modal");
+		updateStaffBtn.setAttribute("data-bs-target", "#editPersonnelModal");
 		updateStaffBtn.setAttribute("data-id", employee.staffId);
 		let updateStaffBtnIcon = document.createElement("i");
 		updateStaffBtnIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
@@ -654,6 +724,8 @@ function createStaffMember() {
 		let newStaffJobTitle = titleizeString($("#createStaffJobTitle").val());
 		let newStaffEmail = $("#createStaffEmailAddress").val().toLowerCase();		// convert email to lower
 		let deptId = Number($('#departmentSelect option').filter(':selected').val());
+
+		console.log(newStaffEmail);
 
 		if (validateEmail(newStaffEmail) == false) {		//invalid email
 			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
@@ -1198,126 +1270,77 @@ function updateDepartment(data) {
 }
 
 function updateStaff(data) {
+	departmentId = $('#departmentsSelect option').filter(':selected').val();
+	firstName = titleizeString($("#newFirstName").val());
+	lastName = titleizeString($("#newLastName").val());
+	jobTitle = titleizeString($("#newStaffJobTitle").val());
+	email = $("#newStaffEmailAddress").val().toLowerCase();		// convert email to lower
+
+	if (validateEmail(email) == false) {		//invalid email
+		renderErrorModal(`Invalid email format for:<br>${email}`)
+	}
+
+	// update locationId with selected value
+	$.ajax({
+		url: "libs/php/updateStaffByID.php",
+		type: "POST",
+		dataType: "json",
+		data: {
+			staffId: staffId,
+			updatedFirst: firstName,
+			updatedLast: lastName,
+			updatedJobTitle: jobTitle,
+			updatedEmail: email,
+			departmentId: departmentId
+		},
+		success: function (result) {
+			if (result && result.status && result.status.code == 200) {
+				$('#modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
+				$('#modal-body').empty();
+				$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+				// send new GET request and display updated data
+				getAndDisplayAllStaff()
+
+			} else {	// code is not 200
+				renderErrorModal("Error updating data.");
+			}
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			renderErrorModal("Error updating data.");
+		}
+	});
+}
+
+function populateEditPersonnelModal(data) {
 	const { employee, departments } = data;
 	let { staffId, firstName, lastName, jobTitle, email, departmentId } = employee;
-
 	// populate modal
-	$('#modal-title').text("Update Employee");
-	$('#modal-body').html(`
-		<form id="updateStaffForm">
-		    <input type="hidden" id="${staffId}">			
-			
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" 
-				value="${firstName}" 
-				id="newFirstName" required>
-				<label for="newFirstName">First Name</label>
-			</div>	
+	$('#editPersonnelForm #editPersonnelEmployeeID').val(staffId);
+	$('#editPersonnelForm #editPersonnelFirstName').val(firstName);
+	$('#editPersonnelForm #editPersonnelLastName').val(lastName);
+	$('#editPersonnelForm #editPersonnelJobTitle').val(jobTitle);
+	$('#editPersonnelForm #editPersonnelEmailAddress').val(email);
 
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" 
-				value="${lastName}" 
-				id="newLastName" required>
-				<label for="newLastName">Last Name</label>
-			</div>			
-
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" 
-					value="${jobTitle}" 
-					id="newStaffJobTitle" required>
-					<label for="newStaffJobTitle">Job Title</label>
-			</div>
-
-			<div class="form-floating mb-3">
-				<input type="email" class="form-control shadow-none"
-					value="${email}"
-				 	id="newStaffEmailAddress" required>
-					<label for="newStaffJobTitle">Email Address</label>
-
-			</div>
-
-			<div class="form-floating">
-                <select class="form-select shadow-none" id="departmentsSelect" placeholder="Departments">
-                </select>
-                <label for="locationsSelect">Department</label>
-             </div>
-		</form>
-		`);
+	// clear departments select element
+	$("#editPersonnelModal #editPersonnelDepartment").html("");
 
 	// populate departments select element
 	$.each(departments, function (i, d) {
-		$("#departmentsSelect").append(
+		$("#editPersonnelModal #editPersonnelDepartment").append(
 			$("<option>", {
 				value: d.departmentId,
 				text: d.departmentName,
 			})
 		);
 	});
+
 	//set value of select to current 
-	$("#departmentsSelect").val(departmentId);
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="updateStaffForm" class="btn btn-outline-primary btn-sm myBtn">
-			UPDATE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
-	// send delete request with ID param
-	$("#updateStaffForm").on("submit", function (e) {
-		e.preventDefault();
-
-		departmentId = $('#departmentsSelect option').filter(':selected').val();
-		firstName = titleizeString($("#newFirstName").val());
-		lastName = titleizeString($("#newLastName").val());
-		jobTitle = titleizeString($("#newStaffJobTitle").val());
-		email = $("#newStaffEmailAddress").val().toLowerCase();		// convert email to lower
-
-		if (validateEmail(email) == false) {		//invalid email
-			renderErrorModal(`Invalid email format for:<br>${email}`)
-		}
-
-		// update locationId with selected value
-		$.ajax({
-			url: "libs/php/updateStaffByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				staffId: staffId,
-				updatedFirst: firstName,
-				updatedLast: lastName,
-				updatedJobTitle: jobTitle,
-				updatedEmail: email,
-				departmentId: departmentId
-			},
-			success: function (result) {
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated employee:<br>${lastName}, ${firstName}`);
-					$('#modal-body').empty();
-					$('#modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					// send new GET request and display updated data
-					getAndDisplayAllStaff()
-
-				} else {	// code is not 200
-					renderErrorModal("Error updating data.");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
-	})
+	$("#editPersonnelModal #editPersonnelDepartment").val(departmentId);
 }
 
 
