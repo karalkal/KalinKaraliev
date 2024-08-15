@@ -87,7 +87,7 @@ $('document').ready(function () {
 	// CREATE new staff/dept/location entry depending on which Btn is active
 	$("#addBtn").click(function () {
 		if ($("#personnelBtn").hasClass("active")) {
-			createStaffMember();
+			$("#createPersonnelModal").modal("show");
 		}
 		else if ($("#departmentsBtn").hasClass("active")) {
 			$("#createDepartmentModal").modal("show");
@@ -160,6 +160,93 @@ $('document').ready(function () {
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				renderErrorModal("Error writing data");
+			}
+		});
+	});
+
+	// create Employee
+	$("#createPersonnelModal").on("show.bs.modal", function (e) {
+		// populate locations select element
+		$.ajax({
+			url: "libs/php/getAllDepartments.php",
+			type: 'GET',
+			dataType: 'json',
+
+			success: function (result) {
+				allDepartments = result.data;
+				$.each(allDepartments, function (i, dept) {
+					$("#createPersonnelDepartment").append(
+						$("<option>", {
+							value: dept.departmentId,
+							text: dept.departmentName,
+						})
+					);
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error getting departments data.");
+			}
+		});
+	});
+
+	$("#createPersonnelForm").on("submit", function (e) {
+		e.preventDefault();
+		let newStaffFirstName = titleizeString($("#createPersonnelFirstName").val());
+		let newStaffLastName = titleizeString($("#createPersonnelLastName").val());
+		let newStaffJobTitle = titleizeString($("#createPersonnelJobTitle").val());
+		let newStaffEmail = $("#createPersonnelEmailAddress").val().toLowerCase();		// convert email to lower
+		let deptId = Number($('#createPersonnelDepartment option').filter(':selected').val());
+
+		if (validateEmail(newStaffEmail) == false) {		//invalid email
+			$("#modal-title").html(`Invalid email format for:<br>${newStaffEmail}`);
+			$('#modal-body').empty();
+			$('#modal-footer').html(`						
+				<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+					CLOSE
+				</button>
+				`)
+			return;
+		}
+
+		// AJAX call to save new staff data
+		$.ajax({
+			url: "libs/php/insertStaff.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				newStaffFirstName: newStaffFirstName,
+				newStaffLastName: newStaffLastName,
+				newStaffJobTitle: newStaffJobTitle,
+				newStaffEmail: newStaffEmail,
+				deptId: deptId,
+			},
+			success: function (result) {
+				$("#editPersonnelModal").modal("toggle");
+				$('#editPersonnelModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Created employee:<br>${newStaffFirstName}, ${newStaffFirstName}`);
+					$('#modal-body').empty();
+					$('#modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+					`)
+
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllStaff()
+
+				} else {	// code is not 200
+					renderErrorModal("Error writing data")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error writing data")
 			}
 		});
 	});
@@ -358,7 +445,7 @@ $('document').ready(function () {
 		});
 	});
 
-	// update Personnel
+	// update Employee
 	$("#editPersonnelModal").on("show.bs.modal", function (e) {
 		$.ajax({
 			url: "libs/php/getStaffByIDAndAllDepartments.php",
