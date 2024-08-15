@@ -34,7 +34,6 @@ $('document').ready(function () {
 	$("#preloader").hide();
 
 	$('.genericModal').on('hidden.bs.modal', function () {
-		console.log("clearing modal...")
 		$('#modal-title').html("");
 		$('#modal-body').html("");
 		$('#modal-footer').html("");
@@ -91,11 +90,78 @@ $('document').ready(function () {
 			createStaffMember();
 		}
 		else if ($("#departmentsBtn").hasClass("active")) {
-			createDepartment();
+			$("#createDepartmentModal").modal("show");
 		}
 		else if ($("#locationsBtn").hasClass("active")) {
 			createLocation();
 		}
+	});
+
+	// create Department
+	$("#createDepartmentModal").on("show.bs.modal", function (e) {
+		$.ajax({
+			url: "libs/php/getAllLocations.php",
+			type: 'GET',
+			dataType: 'json',
+
+			success: function (result) {
+				allLocations = result.data;
+				$.each(allLocations, function (i, location) {
+					$("#createDepartmentLocation").append(
+						$("<option>", {
+							value: location.locationId,
+							text: location.locationName,
+						})
+					);
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error getting locations data.");
+			}
+		});
+	});
+
+	$("#createDepartmentForm").on("submit", function (e) {
+		e.preventDefault();
+		let newDeptName = titleizeString($("#createDepartmentName").val());
+		let locationId = $('#createDepartmentLocation option').filter(':selected').val();
+
+		$.ajax({
+			url: "libs/php/insertDepartment.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				deptName: newDeptName,
+				locationId: locationId,
+			},
+			success: function (result) {
+				$("#createDepartmentModal").modal("toggle");
+				$('#createDepartmentModal').on('hidden.bs.modal', function () {
+					$(this).find('form')[0].reset();
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					$('.genericModal #modal-title').html(`Created department ${newDeptName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments();
+
+				} else {	// code is not 200
+					renderErrorModal("Error writing data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error writing data");
+			}
+		});
 	});
 
 	// DELETE
@@ -103,7 +169,7 @@ $('document').ready(function () {
 		to move this functionality outside rendering functions. 
 		Use this syntax to register DOM events before an element exists. Note that "data-id" is string.*/
 
-	//delete Employee
+	// delete Employee
 	$('body').on('click', '.deleteStaffBtn', function (e) {
 		let staffId = $(e.currentTarget).attr("data-id");
 		deleteStaff(staffId);
@@ -159,6 +225,135 @@ $('document').ready(function () {
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				renderErrorModal("Something went wrong.")
+			}
+		});
+	});
+
+	// update Location
+	$("#editLocationModal").on("show.bs.modal", function (e) {
+		const locationId = $(e.relatedTarget).attr("data-id");
+		$.ajax({
+			url: "libs/php/getLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: { id: locationId },
+			success: function (result) {
+				if (result.status.code == 200) {
+					populateEditLocationModal(result.data);
+				} else {
+					renderErrorModal("Error retrieving data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error retrieving data");
+			}
+		});
+	});
+
+	$("#editLocationForm").on("submit", function (e) {
+		e.preventDefault();
+		let locationId = $("#editLocationID").val();
+		let newLocationName = titleizeString($("#editLocationName").val());
+
+		$.ajax({
+			url: "libs/php/updateLocationByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: locationId,
+				newLocationName: newLocationName,
+			},
+			success: function (result) {
+				$("#editLocationModal").modal("toggle");
+				$('#editLocationModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+				if (result && result.status && result.status.code == 200) {
+					$('#modal-title').html(`Updated location to ${newLocationName}`);
+					$('#modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+					// send new GET request and display updated data
+					getAndDisplayAllLocations()
+
+				} else {	// code is not 200
+					renderErrorModal("Error updating data.")
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error updating data.");
+			}
+		});
+	})
+
+	// update Department
+	$("#editDepartmentModal").on("show.bs.modal", function (e) {
+		$.ajax({
+			url: "libs/php/getDepartmentByIDAndAllLocations.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				id: $(e.relatedTarget).attr("data-id")		// Retrieves the data-id attribute from the calling button
+			},
+			success: function (result) {
+				if (result.status.code == 200) {
+					populateEditDepartmentModal(result.data);
+				} else {
+					renderErrorModal("Error retrieving data");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error retrieving data");
+			}
+		});
+	});
+
+	$("#editDepartmentForm").on("submit", function (e) {
+		e.preventDefault();
+		let departmentId = $("#editDepartmentID").val();
+		let newDeptName = titleizeString($("#editDepartmentName").val());
+		let locationId = $('#editDepartmentLocation option').filter(':selected').val();
+
+		$.ajax({
+			url: "libs/php/updateDepartmentByID.php",
+			type: "POST",
+			dataType: "json",
+			data: {
+				departmentId: departmentId,
+				locationId: locationId,
+				newDeptName: newDeptName,
+			},
+			success: function (result) {
+				$("#editDepartmentModal").modal("toggle");
+				$('#editDepartmentModal').on('hidden.bs.modal', function () {
+					$(this).find('form').trigger('reset');
+				});
+
+				if (result && result.status && result.status.code == 200) {
+					$('.genericModal #modal-title').html(`Updated department ${newDeptName}`);
+					$('.genericModal #modal-body').empty();
+					$('.genericModal #modal-footer').html(`						
+						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
+							CLOSE
+						</button>
+						`)
+
+					$(".genericModal").modal("show");
+
+					// send new GET request and display updated data
+					getAndDisplayAllDepartments();
+
+				} else {	// code is not 200
+					renderErrorModal("Error updating data.");
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				renderErrorModal("Error updating data.");
 			}
 		});
 	});
@@ -242,136 +437,6 @@ $('document').ready(function () {
 			}
 		});
 	});
-
-	// update Department
-	$("#editDepartmentModal").on("show.bs.modal", function (e) {
-		$.ajax({
-			url: "libs/php/getDepartmentByIDAndAllLocations.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				id: $(e.relatedTarget).attr("data-id")		// Retrieves the data-id attribute from the calling button
-			},
-			success: function (result) {
-				if (result.status.code == 200) {
-					populateEditDepartmentModal(result.data);
-				} else {
-					renderErrorModal("Error retrieving data");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error retrieving data");
-			}
-		});
-	});
-
-	$("#editDepartmentForm").on("submit", function (e) {
-		e.preventDefault();
-		let departmentId = $("#editDepartmentID").val();
-		let newDeptName = titleizeString($("#editDepartmentName").val());
-		let locationId = $('#editDepartmentLocation option').filter(':selected').val();
-
-		console.log(departmentId, newDeptName, locationId)
-		$.ajax({
-			url: "libs/php/updateDepartmentByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				departmentId: departmentId,
-				locationId: locationId,
-				newDeptName: newDeptName,
-			},
-			success: function (result) {
-				$("#editDepartmentModal").modal("toggle");
-				$('#editDepartmentModal').on('hidden.bs.modal', function () {
-					$(this).find('form').trigger('reset');
-				});
-
-				if (result && result.status && result.status.code == 200) {
-					$('.genericModal #modal-title').html(`Updated department ${newDeptName}`);
-					$('.genericModal #modal-body').empty();
-					$('.genericModal #modal-footer').html(`						
-							<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-								CLOSE
-							</button>
-							`)
-
-					$(".genericModal").modal("show");
-
-					// send new GET request and display updated data
-					getAndDisplayAllDepartments();
-
-				} else {	// code is not 200
-					renderErrorModal("Error updating data.");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
-	});
-
-	// update Location
-	$("#editLocationModal").on("show.bs.modal", function (e) {
-		const locationId = $(e.relatedTarget).attr("data-id");
-		$.ajax({
-			url: "libs/php/getLocationByID.php",
-			type: "POST",
-			dataType: "json",
-			data: { id: locationId },
-			success: function (result) {
-				if (result.status.code == 200) {
-					populateEditLocationModal(result.data);
-				} else {
-					renderErrorModal("Error retrieving data");
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error retrieving data");
-			}
-		});
-	});
-
-	$("#editLocationForm").on("submit", function (e) {
-		e.preventDefault();
-		let locationId = $("#editLocationID").val();
-		let newLocationName = titleizeString($("#editLocationName").val());
-
-		$.ajax({
-			url: "libs/php/updateLocationByID.php",
-			type: "POST",
-			dataType: "json",
-			data: {
-				id: locationId,
-				newLocationName: newLocationName,
-			},
-			success: function (result) {
-				$("#editLocationModal").modal("toggle");
-				$('#editLocationModal').on('hidden.bs.modal', function () {
-					$(this).find('form').trigger('reset');
-				});
-				if (result && result.status && result.status.code == 200) {
-					$('#modal-title').html(`Updated location to ${newLocationName}`);
-					$('#modal-body').empty();
-					$('.genericModal #modal-footer').html(`						
-						<button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-							CLOSE
-						</button>
-						`)
-
-					$(".genericModal").modal("show");
-					// send new GET request and display updated data
-					getAndDisplayAllLocations()
-
-				} else {	// code is not 200
-					renderErrorModal("Error updating data.")
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				renderErrorModal("Error updating data.");
-			}
-		});
-	})
 });
 
 
@@ -648,58 +713,6 @@ function createLocation() {
 }
 
 function createDepartment() {
-	// populate modal
-	$('#modal-title').text("Create New Department");
-	$('#modal-body').html(`
-		<form id="createDeptForm">
-			<div class="form-floating mb-3">
-				<input type="text" class="form-control shadow-none" id="newDeptName" placeholder="New department" required>
-				<label for="newDeptName">New department</label>
-			</div>
-
-			<div class="form-floating">
-                <select class="form-select shadow-none" id="locationsSelect" placeholder="Locations">
-                </select>
-                <label for="locationsSelect">Locations</label>
-             </div>
-		</form>
-		`);
-
-	// populate locations select element
-	$.ajax({
-		url: "libs/php/getAllLocations.php",
-		type: 'GET',
-		dataType: 'json',
-
-		success: function (result) {
-			allLocations = result.data;
-			$.each(allLocations, function (i, location) {
-				$("#locationsSelect").append(
-					$("<option>", {
-						value: location.locationId,
-						text: location.locationName,
-					})
-				);
-			});
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			renderErrorModal("Error getting locations data.");
-		}
-	});
-
-	$('#modal-footer').html(`
-		<button type="submit" 
-			form="createDeptForm" class="btn btn-outline-primary btn-sm myBtn">
-			SAVE
-		</button>
-        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">
-			CANCEL
-		</button>
-		`)
-
-	// now show modal
-	$(".genericModal").modal("show");
-
 	// get data from form
 	$("#createDeptForm").on("submit", function (e) {
 		e.preventDefault();
